@@ -4,7 +4,7 @@ This protocol is a part of our contribution to the 2019 iGEM international biote
 
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png)
 
-The small-sized thermal cycler is controlled via a motherboard Ninja-PCR Arduino-alike, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR)
+The small-sized thermal cycler is controlled via a motherboard Ninja-PCR Arduino-alike, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR). You can update a new binary since ESP8266 SystemOnChip includes the TCP/IP stack.
 
 
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/robot.png)
