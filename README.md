@@ -3,7 +3,7 @@ Biotechnological protocol for obtaining trained libraries of aptamer molecules a
 This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More information can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/robot.png)
-![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/aptamers.jpg)
+![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/aptamers.png)
 
 
 ## Authos
