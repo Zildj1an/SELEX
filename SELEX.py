@@ -29,12 +29,12 @@ if plate_name not in labware.list():
         depth=10,                       # Depth (mm) of each well on the plate
         volume=200)
 
-plate_samples    =   labware.load('96-flat', '11')			            # Samples
-tiprack          =   labware.load('opentrons-tiprack-10ul', '8')        	    # Tipracks
-magnetic         =   modules.load('magdeck','1')			            # Magnetic Deck
-plate_magnet     =   labware.load('96-flat', '1', share = True)		            # Magnetic Deck plate
-thermocicler     =   modules.load('Ninja-PCR','10') 			            # Ninja-PCR
-thermic_module   =   modules.load()					            # Auxiliar thermic module
+plate_samples    =   labware.load('96-flat', '11')				    # Samples
+tiprack          =   labware.load('opentrons-tiprack-10ul', '8')		    # Tipracks
+magnetic         =   modules.load('magdeck','1')				    # Magnetic Deck
+plate_magnet     =   labware.load('96-flat', '1', share = True)			    # Magnetic Deck plate
+thermocicler     =   modules.load('Ninja-PCR','10')				    # Ninja-PCR
+thermic_module   =   modules.load()						    # Auxiliar thermic module
 
 # [2] Pipettes
 # TODO:
