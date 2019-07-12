@@ -18,12 +18,22 @@ metadata = {
 # [1] Labware
 # TODO: Comprobar types, confirmar posición.
 
-plate_samples    =   labware.load('96-flat', '11')			# Samples
-tiprack          =   labware.load('tiprack-200ul', '8')                 # Tipracks
-magnetic         =   modules.load('magdeck','1')			# Magnetic Deck
-plate_magnet     =   labware.load('96-flat', '1', share = True)		# Magnetic Deck plate
-thermocicler     =   modules.load()					# Ninja-PCR
-thermic_module   =   modules.load()					# Auxiliar thermic module
+plate_name = 'Ninja-PCR'
+if plate_name not in labware.list():
+    custom_plate = labware.create(
+        plate_name,                     # Labware Name
+        grid=(4, 4),                    # Amount of (columns, rows)
+        spacing=(12, 12),               # Distances (mm) between each (column, row)
+        diameter=5,                     # Diameter (mm) of each well on the plate
+        depth=10,                       # Depth (mm) of each well on the plate
+        volume=200)
+
+plate_samples    =   labware.load('96-flat', '11')			            # Samples
+tiprack          =   labware.load('opentrons-tiprack-10ul', '8')        # Tipracks
+magnetic         =   modules.load('magdeck','1')			            # Magnetic Deck
+plate_magnet     =   labware.load('96-flat', '1', share = True)		    # Magnetic Deck plate
+thermocicler     =   modules.load('Ninja-PCR','10') 					# Ninja-PCR
+thermic_module   =   modules.load()					                    # Auxiliar thermic module
 
 # [2] Pipettes
 # TODO:
