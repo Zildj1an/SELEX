@@ -6,6 +6,6 @@ This protocol is a part of our contribution to the 2019 iGEM international biote
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/aptameros.png)
 
 
-## Authos
+## Authors
 * Pablo Villalobos
 * Carlos Bilbao
