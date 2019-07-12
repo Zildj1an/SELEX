@@ -28,5 +28,9 @@ thermic_module   =   modules.load()					# Auxiliar thermic module
 # [2] Pipettes
 # TODO:
 
+pipette = instruments.P50_Single(mount = 'left', tip_racks = [tiprack])
+
 # [3] Commands
 #TODO:
+
+# Ejemplo: pipette.trasnfer(100, plate.wells('A1'), plate.wells('B1'))
