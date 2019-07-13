@@ -1,6 +1,6 @@
 # SELEX (Systematic Evolution of Ligands by Exponential Enrichment) Protocol 
 ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000) 
-![web](https://img.shields.io/badge/web-Read%20our%20website-blueviolet.svg)
+![web](![https://img.shields.io/badge/web-Read%20our%20website-blueviolet.svg](https://2019.igem.org/Team:MADRID_UCM/Landing))
 
 Biotechnological protocol for obtaining trained libraries of aptamer molecules automated with the Opentrons OT-2 robot.
 This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More information can be found in our 
@@ -19,3 +19,4 @@ The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-a
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
 * [Carlos Bilbao](https://github.com/Zildj1an)
+√
