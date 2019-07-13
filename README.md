@@ -1,4 +1,4 @@
-# SELEX (Systematic Evolution of Ligands by Exponential Enrichment) Protocol
+# SELEX (Systematic Evolution of Ligands by Exponential Enrichment) Protocol ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000)
 Biotechnological protocol for obtaining trained libraries of aptamer molecules automated with the Opentrons OT-2 robot.
 This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More information can be found in our 
 <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
