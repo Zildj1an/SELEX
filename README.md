@@ -3,7 +3,7 @@
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://2019.igem.org/Team:MADRID_UCM/Landing)
 
 Biotechnological protocol for obtaining trained libraries of aptamer molecules automated with the Opentrons OT-2 robot.
-This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More info -> <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">web</a>.
+This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More information at <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/robot.png)
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/aptameros.png)
