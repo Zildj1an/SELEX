@@ -1,2 +1,2 @@
 # igem-MADRID-UCM-web
-Website for UCM's iGEM team
+Website for our team.
