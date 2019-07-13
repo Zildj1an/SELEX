@@ -13,7 +13,8 @@ _The robot and SELEX process_
 The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-alike, as shown below, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR). You can update a new binary since ESP8266 SystemOnChip includes the TCP/IP stack.
 
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png)
-_Ninja-PCR PCB_
+
+_The Ninja-PCR PCB_
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
