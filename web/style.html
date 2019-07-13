@@ -1,0 +1,336 @@
+<html lang="en">
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+[class*="col-"] {
+  width: 100%;
+}
+
+body {
+  background-color:white;
+  max-width:100vw;
+}
+
+section {
+  clear: both;
+}
+
+p, h1, h2, h3 {
+font-family: 'Poppins', sans-serif;
+}
+
+p.custom-p, div.custom-p {
+  font-size: 1.5em;
+}
+
+p.small-p, div.small-p {
+  font-size: 1em;
+}
+
+h2 {
+  font-size: 2em;
+}
+
+.bigger.custom-header1 {
+  font-size: 6vw;
+}
+
+.custom-header1 {
+  font-size: 5vw;
+}
+
+.main-header {
+  float:left; width: 80%; z-index: 100; position: relative;
+}
+
+.sum-text {
+  margin-right:7%; position:relative; top: 25%; margin-left: 7%;
+}
+/*
+.text1 {
+  line-height: 2.5vw;
+}*/
+
+div .custom-header1 {
+   color: white;
+}
+
+.ball {
+  position: absolute;
+  border-radius: 100%;
+  opacity: 0.7;
+}
+
+.circle.text1 {
+    margin-top:2%;
+    position:relative;
+}
+
+.square.text1 {
+    margin-top:2%;
+    position:relative;
+}
+
+.triangle.text1 {
+    margin-top:2%;
+    position:relative;
+}
+
+.circle:before{
+   content: ""; box-sizing: content-box; position: absolute; left: -5%; width: 1vw; height: 1vw; background-color: transparent; border-radius: 50%; border: 0.2vw solid white; top:5%;
+}
+
+.square:before{
+   content: ""; box-sizing: content-box; position: absolute; left: -5%; width: 0.85vw; height: 0.85vw; background-color: transparent; border: 0.2vw solid white; top: 5%;
+}
+
+.triangle:before{
+   content: ""; box-sizing: content-box; position: absolute; left: -5%; width: 0px; height: 0px; border-left: 0.5vw solid #15d3ff; border-right: 0.5vw solid #15d3ff; border-bottom: 1vw solid white; top:2%;
+}
+
+.triangle:after{
+   content: ""; box-sizing: content-box; position: absolute; top: 72%; left: -4.5%; width: 0px; height: 0px; border-left: 0.3vw solid transparent; border-right: 0.3vw solid transparent; border-bottom: 0.6vw solid #15d3ff; top:6%;
+}
+
+.bg--red.bg--primary {
+  background-color:red;
+  padding: 0;
+  color: white;
+  content: "";
+  clear: both;
+  display: table;
+  margin-top: 10%;
+}
+
+.full-circle-big {
+   position: absolute;
+   background-color: white;
+   border-radius:50%;
+   height:3vw;
+   width:3vw;
+   transform: translate(50%, 500%);
+}
+
+.hollow-circle-big {
+   position: absolute;
+   background-color: transparent;
+   border-radius:50%;
+   height:3vw;
+   width:3vw;
+   border: 0.3vw solid white;
+   transform: translate(0, 80%);
+}
+
+.rotated-hollow-square {
+   position: absolute;
+   background-color: transparent;
+   border: 0.3vw solid white;
+   height:3vw;
+   width:3vw;
+   transform: rotateZ(45deg) translate(250%, 100%);
+}
+
+.full-square-big {
+   position: absolute;
+   background-color: white;
+   height:3vw;
+   width:3vw;
+   transform: translate(-30%, 800%);
+}
+
+div.img-container {
+  background-color: transparent; 
+  background-image: url(https://2019.igem.org/wiki/images/2/29/T--MADRID_UCM--title1.svg);
+  background-size: 100% auto; background-position: 20% -1.5%;
+  background-origin: content-box;
+  background-clip:border-box;
+  background-repeat:no-repeat;
+  font-weight: bold;
+  font-size: 8vw;
+  text-align: center;
+  vertical-align: middle;
+  padding-left: 4%;
+  padding-right: 5%;
+  color: white;
+  padding-bottom: 1vh;
+}
+
+.tech-section {
+  padding-left: 3vw; padding-right: 3vw; margin-bottom:3vh;
+  position: relative;
+  z-index: 50;
+}
+
+a.btn {
+   background-color: red;
+   margin-top:5%;
+   padding-top: 1%;
+   padding-bottom: 1%;
+   padding-left: 6%;
+   padding-right: 6%;
+   font-size: 4vw;
+   color: white;
+   font-weight: bold;
+   text-align: center;
+   font-family: 'Poppins', sans-serif;
+   border-radius: 5px;
+   border-style: none;
+}
+
+.big-text {
+   font-size:4vw;
+}
+
+#home {
+  height: 130vh; position:relative;
+}
+
+.bbg {
+  background-image: url(https://2019.igem.org/wiki/images/9/9e/T--MADRID_UCM--bg1.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 100%;
+  height:120%;
+  top: 5%;
+  position: absolute;
+  z-index: 10;
+  background-position: 50% -40vh;
+}
+
+video {
+  padding-right: 1em;
+}
+
+#bolas {
+  float: left;
+  width: 0;
+  overflow: visible;
+}
+
+.shapes {
+  display: none;
+}
+
+.ot {
+  background-color: white;
+  padding: 5%;
+}
+
+@media only screen and (min-aspect-ratio:1/1) {
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+
+  .col-6.m-right {
+    float: right;
+  }
+
+  [class*="col-"] {
+    float: left;
+    padding: 15px;
+  }
+  .main-header {
+    width: 50%;
+  }
+  .sum-text {
+    margin-left: 0;
+  }
+  .big-text {
+    font-size:1.5vw;
+  }
+  div .bigger.custom-header1 {
+    font-size:3.7vw;
+  }
+/*  .text1 {
+    line-height: 1.5em;
+  }*/
+  a.btn {
+    font-size: 2vw;
+  }
+
+  h2 {
+    font-size: 2vw;
+  }
+  p.custom-p, div.custom-p {
+    font-size: 1.6em;
+  }
+  p.small-p, div.small-p {
+    font-size: 1.2em;
+  }
+  video {
+    width: 100%;
+    padding-right: 4em;
+  }
+  h1.custom-header1 {
+    font-size: 2.5vw;
+  }
+
+  div.img-container {
+    font-size: 5vw;
+    background-size: 120% auto;
+  }
+
+  .tech-section {
+    padding: 0;
+  }
+
+  .shapes {
+    display: initial;
+  }
+
+  .ot {
+    padding: 0.5%;
+  }
+}
+
+@media only screen and (min-aspect-ratio: 13/10) {
+  .bbg {
+    background-position: 50% -30vh;
+  }
+
+  .sum-text {
+    top: 34%; 
+  }
+}
+
+@media only screen and (min-aspect-ratio: 18/10) {
+  .sum-text {
+    top: 30%;
+  }
+
+  .bbg {
+    background-position: 5% -27vh;
+  }
+}
+
+@media only screen and (min-aspect-ratio: 200/95) {
+
+/*  .text1 {
+    line-height:2em;
+  }*/
+
+  .big-text {
+    font-size:1.5vw;
+  }
+}
+
+@media only screen and (min-aspect-ratio: 25/10) {
+  .sum-text {
+    top: 35%;
+  }
+}
+
+</style>
+</html>
