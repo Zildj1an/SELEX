@@ -19,4 +19,4 @@ The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-a
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
 * [Carlos Bilbao](https://github.com/Zildj1an)
-√
+
