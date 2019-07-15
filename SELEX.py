@@ -15,43 +15,59 @@ metadata = {
 	'source' : '2019.igem.org/Team:MADRID_UCM/Landing'
 }
 
-
 # [1] Labware
-# TODO: Comprobar types, confirmar posición, thermic module, Ninja-PCR.
+# TODO: Comprobar types, confirmar position, {thermic module, Ninja-PCR} sizes.
 
-plate_name = 'Ninja-PCR'
-if plate_name not in labware.list():
-    custom_plate = labware.create(
-        plate_name,                     # Labware Name
+pcr_name = 'Ninja-PCR'
+if pcr_name not in labware.list():
+    thermocicler = labware.create(
+        pcr_name,                       # Labware Name
         grid=(4, 4),                    # Amount of (columns, rows)
         spacing=(12, 12),               # Distances (mm) between each (column, row)
         diameter=5,                     # Diameter (mm) of each well on the plate
         depth=10,                       # Depth (mm) of each well on the plate
         volume=200)
 
-plate_samples    =   labware.load('96-flat', '11')				    # Samples
-tiprack          =   labware.load('opentrons-tiprack-10ul', '8')		    # Tipracks
-magnetic         =   modules.load('magdeck','1')				    # Magnetic Deck
-plate_magnet     =   labware.load('96-flat', '1', share = True)			    # Magnetic Deck plate
-thermocicler     =   modules.load('Ninja-PCR','10')				    # Ninja-PCR
-thermic_module   =   modules.load()						    # Auxiliar thermic module
+thermic_name = 'Thermic_Module'
+if thermic_name not in labware.list():
+    thermic = labware.create(
+        thermic_name,                   # Labware Name
+        grid=(4, 4),                    # Amount of (columns, rows)
+        spacing=(12, 12),               # Distances (mm) between each (column, row)
+        diameter=5,                     # Diameter (mm) of each well on the plate
+        depth=10,                       # Depth (mm) of each well on the plate
+        volume=200)
+
+plate_samples    =   labware.load('96-flat', slot ='11')			    # Samples
+tiprack          =   labware.load('tiprack-10ul', slot='6')	         	    # Tipracks
+magnetic         =   modules.load('magdeck',slot ='1')	         		    # Magnetic Deck
+plate_magnet     =   labware.load('96-flat', slot ='1', share = True)		    # Magnetic Deck plate
+thermocicler     =   labware.load(pcr_name,slot ='10')				    # Ninja-PCR
+thermic_module   =   labware.load(thermic_name, slot ='3')			    # Auxiliar thermic module
 
 # [2] Pipettes
-# TODO:
 
-pipette = instruments.P50_Single(mount = 'left', tip_racks = [tiprack])
+pipette = instruments.P50_Single(mount = 'left')
 
 # [3] Commands
-#TODO:
 
-# Ejemplo: pipette.trasnfer(100, plate.wells('A1'), plate.wells('B1'))
+# Ejemplo: pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+
+# TODO
+def get_pipette_head():
+	print("Getting pipette head...\n");
+	for r in ["A1","B1","C1","D1"] :
+		pipette.pick_up_tip(tiprack.wells(r))
+		
+# [4] SELEX execution
+
+get_pipette_head()
 
 # When done
-while true:
-        robot._driver.turn_off_button_light()
-	time.sleep(.500)
-        robot._driver.turn_on_button_light()
-
-
+while True:
+        robot.turn_off_button_light()
+        time.sleep(.5)
+        robot.turn_on_button_light()
+        time.sleep(.5)
 
 
