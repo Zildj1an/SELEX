@@ -38,36 +38,46 @@ if thermic_name not in labware.list():
         depth=10,                       # Depth (mm) of each well on the plate
         volume=200)
 
-plate_samples    =   labware.load('96-flat', slot ='11')			    # Samples
+plate_samples    =   labware.load('96-flat',      slot ='11')  			    # Samples
 tiprack          =   labware.load('tiprack-10ul', slot='6')	         	    # Tipracks
-magnetic         =   modules.load('magdeck',slot ='1')	         		    # Magnetic Deck
-plate_magnet     =   labware.load('96-flat', slot ='1', share = True)		    # Magnetic Deck plate
-thermocicler     =   labware.load(pcr_name,slot ='10')				    # Ninja-PCR
-thermic_module   =   labware.load(thermic_name, slot ='3')			    # Auxiliar thermic module
+magnetic         =   modules.load('magdeck',      slot ='1')	                    # Magnetic Deck
+plate_magnet     =   labware.load('96-flat',      slot ='1', share = True)	    # Magnetic Deck plate
+thermocicler     =   labware.load(pcr_name,       slot ='10')			    # Ninja-PCR
+thermic_module   =   labware.load(thermic_name,   slot ='3')			    # Auxiliar thermic module
 
 # [2] Pipettes
 
-pipette = instruments.P50_Single(mount = 'left')
+pipette_l = instruments.P50_Single(mount = 'left', tip_racks=[tiprack])
+pipette_r = instruments.P50_Single(mount = 'right', tip_racks=[tiprack])
 
 # [3] Commands
+# TODO usar ambos pipettes
 
-# Ejemplo: pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+def samples_to_pcr():
+        robot._driver.turn_on_rail_lights()
+	# Empezar a calentar a 90 grados
+        pipette_l.pick_up_tip()
+        pipette_l.aspirate(50, plate_samples.wells('A1'))
+        pipette_l.dispense(50, plate_samples.wells('B1'))
+        pipette_l.return_tip()
+        robot._driver.turn_off_rail_lights()
 
-# TODO
-def get_pipette_head():
-	print("Getting pipette head...\n");
-	for r in ["A1","B1","C1","D1"] :
-		pipette.pick_up_tip(tiprack.wells(r))
-		
+def samples_to_aux():
+       robot._driver.turn_on_rail_lights()
+       pipette_l.pick_up_tip()
+       # aspirar de pcr, dispensar en thermocicler
+       pipette_l.return_tip()
+       robot._driver.turn_off_rail_lights()
+
 # [4] SELEX execution
 
-get_pipette_head()
+# Warming at 90 degrees
 
-# When done
-while True:
-        robot.turn_off_button_light()
-        time.sleep(.5)
-        robot.turn_on_button_light()
-        time.sleep(.5)
+print("Applying heat to sample...\n")
+samples_to_pcr()
 
+# Empezar a enfriar aux a 4 grados
+# sleep(10 mins)
+
+samples_to_aux()
 
