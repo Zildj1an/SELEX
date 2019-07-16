@@ -10,13 +10,13 @@ import time
 
 metadata = {
 	'protocolName' : 'Selex',
-	'author' : 'Carlos Bilbao, Pablo Villalobos',
-	'description' : 'Selex protocol for evolving aptamers',
-	'source' : '2019.igem.org/Team:MADRID_UCM/Landing'
+	'author'       : 'Carlos Bilbao, Pablo Villalobos',
+	'description'  : 'Selex protocol for evolving aptamers',
+	'source'       : '2019.igem.org/Team:MADRID_UCM/Landing'
 }
 
 # [1] Labware
-# TODO: Comprobar types, depths.
+# TODO: Check types.
 
 pcr_name = 'Ninja-PCR'
 if pcr_name not in labware.list():
@@ -48,35 +48,27 @@ thermic_module   =   labware.load(thermic_name,   slot ='3')			    # Auxiliar th
 # [2] Pipettes
 
 pipette_l   = instruments.P50_Single(mount = 'left', tip_racks=[tiprack])
-pipette_r  = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack])
+pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack])
 
 # [3] Commands
-# TODO usar ambos pipettes
 
 def samples_to_pcr():
 
+        while not robot._driver.read_window_switches():
+                sleep(1)
+
         robot._driver.turn_on_rail_lights()
-	# Empezar a calentar a 90 grados
+        robot._driver.turn_on_red_button_light()
+        # Empezar a calentar a 90 grados (TODO)
         pipette_l.pick_up_tip()
-
-        for x in range(0,7):
-              pipette_r.aspirate(50, plate_samples.wells(x))
-
-        pipette_l.aspirate(50, plate_samples.wells(8))
-
-        for x in range(0,7):
-              pipette_r.dispense(50, thermocicler.wells(x))
-
-        pipette_l.dispense(50,thermocicler.wells(8))
-
-        # More
-
+        pipette_r.pick_up_tip()
+        # pipette_r.aspirate(50, plate_samples.wells(x))
+        # pipette_l.dispense(50,thermocicler.wells(8))
+        # TODO basura en vez de devolver
         pipette_l.return_tip()
-
-        for x in range(0,7):
-                pipette_r[x].return_tip()
-
+        pipette_r.return_tip()
         robot._driver.turn_off_rail_lights()
+        robot._driver.turn_on_blue_button_light()
 
 def samples_to_aux():
 
@@ -96,5 +88,9 @@ samples_to_pcr()
 # Empezar a enfriar aux a 4 grados
 # sleep(10 mins)
 
-samples_to_aux()
+print("Moving samples to cool them...\n")
+#samples_to_aux()
 
+# ... (TODO)
+
+robot._driver.home()
