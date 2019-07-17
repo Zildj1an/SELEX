@@ -60,7 +60,7 @@ def init_move(function):
         # button turns red
         robot._driver.turn_on_rail_lights()
         robot._driver.turn_on_red_button_light()
-        cmd  = "ffplay -nodisp -autoexit /root/robot.mp3"
+        cmd  = "ffplay -nodisp -autoexit /root/robot.mp3 &> /dev/null"
         cmd2 = "pkill ffplay" 
 
         # Will play while door is opened
@@ -100,6 +100,7 @@ def samples_to_aux():
 # [4] SELEX execution
 
 # Warming at 90 degrees
+
 
 print("Applying heat to sample...\n")
 init_move(samples_to_pcr)
