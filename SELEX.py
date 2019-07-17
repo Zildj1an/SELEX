@@ -60,7 +60,7 @@ def init_move(function):
         # button turns red
         robot._driver.turn_on_rail_lights()
         robot._driver.turn_on_red_button_light()
-        cmd  = "ffplay -nodisp -autoexit /etc/audio/speaker-test.mp3"
+        cmd  = "ffplay -nodisp -autoexit /root/robot.mp3"
         cmd2 = "pkill ffplay" 
 
         # Will play while door is opened
