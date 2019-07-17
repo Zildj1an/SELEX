@@ -51,11 +51,12 @@ magnetic         =   modules.load('magdeck',      slot ='1')	                   
 plate_magnet     =   labware.load('96-flat',      slot ='1', share = True)	    # Magnetic Deck plate
 thermocicler     =   labware.load(pcr_name,       slot ='10')			    # Ninja-PCR
 thermic_module   =   labware.load(thermic_name,   slot ='3')			    # Auxiliar thermic module
+trash            =   labware.load('trash-box',    slot = '12', share = True)        # Trash
 
 # [2] Pipettes
 
-pipette_l   = instruments.P50_Single(mount = 'left', tip_racks=[tiprack])
-pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack])
+pipette_l   = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
+pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack], trash_container = trash)
 
 # [3] Commands
 
@@ -87,14 +88,26 @@ def init_move(function):
 
 def samples_to_pcr():
 
-        pipette_l.pick_up_tip()
         pipette_r.pick_up_tip()
-        # pipette_r.aspirate(50, plate_samples.wells(x))
-        # pipette_l.dispense(50,thermocicler.wells(8))
 
-        # TODO basura en vez de devolver
-        pipette_l.return_tip()
-        pipette_r.return_tip()
+	# Aspirate 4
+        pipette_r.aspirate(50,plate_samples.wells('E1'))
+	# Dispense 4/16
+        pipette_r.dispense(50,thermocicler.wells('A1'))
+        # Aspirate 4
+        pipette_r.aspirate(50,plate_samples.wells('E2'))
+	# Dispensed 8/16
+        pipette_r.dispense(50,thermocicler.wells('A2'))
+        # Aspirate 4
+        pipette_r.aspirate(50,plate_samples.wells('E3'))
+	# Dispensed 12/16
+        pipette_r.dispense(50,thermocicler.wells('A3'))
+        # Aspirate 4
+        pipette_r.aspirate(50,plate_samples.wells('E4'))
+	# Dispensed 16/16
+        pipette_r.dispense(50,thermocicler.wells('A4'))
+
+        pipette_r.drop_tip()
 
 def samples_to_aux():
 
@@ -105,7 +118,7 @@ def samples_to_aux():
        robot._driver.turn_off_rail_lights()
 
 def api_request(temp,URL):
-        
+
          command = '(1[1500|' + temp + '|Final Hold|0])'
          PARAMS = {'s': 'ACGTC',
                    'c':'start',
@@ -117,15 +130,18 @@ def api_request(temp,URL):
 # [4] SELEX execution
 
 # Warming at 90 degrees for 600 seconds
+
 print("Applying heat to samples...\n")
-api_request('90',URL_PCR)
+#api_request('90',URL_PCR)
 init_move(samples_to_pcr)
 
 # Start cooling at 4 degrees the aux
+
 print("Moving samples to cool them...\n")
-api_request(4, URL_AUX)
+#api_request(4, URL_AUX)
+# TODO cerrar la puerta
 #sleep(600)
-init_move(samples_to_aux)
+#init_move(samples_to_aux)
 
 # ... (TODO)
 
