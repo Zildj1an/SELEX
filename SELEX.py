@@ -6,7 +6,9 @@
 """
 
 from opentrons import labware, instruments, modules, robot
-import time
+from subprocess import Popen
+from time import sleep
+import os
 
 metadata = {
 	'protocolName' : 'Selex',
@@ -52,13 +54,32 @@ pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack])
 
 # [3] Commands
 
-def samples_to_pcr():
+def init_move(function):
 
-        while not robot._driver.read_window_switches():
-                sleep(1)
-
+        # When the robot starts moving light goes on and
+        # button turns red
         robot._driver.turn_on_rail_lights()
         robot._driver.turn_on_red_button_light()
+        cmd  = "ffplay -nodisp -autoexit /etc/audio/speaker-test.mp3"
+        cmd2 = "pkill ffplay" 
+
+        # Will play while door is opened
+        while not robot._driver.read_window_switches():
+
+               p = Popen(cmd,shell=True)
+ 
+               while not robot._driver.read_window_switches() and p.poll() is None:
+                      sleep(.1)
+               if robot._driver.read_window_switches() and p.poll() is None:
+                      os.system(cmd2)
+       
+        function()
+    
+        robot._driver.turn_off_rail_lights()
+        robot._driver.turn_on_blue_button_light()
+
+def samples_to_pcr():
+
         # Empezar a calentar a 90 grados (TODO)
         pipette_l.pick_up_tip()
         pipette_r.pick_up_tip()
@@ -67,8 +88,6 @@ def samples_to_pcr():
         # TODO basura en vez de devolver
         pipette_l.return_tip()
         pipette_r.return_tip()
-        robot._driver.turn_off_rail_lights()
-        robot._driver.turn_on_blue_button_light()
 
 def samples_to_aux():
 
@@ -83,14 +102,16 @@ def samples_to_aux():
 # Warming at 90 degrees
 
 print("Applying heat to sample...\n")
-samples_to_pcr()
+init_move(samples_to_pcr)
 
 # Empezar a enfriar aux a 4 grados
 # sleep(10 mins)
 
 print("Moving samples to cool them...\n")
-#samples_to_aux()
+#init_move(samples_to_aux)
 
 # ... (TODO)
 
 robot._driver.home()
+
+
