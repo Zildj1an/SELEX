@@ -117,8 +117,8 @@ def api_request(temp, URL):
                    'c':'start',
                    'l': temp, 			# Ignored by aux therm
                    'p': command}
-         r = requests.get(url = URL, params = PARAMS)
-         print(r.json)
+         data = requests.get(url = URL, params = PARAMS).json()
+         print(data)
 
 # [4] SELEX execution
 
