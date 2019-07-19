@@ -139,7 +139,7 @@ print("Moving samples to cool them...\n")
 sleep(1)
 execute_move(samples_to_aux)
 
-# (3) One hour of rest
+# (3)
 
 #api_request(,URL_AUX) TODO a que temp?
 #sleep(1 hour)
@@ -151,10 +151,10 @@ execute_move(samples_to_aux)
 # moverlo a magdeck
 # magnetic.engage()
 
-# (5) Get rid of the ones stuck
+# (5)
 
 
-# (6) One hour of rest
+# (6)
 
 # (7)
 
