@@ -8,7 +8,7 @@
 from opentrons import labware, instruments, modules, robot
 from subprocess import Popen
 from time import sleep
-import os, requests, logging
+import os, requests, logging, sys
 
 metadata = {
 	'protocolName' : 'Selex',
@@ -117,8 +117,12 @@ def api_request(temp, URL):
                    'c':'start',
                    'l': temp, 			# Ignored by aux therm
                    'p': command}
-         data = requests.get(url = URL, params = PARAMS).json()
-         print(data)
+         try:
+             data = requests.get(url = URL, params = PARAMS)
+             print(data)
+         except requests.exceptions.HTTPError as e:
+             print("Error at request: " + str(e))
+             sys.exit()
 
 # [4] SELEX execution
 
