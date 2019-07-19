@@ -14,7 +14,7 @@ metadata = {
 	'protocolName' : 'Selex',
 	'author'       : 'Carlos Bilbao, Pablo Villalobos',
 	'description'  : 'Selex protocol for evolving aptamers',
-	'source'       : '2019.igem.org/Team:MADRID_UCM/Landing'
+	'source'       : 'https://github.com/Zildj1an/SELEX'
 }
 
 # [0] Ninja-PCR API
@@ -60,7 +60,7 @@ pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack], trash_
 
 # [3] Commands
 
-def init_move(function):
+def execute_move(function):
 
         # When the robot starts moving light goes on and
         # button turns red
@@ -110,7 +110,7 @@ def samples_to_aux():
 
        pipette_r.drop_tip()
 
-def api_request(temp,URL):
+def api_request(temp, URL):
 
          command = '(1[1500|' + temp + '|Final Hold|0])'
          PARAMS = {'s': 'ACGTC',
@@ -124,22 +124,39 @@ def api_request(temp,URL):
 
 logging.getLogger("opentrons").setLevel(logging.INFO)
 
-# Warming at 90 degrees for 600 seconds
+# (1) Warming at 90 degrees for 600 seconds (PCR)
 
 print("Applying heat to samples...\n")
 #api_request('90',URL_PCR)
-init_move(samples_to_pcr)
+execute_move(samples_to_pcr)
 
-# Start cooling at 4 degrees the aux
+# (2) Cooling at 4 degrees for 600 seconds (aux)
 
 print("Moving samples to cool them...\n")
-#api_request(4, URL_AUX)
+#api_request('4', URL_AUX)
 # TODO cerrar la puerta
 # TODO sleep 10 mins
 sleep(1)
-init_move(samples_to_aux)
+execute_move(samples_to_aux)
 
-# ... (TODO)
+# (3) One hour of rest
+
+#api_request(,URL_AUX) TODO a que temp?
+#sleep(1 hour)
+
+# (4) Magnentic separation
+
+# The first time you wish to get read of the ones stuck to the
+# non-modified e.coli
+# moverlo a magdeck
+# magnetic.engage()
+
+# (5) Get rid of the ones stuck
+
+
+# (6) One hour of rest
+
+# (7)
 
 robot._driver.home()
 
