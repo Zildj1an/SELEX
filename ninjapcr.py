@@ -5,11 +5,21 @@ from time import sleep
 
 log = logging.getLogger('opentrons')
 
+STOPPED_STR = "stopped";
+LIDWAIT_STR = "lidwait";
+RUNNING_STR = "running";
+COMPLETE_STR = "complete";
+STARTUP_STR = "startup";
+ERROR_STR = "error";
+PAUSED_STR = "paused";
+
 PCR_NAME = "NinjaPCR"
     
 CONNECTION_MODES = ["external_wifi", "ninja_ap", "opentrons_ap"]
     
 COMMAND_DIR = "/command"
+
+STATUS_DIR = "/status"
 
 SAMPLE_PROGRAM = {'name': 'Sample program',
                   'lid_temp': 110,
@@ -52,33 +62,64 @@ def NinjaPCR(Object):
     """
 
     def __init__(self,
-                 slot = "10",
-                 name = "ninjapcr",
-                 connection_mode = "external_wifi",
+                 slot = '10',
+                 name = 'ninjapcr',
+                 connection_mode = 'external_wifi',
                  ssid = None,
                  psk = None):
 
         if connection_mode not in CONNECTION_MODES:
-            raise ValueError("Invalid connection mode: {}".format(connection_mode))
+            raise ValueError(f'Invalid connection mode: {connection_mode}')
 
-        self.local_url = "http://" + name + ".local"
+        self.local_url = f'http://{name}.local'
         self.net_ssid = ssid
         self.net_psk = psk
         self.connected = False
         
         # Define and load associated labware
-        
-        wells = labware.create(
-            PCR_NAME,                       # Labware Name
-            grid=(4, 4),                    # Amount of (columns, rows)
-            spacing=(9, 9),                 # Distances (mm) between each (column, row)
-            diameter=2,                     # Diameter (mm) of each well on the plate
-            depth=10,                       # Depth (mm) of each well on the plate
-            volume=50)
-        
-        labware.load(pcr_name, slot = slot)
+
+        if PCR_NAME not in labware.list():
+            labware.create(
+                PCR_NAME,                       # Labware Name
+                grid=(4, 4),                    # Amount of (columns, rows)
+                spacing=(9, 9),                 # Distances (mm) between each (column, row)
+                diameter=2,                     # Diameter (mm) of each well on the plate
+                depth=10,                       # Depth (mm) of each well on the plate
+                volume=50)
+
+        self.labware = labware.load(PCR_NAME, slot=slot)
 
 
+    def wait_for_program(self, program):
+            
+        # Starts a program and actively waits until it's finished
+
+        self.send_command('start', program)
+
+        sleep(5)
+
+        status = self.get_status()
+
+        if status['state'] in [LIDWAIT_STR, RUNNING_STR]:
+            log.info(f'NinjaPCR was successfully started and is in state {status["state"]}')
+            keep_going = True
+        else:
+            log.info(f'NinjaPCR did nos start successfully. State: {status["state"]}')
+            keep_going = False
+        
+        while keep_going:
+            sleep(5)
+            status = self.get_status()
+            if status['state'] in [STOPPED_STR, COMPLETE_STR, ERROR_STR]:
+                log.info(f'NinjaPCR stopped in state {status["state"]}')
+                if status['state'] == ERROR_STR:
+                    raise Error("NinjaPCR error")
+                keep_going = False
+            else:
+                log.info(f'NinjaPCR is running. Remaining time: {status["remaining_time"]}')
+                
+        
+        
     def send_command(self, cmd, program = None):
 
         # Send an HTTP API request to the NinjaPCR with the given command
@@ -96,11 +137,42 @@ def NinjaPCR(Object):
             # We got a response
             if '"1"' not in response.text:
                 # Unsuccesful command
-                raise Error(f'Could not execute command {cmd}'
-
+                raise Error(f'Could not execute command {cmd}')
+                            
         else:
+            self.connected = False
             raise Error(f'Bad connection: {response.status_code}')
+
         
+
+    def get_status(self):
+
+        # Get status as dictionary
+
+        response = requests.get(self.local_url + STATUS_DIR)
+
+        status = {}
+        
+        if response and response == 200:
+            # We got a response
+            json = response.json()
+            status['state'] = json['s']
+            status['program_id'] = json['d']
+            status['lid_temp'] = json['l']
+            status['base_temp'] = json['b']
+            status['thermocycler_state'] = json['t']
+            status['sample_temp'] = json['z']
+
+            if status['state'] == RUNNING_STR:
+                status['elapsed_time'] = json['e']
+                status['remaining_time'] = json['r']
+                
+            
+        else:
+            self.connected = False
+            raise Error(f'Bad connection: {response.status_code}')
+
+        return status
 
 
     def _build_params(self, cmd, program):
@@ -110,7 +182,7 @@ def NinjaPCR(Object):
         params = {'s': 'ACGTC',
                   'c': cmd}
 
-        if cmd == "start":
+        if cmd == 'start':
             params['l'] = program['lid_temp']
 
             # Build program string
@@ -124,11 +196,9 @@ def NinjaPCR(Object):
                 if p['type'] == 'step':
                     # If this is a step, add (1..) when necessary and build string
                     if i == 0 or program['steps'][i-1]['type'] == 'cycle':
-                        prog_string += '(1{})'
+                        prog_string += f'(1{self._build_step_string(p)})'
                     else:
-                        prog_string += '{}'
-
-                    prog_string.format(self._build_step_string(p))
+                        prog_string += f'{self._build_step_string(p)}'
 
                 else:
                     # If this is a cycle, just build it
@@ -147,12 +217,12 @@ def NinjaPCR(Object):
 
         if program['type'] == 'step':
             p = program
-            step_string = '[{}|{}|{}|{}]'.format(p['time'], p['temp'], p['name'], p['ramp'])
+            step_string = f'[{p["time"]}|{p["temp"]}|{p["name"]}|{p["ramp"]}]'
 
         else:
-            step_string = '({}'.format(program['count'])
+            step_string = f'({program["count"}')
             for s in program['steps']:
-                step_string += "[{}|{}|{}|{}]".format(s['time'], s['temp'], s['name'], s['ramp'])
+                step_string += f'[{p["time"]}|{p["temp"]}|{p["name"]}|{p["ramp"]}]'
             step_string += ')'
 
         return step_string
@@ -161,10 +231,10 @@ def NinjaPCR(Object):
     def connect(self):
         # Attempt to connect to the NinjaPCR. This should be called before attempting to send any command
         
-        if connection_mode == "ninja_ap":
+        if connection_mode == 'ninja_ap':
             self._connect_to_ap()
             
-        elif connection_mode == "opentrons_ap":
+        elif connection_mode == 'opentrons_ap':
             self._setup_ap()
 
         self._check_connection()
@@ -175,9 +245,9 @@ def NinjaPCR(Object):
         
         response = requests.get(self.local_url)
         if response and response.status_code == 200:
-            log.info("Connected to NinjaPCR at {}".format(self.local_url))
+            log.info(f'Connected to NinjaPCR at {self.local_url}')
         else:
-            raise Error("Could not connect to NinjaPCR at {}. Status code: {}".format(self.local_url, response.status_code))
+            raise Error(f'Could not connect to NinjaPCR at {self.local_url}. Status code: {response.status_code}')
 
         
     def _connect_to_ap(self):
@@ -186,15 +256,15 @@ def NinjaPCR(Object):
     
         if not nmcli.connection_exists(self.ssid):
             if self.ssid not in nmcli.available_ssids():
-                raise Error("Network {} not found".format(self.ssid))
+                raise Error(f'Network {self.ssid} not found')
                             
             success, msg = nmcli.configure(self.ssid, nmcli.WPA_PSK, self.psk)
             if not success:
-                raise Error("Could not setup connection: {}".format(msg))
+                raise Error(f'Could not setup connection: {msg}')
                             
             sleep(2)
             if not nmcli.connection_exists(self.ssid):
-                raise Error("Could not connect to ssid {}. Wrong passphrase?".format(self.ssid))
+                raise Error('Could not connect to ssid {self.ssid}. Wrong passphrase?')
             
             
     def _setup_ap(self):
