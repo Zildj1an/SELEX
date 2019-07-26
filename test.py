@@ -28,9 +28,12 @@ pipette = instruments.P50_Multi(mount='right')
 # commands
 pipette.pick_up_tip(tiprack.wells('A12'), increment = 0.5)
 
-pipette.move_to(plate.wells('A1').bottom())
+pipette.move_to(plate.wells('A1').bottom(1))
+sleep(1)
 pipette.aspirate(10)
 pipette.move_to(plate.wells('A1').top(50))
 if not robot.is_simulating():
     sleep(20)
+pipette.move_to(plate.wells('A1').bottom(1))
+pipette.dispense(10)
 pipette.return_tip()
