@@ -19,8 +19,8 @@ _The SELEX process_
 You can clone this repo or download the zip. Make sure all the dependencies are covered. First line is for installation of pip at most Linux distributions.
 
 ```
-sudo apt install python-pip || pacman -S python-pip
-pip install opentrons subprocess time os
+$ sudo apt install python-pip || pacman -S python-pip
+$ pip install opentrons subprocess time os
 ```
 The robot uses the audio robot.mp3 and gets it from Robot raspberry's /mnt/usbdrive/ (put it there or edit the location).
 
