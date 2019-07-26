@@ -25,12 +25,12 @@ SAMPLE_PROGRAM = {'name': 'Sample program',
                   'lid_temp': 110,
                   'steps': [
                       {'type': 'step',
-                       'time': 30,
+                       'time': 150,
                        'temp': 95,
                        'name': 'Initial Step',
                        'ramp': 0},
                       {'type': 'cycle',
-                       'count': 2,
+                       'count': 15,
                        'steps': [
                            {'type': 'step',
                             'time': 30,
@@ -39,29 +39,35 @@ SAMPLE_PROGRAM = {'name': 'Sample program',
                             'ramp': 0},
                            {'type': 'step',
                             'time': 30,
-                            'temp': 55,
+                            'temp': 53.5,
                             'name': 'Annealing',
                             'ramp': 0},
                            {'type': 'step',
-                            'time': 60,
+                            'time': 30,
                             'temp': 72,
                             'name': 'Extending',
                             'ramp': 0}
                        ]},
                       {'type': 'step',
-                       'time': 0,
-                       'temp': 20,
-                       'name': 'Final Hold',
-                       'ramp': 0}
-                      ]}
+                       'time': 180,
+                       'temp': 72,
+                       'name': 'Final Extension',
+                       'ramp': 0},
+                      {'type': 'step',
+                         'time': 54000,
+                         'temp': 20,
+                         'name': 'Final Hold',
+                         'ramp': 0}]}
+                      
 
-def NinjaPCR(Object):
+class NinjaPCR:
 
     """
     Opentrons driver for NinjaPCR
     """
 
     def __init__(self,
+                 simulating = True,
                  slot = '10',
                  name = 'ninjapcr',
                  connection_mode = 'external_wifi',
@@ -71,10 +77,12 @@ def NinjaPCR(Object):
         if connection_mode not in CONNECTION_MODES:
             raise ValueError(f'Invalid connection mode: {connection_mode}')
 
+        self.simulating = simulating
         self.local_url = f'http://{name}.local'
         self.net_ssid = ssid
         self.net_psk = psk
         self.connected = False
+        self.connection_mode = connection_mode
         
         # Define and load associated labware
 
@@ -91,6 +99,9 @@ def NinjaPCR(Object):
 
 
     def wait_for_program(self, program):
+
+        if self.simulating:
+            return
             
         # Starts a program and actively waits until it's finished
 
@@ -113,20 +124,23 @@ def NinjaPCR(Object):
             if status['state'] in [STOPPED_STR, COMPLETE_STR, ERROR_STR]:
                 log.info(f'NinjaPCR stopped in state {status["state"]}')
                 if status['state'] == ERROR_STR:
-                    raise Error("NinjaPCR error")
+                    raise Exception("NinjaPCR error")
                 keep_going = False
-            else:
+            elif status['state'] == RUNNING_STR:
                 log.info(f'NinjaPCR is running. Remaining time: {status["remaining_time"]}')
                 
         
         
     def send_command(self, cmd, program = None):
 
+        if self.simulating:
+            return
+
         # Send an HTTP API request to the NinjaPCR with the given command
         # When cmd == 'start', a program in dict form must be specified
 
         if not self.connected:
-            raise Error('NinjaPCR is not connected')
+            raise Exception('NinjaPCR is not connected')
         
 
         params = self._build_params(cmd, program)
@@ -135,17 +149,21 @@ def NinjaPCR(Object):
 
         if response and response.status_code == 200:
             # We got a response
-            if '"1"' not in response.text:
+            #if '"1"' not in response.text:
                 # Unsuccesful command
-                raise Error(f'Could not execute command {cmd}')
+            #    raise Exception(f'Could not execute command {cmd}')
+            log.info(f'Sent command {cmd}')
                             
         else:
             self.connected = False
-            raise Error(f'Bad connection: {response.status_code}')
+            raise Exception(f'Bad connection: {response.status_code}')
 
         
 
     def get_status(self):
+
+        if self.simulating:
+            return {'simulating': True}
 
         # Get status as dictionary
 
@@ -153,15 +171,16 @@ def NinjaPCR(Object):
 
         status = {}
         
-        if response and response == 200:
+        if response and response.status_code == 200:
             # We got a response
-            json = response.json()
+            json = {k:v for k,v in [x.split('=') for x in response.text[23:-6].split('&')]}
             status['state'] = json['s']
             status['program_id'] = json['d']
             status['lid_temp'] = json['l']
             status['base_temp'] = json['b']
             status['thermocycler_state'] = json['t']
             status['sample_temp'] = json['z']
+            status['lid_closed'] = json['L']
 
             if status['state'] == RUNNING_STR:
                 status['elapsed_time'] = json['e']
@@ -170,7 +189,7 @@ def NinjaPCR(Object):
             
         else:
             self.connected = False
-            raise Error(f'Bad connection: {response.status_code}')
+            raise Exception(f'Bad connection: {response.status_code}')
 
         return status
 
@@ -220,9 +239,9 @@ def NinjaPCR(Object):
             step_string = f'[{p["time"]}|{p["temp"]}|{p["name"]}|{p["ramp"]}]'
 
         else:
-            step_string = f'({program["count"}')
+            step_string = f'({program["count"]}'
             for s in program['steps']:
-                step_string += f'[{p["time"]}|{p["temp"]}|{p["name"]}|{p["ramp"]}]'
+                step_string += f'[{s["time"]}|{s["temp"]}|{s["name"]}|{s["ramp"]}]'
             step_string += ')'
 
         return step_string
@@ -231,10 +250,10 @@ def NinjaPCR(Object):
     def connect(self):
         # Attempt to connect to the NinjaPCR. This should be called before attempting to send any command
         
-        if connection_mode == 'ninja_ap':
+        if self.connection_mode == 'ninja_ap':
             self._connect_to_ap()
             
-        elif connection_mode == 'opentrons_ap':
+        elif self.connection_mode == 'opentrons_ap':
             self._setup_ap()
 
         self._check_connection()
@@ -247,7 +266,7 @@ def NinjaPCR(Object):
         if response and response.status_code == 200:
             log.info(f'Connected to NinjaPCR at {self.local_url}')
         else:
-            raise Error(f'Could not connect to NinjaPCR at {self.local_url}. Status code: {response.status_code}')
+            raise Exception(f'Could not connect to NinjaPCR at {self.local_url}. Status code: {response.status_code}')
 
         
     def _connect_to_ap(self):
@@ -256,15 +275,15 @@ def NinjaPCR(Object):
     
         if not nmcli.connection_exists(self.ssid):
             if self.ssid not in nmcli.available_ssids():
-                raise Error(f'Network {self.ssid} not found')
+                raise Exception(f'Network {self.ssid} not found')
                             
             success, msg = nmcli.configure(self.ssid, nmcli.WPA_PSK, self.psk)
             if not success:
-                raise Error(f'Could not setup connection: {msg}')
+                raise Exception(f'Could not setup connection: {msg}')
                             
             sleep(2)
             if not nmcli.connection_exists(self.ssid):
-                raise Error('Could not connect to ssid {self.ssid}. Wrong passphrase?')
+                raise Exception('Could not connect to ssid {self.ssid}. Wrong passphrase?')
             
             
     def _setup_ap(self):
@@ -273,4 +292,7 @@ def NinjaPCR(Object):
 
         # Setup the robot's wifi interface as an access point
 
-        nmcli._call(['nmcli', 'dev', 'wifi', 'hotspot', 'ifname', 'wlan0', 'ssid', self.ssid, 'password', self.psk]
+        nmcli._call(['nmcli', 'dev', 'wifi', 'hotspot', 'ifname', 'wlan0', 'ssid', self.ssid, 'password', self.psk])
+
+
+        

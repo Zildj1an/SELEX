@@ -47,8 +47,8 @@ if thermic_name not in labware.list():
 
 plate_samples    =   labware.load('96-flat',      slot ='11')  			    # Samples
 tiprack          =   labware.load('tiprack-10ul', slot='6')	         	    # Tipracks
-magnetic         =   modules.load('magdeck',      slot ='1')	                    # Magnetic Deck
-plate_magnet     =   labware.load('96-flat',      slot ='1', share = True)	    # Magnetic Deck plate
+magnetic         =   modules.load('magdeck',      slot ='4')	                    # Magnetic Deck
+plate_magnet     =   labware.load('96-flat',      slot ='4', share = True)	    # Magnetic Deck plate
 thermocycler     =   labware.load(pcr_name,       slot ='10')			    # Ninja-PCR
 thermic_module   =   labware.load(thermic_name,   slot ='3')			    # Auxiliar thermic module
 trash            =   labware.load('trash-box',    slot = '12', share = True)        # Trash
