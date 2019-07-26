@@ -8,11 +8,21 @@ This is the biotechnological protocol for obtaining trained libraries of aptamer
 <img src="https://github.com/Zildj1an/SELEX/blob/master/img/robot.jpg" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="444"/>
 
 ## The SELEX Process
-Aptamers are a cutting-edge technology that is revolutionizing biotechnology, from biosensing to synthetic biology.Aptamers are single-strand DNA molecules that hold nature’s most important information: our genetic code.But instead of using DNA for carrying information, our aptamers depend on DNA’s 3-dimensional shape. We genetically engineer this shape to take hold of and mesh with our target molecule.DNA’s unique role in nature gives aptamers amazing characteristics, making them robust, stable, and cheap to produce. 
+Aptamers are a cutting-edge technology that is revolutionizing biotechnology, from biosensing to synthetic biology. Aptamers are single-strand DNA molecules that hold nature’s most important information: our genetic code.But instead of using DNA for carrying information, our aptamers depend on DNA’s 3-dimensional shape. We genetically engineer this shape to take hold of and mesh with our target molecule.DNA’s unique role in nature gives aptamers amazing characteristics, making them robust, stable, and cheap to produce. 
 
 <img src="https://github.com/Zildj1an/SELEX/blob/master/img/aptameros.png" alt="" width="350"/>
 
 _The SELEX process_
+
+## Installation and Usage
+
+You can clone this repo or download the zip. Make sure all the dependencies are covered. First line is for installation of pip at most Linux distributions.
+
+```
+sudo apt install python-pip || pacman -S python-pip
+pip install opentrons subprocess time os
+```
+There is also two things that need to be done. The robot uses the audio robot.mp3 and gets it from Robot raspberry's /mnt/usbdrive/ (put it there or edit the location).
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
