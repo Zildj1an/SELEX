@@ -1,5 +1,5 @@
 '''
- Amplify the DNA via PCR
+ Amplify the DNA via PCR thermocycler
 
 '''
 
@@ -10,8 +10,8 @@ from time import sleep
 import os, sys
 
 FINAL_HOLD = {'name': 'Final hold',
-                  'lid_temp': 20,
-                  'steps': [
+              'lid_temp': 20,
+              'steps': [
                         {'type': 'step',
                          'time': 54000,
                          'temp': 20,
@@ -30,61 +30,36 @@ def pcr(plate, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well,
         # Attempt to connect to the thermocycler
 
         if not thermocycler.connected:
-                thermocycler.connect() 
+                thermocycler.connect()
 
-
-        location = 'H5'
-                
+        location = 'H1'
         pipette_r.pick_up_tip(location = tiprack.wells(location))
-
         volumes = [5,25,20, [20, 10]]
+        dispense_m = {primer_well:[first_mix,second_mix],mm_well:[first_mix,second_mix,third_mix],dna_well:[second_mix],water_well:[first_mix,third_mix]}
 
-        '''
         # (1) MasterMix
-        pipette_r.distribute(volumes[1], plate.wells(mm_well), [plate.wells(first_mix), plate.wells(second_mix), plate.wells(third_mix)], new_tip='never')
+        for sample in [mm_well,water_well, primer_well, dna_well]:
+                
+                 pipette_r.pick_up_tip(location = tiprack.wells(location))
+	         location = next_loc(location)
 
-        pipette_r.drop_tip()
-        location = next_loc(location)
-        pipette_r.pick_up_tip(location = tiprack.wells(location))
-        '''
-        '''x
-        # (2) Water
-        pipette_r.distribute(volumes[3], plate.wells(water_well), [plate.wells(first_mix), plate.wells(third_mix)], new_tip='never')
+                 for wells in dispense_m[sample]:
+                   
+                     pipette_r.aspirate(volumes[1],plate.wells(sample).botton(1))
+                     pipette_r.dispense(volumes[1],plate.wells(wells))
+                 pipette_r.drop_tip()
 
-        pipette_r.drop_tip()
-        location = next_loc(location)
-        pipette_r.pick_up_tip(location = tiprack.wells(location))
-
-
-        # (3) Priemrs
-        pipette_r.distribute(volumes[0], plate.wells(primer_well), [plate.wells(first_mix), plate.wells(second_mix)], new_tip='never')
-
-        pipette_r.drop_tip()
-        location = next_loc(location)
-        pipette_r.pick_up_tip(location = tiprack.wells(location))
-
-        # (4) DNA
-        pipette_r.distribute(volumes[2], plate.wells(dna_well), [plate.wells(second_mix)], new_tip='never')
-        
-        pipette_r.drop_tip()
-        location = next_loc(location)
-        '''
         #pipette_r.pick_up_tip(location = tiprack.wells(location))
 
         pipette_r.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'))
-
         location = next_loc(location)
         pipette_r.pick_up_tip(location = tiprack.wells(location))
-
         pipette_r.transfer(50, plate.wells('B1'), thermocycler.labware.wells('A2'))
-
         location = next_loc(location)
         pipette_r.pick_up_tip(location = tiprack.wells(location))
-
         pipette_r.transfer(50, plate.wells('C1'), thermocycler.labware.wells('A3'))
 
-
-        program = {'name': 'Heat',
+        PROGRAM = {'name': 'Heat',
                    'lid_temp': 110,
                    'steps': [{
                            'type': 'step',
@@ -92,14 +67,9 @@ def pcr(plate, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well,
                            'temp': 65,
                            'name': 'Heat',
                            'ramp': 0}]}
-        
-        thermocycler.wait_for_program(SAMPLE_PROGRAM)
-        
+
+        thermocycler.wait_for_program(PROGRAM)
         robot.home()
-
-        thermocycler.wait_for_program(FINAL_HOLD)
-                   
-
 
 def execute_move(function, args):
 
@@ -107,7 +77,6 @@ def execute_move(function, args):
                 function(*args)
 
         else:
-
                 # When the robot starts moving light goes on and
                 # button turns red
                 robot._driver.turn_on_rail_lights()
@@ -115,12 +84,12 @@ def execute_move(function, args):
                 cmd  = "ffplay -nodisp -autoexit /mnt/usbdrive/robot.mp3 &> /dev/null"
                 cmd2 = "pkill ffplay"
                 cmd_video = 'ffmpeg -video_size 320x240 -i /dev/video0 -t 00:06:00 -metadata:s:v rotate="180" video.mp4'
-                
+
                 # Will play while door is opened
                 while not robot._driver.read_window_switches():
-                        
+
                         p = Popen(cmd,shell=True)
-                        
+
                         while not robot._driver.read_window_switches() and p.poll() is None:
                                 sleep(.1)
                         if robot._driver.read_window_switches() and p.poll() is None:
@@ -130,12 +99,10 @@ def execute_move(function, args):
                         function(*args)
                 except:
                         print("Error calling function " + function().__name__ + "\n")
-                        
+
                 robot._driver.turn_off_rail_lights()
                 robot._driver.turn_on_blue_button_light()
-                        
 
-        
 # Run PCR as an independent protocol
 
 # Labware and module initialization
@@ -157,3 +124,5 @@ third_mix = 'C1'
 pipette_r = instruments.P50_Multi(mount='right')
 
 execute_move(pcr, [plate, pipette_r, tiprack, ninja, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix])
+
+
