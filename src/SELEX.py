@@ -76,10 +76,15 @@ def execute_move(function, args):
         try:
            function(*args)
         except:
-           print("Error calling function " + function().__name__ + "\n")
+           debug_msg("Error calling function " + function().__name__ + "\n")
 
         robot._driver.turn_off_rail_lights()
         robot._driver.turn_on_blue_button_light()
+
+def debug_msg(msg):
+
+        p = Popen("echo " + msg + " >> /debug_file" ,shell=True)
+        print(msg)
 
 def next_loc(loc):
         if int(loc[1:]) < 12:
@@ -114,7 +119,7 @@ def samples_to_aux():
        pipette_r.drop_tip()
 
 def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix):
-       
+
         location = 'H1'
         pipette_r.pick_up_tip(location = tiprack.wells(location))
         volumes = [5,25,20, [20, 10]]
@@ -122,12 +127,12 @@ def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_w
 
         # (1) MasterMix
         for sample in [mm_well,water_well, primer_well, dna_well]:
-                
+
                  pipette_r.pick_up_tip(location = tiprack.wells(location))
 	         location = next_loc(location)
 
                  for wells in dispense_m[sample]:
-                   
+
                      pipette_r.aspirate(volumes[1],plate.wells(sample).botton(1))
                      pipette_r.dispense(volumes[1],plate.wells(wells))
                  pipette_r.drop_tip()
@@ -144,13 +149,15 @@ def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_w
 
 logging.getLogger("opentrons").setLevel(logging.INFO)
 
-# Attempt to connect to the thermocycler
+try:
 if not thermocycler.connected:
         thermocycler.connect()
+except:
+        debug_msg("Initial Connection failed!\n")
 
 # (1) Warming at 90 degrees for 600 seconds (PCR)
 
-print("Applying heat to samples...\n")
+debug_msg("Applying heat to samples...\n")
 
 heat_program = {'name': 'Heat',
                 'lid_temp': 110,
@@ -166,7 +173,7 @@ execute_move(samples_to_pcr)
 
 # (2) Cooling at 4 degrees for 600 seconds (aux)
 
-print("Moving samples to cool them...\n")
+debug_msg("Moving samples to cool them...\n")
 #api_request('4', URL_AUX)
 # TODO cerrar la puerta
 # TODO sleep 10 mins
