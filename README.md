@@ -7,6 +7,9 @@ This is the biotechnological protocol for obtaining trained libraries of aptamer
 
 <img src="https://github.com/Zildj1an/SELEX/blob/master/img/robot.jpg" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="444"/>
 
+## The SELEX Process
+Aptamers are a cutting-edge technology that is revolutionizing biotechnology, from biosensing to synthetic biology.Aptamers are single-strand DNA molecules that hold nature’s most important information: our genetic code.But instead of using DNA for carrying information, our aptamers depend on DNA’s 3-dimensional shape. We genetically engineer this shape to take hold of and mesh with our target molecule.DNA’s unique role in nature gives aptamers amazing characteristics, making them robust, stable, and cheap to produce. 
+
 _The robot and The Ninja-PCR PCB_
 
 <img src="https://github.com/Zildj1an/SELEX/blob/master/img/aptameros.png" alt="" width="350"/>
