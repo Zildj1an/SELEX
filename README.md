@@ -6,7 +6,7 @@ Biotechnological protocol for obtaining trained libraries of aptamer molecules a
 This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More information at <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
 ![alt text](https://github.com/Zildj1an/SELEX/blob/master/img/robot.png)
-<img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.pngg" alt="drawing" width="200"/>
+<img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png"width="200"></img>
 
 _The robot and The Ninja-PCR PCB_
 
