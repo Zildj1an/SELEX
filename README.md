@@ -3,7 +3,7 @@
 ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000) 
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://2019.igem.org/Team:MADRID_UCM/Landing)
 
-This is the biotechnological protocol for obtaining trained libraries of aptamer molecules automated with the Opentrons OT-2 robot. This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. For the thermocycler we built the Ninja-PCR. More information can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
+This is the biotechnological protocol for obtaining trained libraries of aptamer molecules automated with the Opentrons OT-2 robot. This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. For the thermocycler we built the Ninja-PCR. More information about the entire project can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
 <img src="https://github.com/Zildj1an/SELEX/blob/master/img/robot.jpg" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="444"/>
 
@@ -18,4 +18,7 @@ _The SELEX process_
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
 * [Carlos Bilbao](https://github.com/Zildj1an)
+
+## License
+This project's source code is licensed under the GNU-GPL License - see the <a href="https://github.com/Zildj1an/SELEX/blob/master/LICENSE">LICENSE.md</a> file for details. The other parts of the project have the Creative Commons license, as stated in the competition guidelines.
 
