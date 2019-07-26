@@ -1,4 +1,4 @@
-# SELEX (Systematic Evolution of Ligands by Exponential Enrichment) Protocol 
+# SELEX Protocol for DNA molecules 
 ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000) 
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://2019.igem.org/Team:MADRID_UCM/Landing)
 
