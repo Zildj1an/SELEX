@@ -22,7 +22,7 @@ You can clone this repo or download the zip. Make sure all the dependencies are 
 sudo apt install python-pip || pacman -S python-pip
 pip install opentrons subprocess time os
 ```
-There is also two things that need to be done. The robot uses the audio robot.mp3 and gets it from Robot raspberry's /mnt/usbdrive/ (put it there or edit the location).
+The robot uses the audio robot.mp3 and gets it from Robot raspberry's /mnt/usbdrive/ (put it there or edit the location).
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
