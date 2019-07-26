@@ -5,7 +5,7 @@
 Biotechnological protocol for obtaining trained libraries of aptamer molecules automated with the Opentrons OT-2 robot.
 This protocol is a part of our contribution to the 2019 iGEM international biotechnology competition. More information at <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
-<img src="https://github.com/Zildj1an/SELEX/blob/master/img/robot.png" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="450"/>
+<img src="https://github.com/Zildj1an/SELEX/blob/master/img/robot.png" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="445"/>
 
 _The robot and The Ninja-PCR PCB_
 
