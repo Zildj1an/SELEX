@@ -23,7 +23,7 @@ $ sudo apt install python-pip || pacman -S python-pip
 $ pip install opentrons subprocess time os
 ```
 The robot uses the audio robot.mp3 and gets it from Robot raspberry's /mnt/usbdrive/ (put it there or edit the location).
-You can load the protocol in the Opentrons application <a href = "https://opentrons.com/ot-app">here</a>.
+You can load the protocol in the Opentrons application, available <a href = "https://opentrons.com/ot-app">here</a>.
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
