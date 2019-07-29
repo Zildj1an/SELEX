@@ -19,6 +19,9 @@ if "eppendorf_rack" not in labware.list():
         depth=21,
         volume=50)
 
+robot._driver.turn_off_rail_lights()
+
+'''
 plate = labware.load('eppendorf_rack', '8')
 tiprack = labware.load('opentrons-tiprack-300ul', '6')
 
@@ -37,3 +40,4 @@ if not robot.is_simulating():
 pipette.move_to(plate.wells('A1').bottom(1))
 pipette.dispense(10)
 pipette.return_tip()
+'''

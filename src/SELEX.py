@@ -94,7 +94,7 @@ def next_loc(loc):
                 n_loc[0] -= 1
         return n_loc
 
-def samples_to_pcr():
+def samples_to_pcr(args):
 
         pipette_r.pick_up_tip()
 
@@ -107,7 +107,13 @@ def samples_to_pcr():
 
         pipette_r.drop_tip()
 
-def samples_to_aux():
+def samples_to_magdeck(args):
+
+        pipette_r.pick_up_tip()
+        # TODO mover del aux al magdeck
+        pipette_r.drop_tip()
+
+def samples_to_aux(args):
 
        pipette_r.pick_up_tip()
 
@@ -117,6 +123,18 @@ def samples_to_aux():
              pipette_r.dispense(50,thermic_module.wells(x))
 
        pipette_r.drop_tip()
+
+def wash_madgeck(args):
+
+      pipette_r.pick_up_tip()
+      # TODO "Lavados"
+      # Pasos:
+      # 1 Liquido buffer a las pipetas del magdeck
+      # 2 magdeck.engage()
+      # 3 Esperar tiempo por determinar
+      # 4 Extraer liquido y repetir el paso 1
+      # 5 El proceso se repite un num por determinar
+      pipette_r.drop_tip()
 
 def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix):
 
@@ -129,11 +147,11 @@ def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_w
         for sample in [mm_well,water_well, primer_well, dna_well]:
 
                  pipette_r.pick_up_tip(location = tiprack.wells(location))
-	         location = next_loc(location)
+                 location = next_loc(location)
 
                  for wells in dispense_m[sample]:
 
-                     pipette_r.aspirate(volumes[1],plate.wells(sample).botton(1))
+                     pipette_r.aspirate(volumes[1],plate.wells(sample).bottom(1))
                      pipette_r.dispense(volumes[1],plate.wells(wells))
                  pipette_r.drop_tip()
 
@@ -147,6 +165,7 @@ def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_w
 
 # [4] SELEX execution
 
+'''
 logging.getLogger("opentrons").setLevel(logging.INFO)
 
 try:
@@ -154,7 +173,7 @@ if not thermocycler.connected:
         thermocycler.connect()
 except:
         debug_msg("Initial Connection failed!\n")
-
+'''
 # (1) Warming at 90 degrees for 600 seconds (PCR)
 
 debug_msg("Applying heat to samples...\n")
@@ -168,39 +187,46 @@ heat_program = {'name': 'Heat',
                     'name': 'Initial Step',
                     'ramp': 0}]}
 
-thermocycler.send_command('start',heat_program)
-execute_move(samples_to_pcr)
+#TODO Abrir puerta
+#thermocycler.send_command('start',heat_program)
+#execute_move(samples_to_pcr, [None])
 
 # (2) Cooling at 4 degrees for 600 seconds (aux)
 
 debug_msg("Moving samples to cool them...\n")
-#api_request('4', URL_AUX)
+#thermocycler.send_command()
 # TODO cerrar la puerta
 # TODO sleep 10 mins
 sleep(1)
-execute_move(samples_to_aux)
+#execute_move(samples_to_aux, [None])
 
-# (3)
+# (3) Rest 1 hour
 
-#api_request(,URL_AUX)
+#aux.send_command()
 #sleep(1 hour)
 
 # (4) Magnentic separation
 
-# The first time you wish to get read of the ones stuck to the
+#execute_move(samples_to_magdeck, [None])
+
+# The first time you wish to get rid of the ones stuck to the
 # non-modified e.coli
 # moverlo a magdeck
 # magnetic.engage()
 
-# (5)
+# (5) Aptamers somewhere else
+# move aptamers at magdeck to cholira
 
-# (6)
+# (6) Wash the magdeck (Lavados)
+#execute_move(wash_magdeck,[None])
 
-# (7)
+# Rest aptamers + cholira (e-choli with "cholera")
+# (7) De nuevo (4),(6)
 
-# ...
+# (8) Robot must be stopped for DNA measuring
+# It will resume when bottom is pressed TODO
 
-# Amplify the DNA via PCR
+# (9) Amplify the DNA via PCR
 
 primer_well = 'A2'
 mm_well     = 'B2'
@@ -209,8 +235,9 @@ water_well  = 'D2'
 first_mix   = 'A1'
 second_mix  = 'B1'
 third_mix   = 'C1'
-execute_move(pcr, [plate, pipette_r, tiprack, ninja, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix])
+#execute_move(DNA_amplification, [plate_samples, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix])
 
+# (10) De nuevo (4), (6)
 
 robot._driver.home()
 
