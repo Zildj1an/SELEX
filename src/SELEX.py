@@ -35,12 +35,12 @@ if thermic_name not in labware.list():
         depth=10,                       # Depth (mm) of each well on the plate
         volume=50)
 
-plate_samples    =   labware.load('96-flat',      slot ='11')  			    # Samples
-tiprack          =   labware.load('tiprack-10ul', slot='6')	         	    # Tipracks
-magnetic         =   modules.load('magdeck',      slot ='4')	                    # Magnetic Deck
-plate_magnet     =   labware.load('96-flat',      slot ='4', share = True)	    # Magnetic Deck plate
-thermocycler     =   NinjaPCR(slot='10', simulating = robot.is_simulating())	    # Ninja-PCR
-thermic_module   =   labware.load(thermic_name,   slot ='3')			    # Auxiliar thermic module
+plate_samples    =   labware.load('96-flat',      slot ='11')                       # Samples
+tiprack          =   labware.load('tiprack-10ul', slot='6')                         # Tipracks
+magnetic         =   modules.load('magdeck',      slot ='4')                        # Magnetic Deck
+plate_magnet     =   labware.load('96-flat',      slot ='4', share = True)          # Magnetic Deck plate
+thermocycler     =   NinjaPCR(slot='10', simulating = robot.is_simulating())        # Ninja-PCR
+thermic_module   =   labware.load(thermic_name,   slot ='3')                        # Auxiliar thermic module
 trash            =   labware.load('trash-box',    slot = '12', share = True)        # Trash
 
 # [2] Pipettes
@@ -127,9 +127,12 @@ def samples_to_aux(args):
 def wash_madgeck(args):
 
       pipette_r.pick_up_tip()
+
       # TODO "Lavados"
       # Pasos:
       # 1 Liquido buffer a las pipetas del magdeck
+      # pipette_r.aspirate(50,)
+      # pipette_r.dispense(50,)
       # 2 magdeck.engage()
       # 3 Esperar tiempo por determinar
       # 4 Extraer liquido y repetir el paso 1
