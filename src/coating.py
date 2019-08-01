@@ -13,6 +13,7 @@
 # TODO usar la multiple
 
 from opentrons import labware, instruments, modules, robot
+from opentrons.data_storage import database
 
 metadata = {
    'protocolName' : 'Coating',
@@ -22,11 +23,16 @@ metadata = {
 
 # [0] Our design for the three modules
 
+'''
+database.delete_container('Falcon_Samples')
+database.delete_container('Eppendorf_Samples')
+'''
+
 plate_falcon = 'Falcon_Samples'
 if plate_falcon not in labware.list():
    Falcon = labware.create(
       plate_falcon,
-      grid = (3,3),
+      grid = (3,2),
       spacing = (35,43), #TODO change
       diameter = 10,
       depth  = 110,
@@ -61,12 +67,14 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B):
    pipette.pick_up_tip()
 
    for i in range(1,times):
-      pipette.transfer(50,pos1.wells(A),pos2.wells(B), new_tip='never')
+      pipette.aspirate(50,pos1.wells(A).bottom(1))
+      pipette.dispense(50,pos2.wells(B))
 
    quantity = quantity - (times * 50)
 
    if quantity > 0:
-      pipette.transfer(quantity,pos1.wells(A),pos2.wells(B), new_tip='never')
+      pipette.aspirate(quantity,pos1.wells(A).bottom(1))
+      pipette.dispense(quantity,pos2.wells(B))
       
   
 # [3] Execution
