@@ -37,7 +37,7 @@ if plate_eppendorf not in labware.list():
    Eppendorf = labware.create(
       plate_eppendorf,
       grid = (8,4),
-      spacing = (1.5,2),
+      spacing = (15,20),
       diameter = 10,
       depth  = 32,
       volume = 100)
