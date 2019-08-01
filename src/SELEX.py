@@ -2,10 +2,16 @@
 @author Carlos Bilbao, Pablo Villalobos
 @date July 12th, 2019
 @version 1
+ __    __  __    ____  __
+/ _\  /__\/ /   /__\ \/ /
+\ \  /_\ / /   /_\  \  /
+_\ \//__/ /___//__  /  \
+\__/\__/\____/\__/ /_/\_\
 
 """
 
 from opentrons import labware, instruments, modules, robot
+from opentrons.data_storage import database
 from ninjapcr import NinjaPCR
 from subprocess import Popen
 from time import sleep
@@ -24,6 +30,8 @@ URL_PCR = "http://ninjapcr.local/command"
 URL_AUX = "http://thermaux.local/command"
 
 # [1] Labware
+
+database.delete_container('Thermic_Module')
 
 thermic_name = 'Thermic_Module'
 if thermic_name not in labware.list():
