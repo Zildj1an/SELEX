@@ -15,9 +15,9 @@
 from opentrons import labware, instruments, modules, robot
 
 metadata = {
-       'protocolName' : 'Coating',
-       'description'  : 'Coating of the samples',
-       'source'       : 'https://github.com/Zildj1an/SELEX'
+   'protocolName' : 'Coating',
+   'description'  : 'Coating of the samples',
+   'source'       : 'https://github.com/Zildj1an/SELEX'
 }
 
 # [0] Our design for the three modules
@@ -37,9 +37,9 @@ if plate_eppendorf not in labware.list():
    Eppendorf = labware.create(
       plate_eppendorf,
       grid = (8,4),
-      spacing = (1,2),
-      diameter = 1,
-      depth  = 2,
+      spacing = (1.5,2),
+      diameter = 10,
+      depth  = 32,
       volume = 50)
 
 # [1] Labware
@@ -55,20 +55,19 @@ plate_samples    = labware.load('96-flat',       slot = '11')                   
 pipette_l = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
 
 def custom_transfer(pipette,quantity,pos1,pos2,A,B):
-    
-   times = quantity / 50
+   
+   times = quantity // 50
    
    pipette.pick_up_tip()
 
    for i in range(1,times):
-       pipette.transfer(50,pos1.wells(A),pos2.wells(B))
+      pipette.transfer(50,pos1.wells(A),pos2.wells(B), new_tip='never')
 
    quantity = quantity - (times * 50)
 
    if quantity > 0:
-       pipette.transfer(quantity,pos1.wells(A),pos2.wells(B))
-   
-   pipette.drop_tip()
+      pipette.transfer(quantity,pos1.wells(A),pos2.wells(B), new_tip='never')
+      
   
 # [3] Execution
 
@@ -85,37 +84,45 @@ for falcon in ['A1','B1','B2']:
     # 1st Eppendorf -> 400 ul of PBS + 400 ul of Falcon15
     custom_transfer(pipette_l,400,Falcon,Eppendorf,falcon50,'A'+ str(val))
     pipette_l.mix(2,50,Falcon.wells(falcon))
+    pipette_l.drop_tip()
     custom_transfer(pipette_l,400,Falcon,Eppendorf,falcon,  'A' + str(val))
 
     # 2nd Eppendorf -> 640 ul of PBS + 160 ul of Falcon15
     custom_transfer(pipette_l,640,Falcon,Eppendorf,falcon50,'B' + str(val))
     pipette_l.mix(2,50,Falcon.wells(falcon))
+    pipette_l.drop_tip()
     custom_transfer(pipette_l,160,Falcon,Eppendorf,falcon,  'B' + str(val))
 
     # 3rd Eppendorf -> 720 ul of PBS + 80 ul of Falcon
     custom_transfer(pipette_l,720,Falcon,Eppendorf,falcon50,'C' + str(val))
     pipette_l.mix(2,50,Falcon.wells(falcon))
+    pipette_l.drop_tip()
     custom_transfer(pipette_l,80,Falcon,Eppendorf,falcon,   'C' + str(val))
 
     # 3rd Eppendorf -> 784 ul of PBS + 16 ul of Falcon
     custom_transfer(pipette_l,784,Falcon,Eppendorf,falcon50,'D' + str(val))
     pipette_l.mix(2,50,Falcon.wells(falcon))
+    pipette_l.drop_tip()
     custom_transfer(pipette_l,16,Falcon,Eppendorf,falcon,   'D' + str(val))
 
     val = val + 1
 
     for pos in ['A','B','C','D']:
-        
+       
         init = 1
         end = 6
 
         if falcon == 'B1':
            init = 1
            end  = 6 
-
+ 
+           
         for i in range(init,end):
 
-           pipette_l.transfer(100,Eppendorf.wells(pos + str(val)),plate_samples.wells(pos + str(i)))
+           pipette_l.transfer(100,Eppendorf.wells(pos + str(val)),plate_samples.wells(pos + str(i)), new_tip='never')
+           
+        pipette_l.drop_tip()
+         
 
 
 robot._driver.turn_off_rail_lights()
