@@ -27,10 +27,10 @@ if plate_falcon not in labware.list():
    Falcon = labware.create(
       plate_falcon,
       grid = (3,3),
-      spacing = (3,3), #TODO change
-      diameter = 2,
-      depth  = 2,
-      volume = 50)
+      spacing = (35,43), #TODO change
+      diameter = 10,
+      depth  = 110,
+      volume = 800)
 
 plate_eppendorf = 'Eppendorf_Samples'
 if plate_eppendorf not in labware.list():
@@ -40,7 +40,7 @@ if plate_eppendorf not in labware.list():
       spacing = (1.5,2),
       diameter = 10,
       depth  = 32,
-      volume = 50)
+      volume = 100)
 
 # [1] Labware
 
