@@ -36,7 +36,7 @@ if thermic_name not in labware.list():
         volume=50)
 
 plate_samples    =   labware.load('96-flat',      slot ='11')                       # Samples
-tiprack          =   labware.load('tiprack-10ul', slot='6')                         # Tipracks
+tiprack          =   labware.load('tiprack-10ul', slot ='6')                        # Tipracks
 magnetic         =   modules.load('magdeck',      slot ='4')                        # Magnetic Deck
 plate_magnet     =   labware.load('96-flat',      slot ='4', share = True)          # Magnetic Deck plate
 thermocycler     =   NinjaPCR(slot='10', simulating = robot.is_simulating())        # Ninja-PCR
@@ -190,23 +190,23 @@ heat_program = {'name': 'Heat',
                     'name': 'Initial Step',
                     'ramp': 0}]}
 
-#TODO Abrir puerta
+#TODO Abrir puerta TODO calientas NO en el PCR
 #thermocycler.send_command('start',heat_program)
-#execute_move(samples_to_pcr, [None])
+execute_move(samples_to_pcr, [None])
 
 # (2) Cooling at 4 degrees for 600 seconds (aux)
 
 debug_msg("Moving samples to cool them...\n")
 #thermocycler.send_command()
 # TODO cerrar la puerta
-# TODO sleep 10 mins
+# TODO sleep +10 mins
+# COMPROBAR QUE YA ESTA A 4 GRADOS PQ DEBE ESTARLO AL MOVER
 sleep(1)
-#execute_move(samples_to_aux, [None])
+execute_move(samples_to_aux, [None])
 
-# (3) Rest 1 hour
+# (3) Rest 10 min
 
 #aux.send_command()
-#sleep(1 hour)
 
 # (4) Magnentic separation
 
@@ -238,7 +238,7 @@ water_well  = 'D2'
 first_mix   = 'A1'
 second_mix  = 'B1'
 third_mix   = 'C1'
-#execute_move(DNA_amplification, [plate_samples, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix])
+execute_move(DNA_amplification, [plate_samples, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix])
 
 # (10) De nuevo (4), (6)
 
