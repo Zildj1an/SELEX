@@ -33,7 +33,7 @@ if plate_falcon not in labware.list():
    Falcon = labware.create(
       plate_falcon,
       grid = (3,2),
-      spacing = (35,43), #TODO change
+      spacing = (35,43),
       diameter = 10,
       depth  = 110,
       volume = 800)
@@ -61,9 +61,9 @@ plate_samples    = labware.load('96-flat',       slot = '11')                   
 pipette_l = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
 
 def custom_transfer(pipette,quantity,pos1,pos2,A,B):
-   
+
    times = quantity // 50
-   
+
    pipette.pick_up_tip()
 
    for i in range(1,times):
@@ -75,8 +75,8 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B):
    if quantity > 0:
       pipette.aspirate(quantity,pos1.wells(A).bottom(1))
       pipette.dispense(quantity,pos2.wells(B))
-      
-  
+
+
 # [3] Execution
 
 # Previous:
@@ -116,22 +116,19 @@ for falcon in ['A1','B1','B2']:
     val = val + 1
 
     for pos in ['A','B','C','D']:
-       
+
         init = 1
         end = 6
 
         if falcon == 'B1':
            init = 1
-           end  = 6 
- 
-           
+           end  = 6
+
         for i in range(init,end):
 
            pipette_l.transfer(100,Eppendorf.wells(pos + str(val)),plate_samples.wells(pos + str(i)), new_tip='never')
-           
-        pipette_l.drop_tip()
-         
 
+        pipette_l.drop_tip()
 
 robot._driver.turn_off_rail_lights()
 robot._driver.home()
