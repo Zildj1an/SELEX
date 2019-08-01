@@ -2,6 +2,11 @@
 @author Carlos Bilbao, Pablo Villalobos
 @date July 12th, 2019
 @version 1
+ __    __  __    ____  __
+/ _\  /__\/ /   /__\ \/ /
+\ \  /_\ / /   /_\  \  /
+_\ \//__/ /___//__  /  \
+\__/\__/\____/\__/ /_/\_\
 
 """
 
