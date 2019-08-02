@@ -40,20 +40,20 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
         # (1) MasterMix
         for sample in [mm_well,water_well, primer_well, dna_well]:
-                
+
                 #pipette.pick_up_tip(location = tiprack.wells(location))
                 #location = next_loc(location)
                 pipette.pick_up_tip()
-                
+
                 for wells in dispense_m[sample]:
-                        
+
                         pipette.aspirate(volumes[1],plate.wells(sample).bottom(1))
                         pipette.dispense(volumes[1],plate.wells(wells))
 
                 pipette.drop_tip()
-                        
+
                 #pipette.pick_up_tip(location = tiprack.wells(location))
-                        
+
         pipette.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'))
         #location = next_loc(location)
         #pipette.pick_up_tip(location = tiprack.wells(location))
@@ -129,5 +129,4 @@ pipette_l = instruments.P50_Single(mount='left')
 args = [plate, pipette_l, tiprack, ninja, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix]
 
 pcr(*args)
-
 

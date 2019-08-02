@@ -246,7 +246,8 @@ water_well  = 'D2'
 first_mix   = 'A1'
 second_mix  = 'B1'
 third_mix   = 'C1'
-execute_move(DNA_amplification, [plate_samples, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix])
+args = [plate_samples, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix]
+execute_move(DNA_amplification, *args)
 
 # (10) De nuevo (4), (6)
 
