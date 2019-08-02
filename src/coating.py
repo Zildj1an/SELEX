@@ -21,15 +21,14 @@ metadata = {
 
 # [0] Our design for the three modules
 
-max_speed_per_axis = {
-    'x': 600, 'y': 500, 'z': 150, 'a': 150, 'b': 40, 'c': 40}
+# X,Y,Z,A speeds for lateral,front and vertical motion for left and right
+# B,C plunger speed for motor
+max_speed_per_axis = {'x': 600,'y': 400,'z': 125,'a': 125,'b': 40,'c': 40}
 robot.head_speed(**max_speed_per_axis)
-
 '''
 database.delete_container('Falcon_Samples')
 database.delete_container('Eppendorf_Samples')
 '''
-
 plate_falcon = 'Falcon_Samples'
 if plate_falcon not in labware.list():
    Falcon = labware.create(
@@ -61,7 +60,7 @@ plate_samples    = labware.load('96-flat',       slot = '11')                   
 # [2] Pipettes
 
 pipette_l = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
-pipette_l.set_flow_rate(aspirate=50, dispense=100)
+pipette_l.set_flow_rate(aspirate = 50, dispense = 100)
 
 volume_50 = 50000
 ml_rate = 9/5000
@@ -88,6 +87,8 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1):
 # Each Falcon has 1 ml shaked of PBS (Human part BEFORE Protocol)
 
 # (1) Each Falcon to Eppendorfs:
+
+robot._driver.turn_on_rail_lights()
 
 falcon50 = 'A1'
 val = 0

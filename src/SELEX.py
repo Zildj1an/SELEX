@@ -31,6 +31,11 @@ URL_AUX = "http://thermaux.local/command"
 
 # [1] Labware
 
+# X,Y,Z,A speeds for lateral,front and vertical motion for left and right
+# B,C plunger speed for motor
+max_speed_per_axis = {'X': 600,'Y': 400,'Z': 125,'A': 125,'B': 40,'C': 40}
+robot.head_speed(**max_speed_per_axis)
+
 database.delete_container('Thermic_Module')
 
 thermic_name = 'Thermic_Module'
@@ -55,6 +60,8 @@ trash            =   labware.load('trash-box',    slot = '12', share = True)    
 
 pipette_l   = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
 pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack], trash_container = trash)
+pipette_l.set_flow_rate(aspirate = 50, dispense = 100)
+pipette_r.set_flow_rate(aspirate = 50, dispense = 100)
 
 # [3] Commands
 
