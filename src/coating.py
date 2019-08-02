@@ -37,7 +37,7 @@ if plate_falcon not in labware.list():
    Falcon = labware.create(
       plate_falcon,
       grid = (3,2),
-      spacing = (35,43), #TODO change
+      spacing = (35,43),
       diameter = 10,
       depth  = 110,
       volume = 800)
@@ -74,8 +74,6 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1):
    
    times = quantity // 50
    
-   
-
    for i in range(1,times+1):
       pipette.aspirate(50,pos1.wells(A).bottom(depth))
       pipette.dispense(50,pos2.wells(B))
