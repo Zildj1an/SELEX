@@ -33,32 +33,33 @@ URL_AUX = "http://thermaux.local/command"
 
 # X,Y,Z,A speeds for lateral,front and vertical motion for left and right
 # B,C plunger speed for motor
+
 max_speed_per_axis = {'X': 600,'Y': 400,'Z': 125,'A': 125,'B': 40,'C': 40}
 robot.head_speed(**max_speed_per_axis)
 
 database.delete_container('Thermic_Module')
 
-thermic_name = 'Thermic_Module'
+thermic_name = 'Thermic_Module' #TODO check
 if thermic_name not in labware.list():
     thermic = labware.create(
-        thermic_name,                   # Labware Name
-        grid=(4, 4),                    # Amount of (columns, rows)
-        spacing=(9, 9),                 # Distances (mm) between each (column, row)
-        diameter=2,                     # Diameter (mm) of each well on the plate
-        depth=10,                       # Depth (mm) of each well on the plate
-        volume=50)
+        thermic_name,                         # Labware Name
+        grid     = (4, 4),                    # Amount of (columns, rows)
+        spacing  = (9, 9),                    # Distances (mm) between each (column, row)
+        diameter = 2,                         # Diameter (mm) of each well on the plate
+        depth    = 10,                        # Depth (mm) of each well on the plate
+        volume   = 50)
 
-plate_samples    =   labware.load('96-flat',      slot ='11')                       # Samples
+plate_samples    =   labware.load('96-flat',      slot ='11')                       # Samples TODO Eppendorf 1.5
 tiprack          =   labware.load('tiprack-10ul', slot ='6')                        # Tipracks
 magnetic         =   modules.load('magdeck',      slot ='4')                        # Magnetic Deck
 plate_magnet     =   labware.load('96-flat',      slot ='4', share = True)          # Magnetic Deck plate
 thermocycler     =   NinjaPCR(slot='10', simulating = robot.is_simulating())        # Ninja-PCR
-thermic_module   =   labware.load(thermic_name,   slot ='3')                        # Auxiliar thermic module
+thermic_module   =   labware.load(thermic_name,   slot ='1')                        # Auxiliar thermic module
 trash            =   labware.load('trash-box',    slot = '12', share = True)        # Trash
 
 # [2] Pipettes
 
-pipette_l   = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
+pipette_l   = instruments.P300_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
 pipette_r   = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack], trash_container = trash)
 pipette_l.set_flow_rate(aspirate = 50, dispense = 100)
 pipette_r.set_flow_rate(aspirate = 50, dispense = 100)
@@ -111,37 +112,34 @@ def next_loc(loc):
 
 def samples_to_pcr(args):
 
-        pipette_r.pick_up_tip()
+        pipette_l.pick_up_tip()
 
-        for x,y in [('E1','A1'),('E2','A2'),('E3','A3'),('E4','A4')]:
+        for l in ['A','B','C','D']:
 
-         	# Aspirate 4
-                pipette_r.aspirate(50,plate_samples.wells(x))
-	        # Dispense 4
-                pipette_r.dispense(50,thermocycler.labware.wells(y))
+               pipette_l.aspirate(250,plate_samples.wells('A1'))
 
-        pipette_r.drop_tip()
+               for x in [(l + '{}').format(i) for i in range(1, 5)]:
+                     pipette_l.dispense(50,thermocycler.labware.wells(x))
 
-def samples_to_magdeck(args):
+        pipette_l.drop_tip()
 
-        pipette_r.pick_up_tip()
-        # TODO mover del aux al magdeck
-        pipette_r.drop_tip()
+def samples_to([orig,dest]):
 
-def samples_to_aux(args):
+        pipette_l.pick_up_tip()
 
-       pipette_r.pick_up_tip()
+        for l in ['A','B','C','D']:
 
-       for x in ['A1','A2','A3','A4']:
+               for x in [(l + '{}').format(i) for i in range(1, 5)]:
+                     pipette_l.aspirate(50,orig.labware.wells(x))
 
-             pipette_r.aspirate(50,thermocycler.labware.wells(x))
-             pipette_r.dispense(50,thermic_module.wells(x))
+               for x in [(l + '{}').format(i) for i in range(1, 5)]:
+                     pipette_l.dispense(50,dest.labware.wells(x))
 
-       pipette_r.drop_tip()
+        pipette_l.drop_tip()
 
 def wash_madgeck(args):
 
-      pipette_r.pick_up_tip()
+      pipette_l.pick_up_tip()
 
       # TODO "Lavados"
       # Pasos:
@@ -150,40 +148,62 @@ def wash_madgeck(args):
       # pipette_r.dispense(50,)
       # 2 magdeck.engage()
       # 3 Esperar tiempo por determinar
+      sleep(1)
       # 4 Extraer liquido y repetir el paso 1
       # 5 El proceso se repite un num por determinar
-      pipette_r.drop_tip()
+      pipette_l.drop_tip()
 
 def DNA_amplification(plate, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix):
 
-        location = 'H1'
-        pipette_r.pick_up_tip(location = tiprack.wells(location))
-        volumes = [5,25,20, [20, 10]]
+        try:
+        if not thermocycler.connected:
+              thermocycler.connect()
+        except:
+              debug_msg("Initial Connection failed!\n")
+
+        # Water and primer volumes have been increased by 1-2ul to account for OT pipette error
+        volumes = {mm_well:[25,25,25],water_well:[22,27],primer_well:[6,6],dna_well:[20]}
         dispense_m = {primer_well:[first_mix,second_mix],mm_well:[first_mix,second_mix,third_mix],dna_well:[second_mix],water_well:[first_mix,third_mix]}
 
         # (1) MasterMix
         for sample in [mm_well,water_well, primer_well, dna_well]:
 
-                 pipette_r.pick_up_tip(location = tiprack.wells(location))
-                 location = next_loc(location)
+                #pipette.pick_up_tip(location = tiprack.wells(location))
+                #location = next_loc(location)
+                pipette.pick_up_tip()
 
-                 for wells in dispense_m[sample]:
+                for wells,vol in zip(dispense_m[sample], volumes[sample]):
 
-                     pipette_r.aspirate(volumes[1],plate.wells(sample).bottom(1))
-                     pipette_r.dispense(volumes[1],plate.wells(wells))
-                 pipette_r.drop_tip()
+                        pipette.aspirate(vol,plate.wells(sample).bottom(1))
+                        pipette.dispense(vol,plate.wells(wells))
+                        pipette.blow_out(plate.wells(wells).top(-10))
+                        pipette.touch_tip()
 
-        pipette_r.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'))
-        location = next_loc(location)
-        pipette_r.pick_up_tip(location = tiprack.wells(location))
-        pipette_r.transfer(50, plate.wells('B1'), thermocycler.labware.wells('A2'))
-        location = next_loc(location)
-        pipette_r.pick_up_tip(location = tiprack.wells(location))
-        pipette_r.transfer(50, plate.wells('C1'), thermocycler.labware.wells('A3'))
+                pipette.drop_tip()
+
+                #pipette.pick_up_tip(location = tiprack.wells(location))
+
+        pipette.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'))
+        #location = next_loc(location)
+        #pipette.pick_up_tip(location = tiprack.wells(location))
+        pipette.transfer(50, plate.wells('B1'), thermocycler.labware.wells('A2'))
+        #location = next_loc(location)
+        #pipette.pick_up_tip(location = tiprack.wells(location))
+        pipette.transfer(50, plate.wells('C1'), thermocycler.labware.wells('A3'))
+
+        PROGRAM = {'name': 'Heat',
+                   'lid_temp': 110,
+                   'steps': [{
+                           'type': 'step',
+                           'time': 30,
+                           'temp': 65,
+                           'name': 'Heat',
+                           'ramp': 0}]}
+
+        thermocycler.wait_for_program(PROGRAM)
 
 # [4] SELEX execution
 
-'''
 logging.getLogger("opentrons").setLevel(logging.INFO)
 
 try:
@@ -191,11 +211,10 @@ if not thermocycler.connected:
         thermocycler.connect()
 except:
         debug_msg("Initial Connection failed!\n")
-'''
+
 # (1) Warming at 90 degrees for 600 seconds (PCR)
 
 debug_msg("Applying heat to samples...\n")
-
 heat_program = {'name': 'Heat',
                 'lid_temp': 110,
                 'steps': [{
@@ -205,27 +224,34 @@ heat_program = {'name': 'Heat',
                     'name': 'Initial Step',
                     'ramp': 0}]}
 
-#TODO Abrir puerta TODO calientas NO en el PCR
-#thermocycler.send_command('start',heat_program)
+#TODO Abrir puerta PCR
+thermocycler.send_command('start',heat_program)
+
+cold_program = {'name': 'Cold',
+                'lid_temp': 4,
+                'steps': [{
+                    'type': 'step',
+                    'time': 2500,
+                    'temp': 4,
+                    'name': 'Second Step',
+                    'ramp': 0}]}
+
+#thermic_module.send_command('start',cold_program) TODO
+
 execute_move(samples_to_pcr, [None])
+# TODO cerrar la puerta
+# sleep(600)
 
 # (2) Cooling at 4 degrees for 600 seconds (aux)
 
 debug_msg("Moving samples to cool them...\n")
-#thermocycler.send_command()
-# TODO cerrar la puerta
-# TODO sleep +10 mins
+
 # COMPROBAR QUE YA ESTA A 4 GRADOS PQ DEBE ESTARLO AL MOVER
-sleep(1)
-execute_move(samples_to_aux, [None])
-
-# (3) Rest 10 min
-
-#aux.send_command()
+execute_move(samples_to, [thermocycler,thermic_module])
 
 # (4) Magnentic separation
 
-#execute_move(samples_to_magdeck, [None])
+execute_move(samples_to_magdeck, [thermic_module,magdeck])
 
 # The first time you wish to get rid of the ones stuck to the
 # non-modified e.coli
@@ -253,7 +279,7 @@ water_well  = 'D2'
 first_mix   = 'A1'
 second_mix  = 'B1'
 third_mix   = 'C1'
-args = [plate_samples, pipette_r, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix]
+args = [plate_samples, pipette_l, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix]
 execute_move(DNA_amplification, *args)
 
 # (10) De nuevo (4), (6)

@@ -35,7 +35,7 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
         #location = 'H1'
         #pipette_r.pick_up_tip(location = tiprack.wells(location))
-        
+
         # Water and primer volumes have been increased by 1-2ul to account for OT pipette error
         volumes = {mm_well:[25,25,25],water_well:[22,27],primer_well:[6,6],dna_well:[20]}
         dispense_m = {primer_well:[first_mix,second_mix],mm_well:[first_mix,second_mix,third_mix],dna_well:[second_mix],water_well:[first_mix,third_mix]}
@@ -76,40 +76,7 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
                            'ramp': 0}]}
 
         #thermocycler.wait_for_program(PROGRAM)
-        robot.home()
-'''
-def execute_move(function, args):
 
-        if robot.is_simulating():
-                function(*args)
-
-        else:
-                # When the robot starts moving light goes on and
-                # button turns red
-                robot._driver.turn_on_rail_lights()
-                robot._driver.turn_on_red_button_light()
-                cmd  = "ffplay -nodisp -autoexit /mnt/usbdrive/robot.mp3 &> /dev/null"
-                cmd2 = "pkill ffplay"
-                cmd_video = 'ffmpeg -video_size 320x240 -i /dev/video0 -t 00:06:00 -metadata:s:v rotate="180" video.mp4'
-
-                # Will play while door is opened
-                while not robot._driver.read_window_switches():
-
-                        p = Popen(cmd,shell=True)
-
-                        while not robot._driver.read_window_switches() and p.poll() is None:
-                                sleep(.1)
-                        if robot._driver.read_window_switches() and p.poll() is None:
-                                os.system(cmd2)
-                try:
-                        p = Popen(cmd_video, shell=True)
-                        function(*args)
-                except:
-                        print("Error calling function " + function().__name__ + "\n")
-
-                robot._driver.turn_off_rail_lights()
-                robot._driver.turn_on_blue_button_light()
-'''
 # Run PCR as an independent protocol
 
 # Labware and module initialization
@@ -133,4 +100,3 @@ pipette_l = instruments.P50_Single(mount='left')
 args = [plate, pipette_l, tiprack, ninja, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix]
 
 pcr(*args)
-
