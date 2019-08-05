@@ -35,7 +35,9 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
         #location = 'H1'
         #pipette_r.pick_up_tip(location = tiprack.wells(location))
-        volumes = [5,25,20, [20, 10]]
+        
+        # Water and primer volumes have been increased by 1-2ul to account for OT pipette error
+        volumes = {mm_well:[25,25,25],water_well:[22,27],primer_well:[6,6],dna_well:[20]}
         dispense_m = {primer_well:[first_mix,second_mix],mm_well:[first_mix,second_mix,third_mix],dna_well:[second_mix],water_well:[first_mix,third_mix]}
 
         # (1) MasterMix
@@ -45,10 +47,12 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
                 #location = next_loc(location)
                 pipette.pick_up_tip()
 
-                for wells in dispense_m[sample]:
+                for wells,vol in zip(dispense_m[sample], volumes[sample]):
 
-                        pipette.aspirate(volumes[1],plate.wells(sample).bottom(1))
-                        pipette.dispense(volumes[1],plate.wells(wells))
+                        pipette.aspirate(vol,plate.wells(sample).bottom(1))
+                        pipette.dispense(vol,plate.wells(wells))
+                        pipette.blow_out(plate.wells(wells).top(-10))
+                        pipette.touch_tip()
 
                 pipette.drop_tip()
 
