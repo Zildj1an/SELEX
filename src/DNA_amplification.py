@@ -51,7 +51,7 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
                         pipette.aspirate(vol,plate.wells(sample).bottom(1))
                         pipette.dispense(vol,plate.wells(wells))
-                        pipette.blow_out(plate.wells(wells).top(-10))
+                        pipette.blow_out(plate.wells(wells))
                         pipette.touch_tip()
 
                 pipette.drop_tip()
@@ -81,9 +81,9 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
 # Labware and module initialization
 
-plate = labware.load('96-flat', slot='8')
+plate   = labware.load('96-flat', slot='8')
 tiprack = labware.load('opentrons-tiprack-300ul', slot='6')
-ninja = NinjaPCR(slot='10', simulating = robot.is_simulating())
+ninja   = NinjaPCR(slot='10', simulating = robot.is_simulating())
 
 primer_well = 'A2'
 mm_well = 'B2'
@@ -93,7 +93,6 @@ water_well = 'D2'
 first_mix = 'A1'
 second_mix = 'B1'
 third_mix = 'C1'
-
 
 pipette_l = instruments.P50_Single(mount='left')
 

@@ -23,6 +23,7 @@ metadata = {
 
 # X,Y,Z,A speeds for lateral,front and vertical motion for left and right
 # B,C plunger speed for motor
+#max_speed_per_axis = {'x': 600,'y': 400,'z': 125,'a': 125,'b': 40,'c': 40}
 max_speed_per_axis = {'x': 600,'y': 400,'z': 125,'a': 125,'b': 40,'c': 40}
 robot.head_speed(**max_speed_per_axis)
 '''
@@ -54,13 +55,13 @@ if plate_eppendorf not in labware.list():
 Falcon           = labware.load(plate_falcon,    slot = '2')
 Eppendorf        = labware.load(plate_eppendorf, slot = '5')
 tiprack          = labware.load('tiprack-10ul',  slot = '6')
-trash            = labware.load('trash-box',     slot = '12', share = True)
-plate_samples    = labware.load('96-flat',       slot = '1')                       # Samples
+trash            =   labware.load('trash-box',    slot = '12', share = True)        # Trash
+plate_samples    = labware.load('96-flat',       slot = '11')                       # Samples
 
 # [2] Pipettes
 
 pipette_l = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
-pipette_l.set_flow_rate(aspirate = 50, dispense = 100)
+pipette_l.set_flow_rate(aspirate = 50, dispense = 50)
 
 volume_50 = 50000
 ml_rate = 9/5000
@@ -73,6 +74,7 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1):
       pipette.aspirate(50,pos1.wells(A).bottom(depth))
       pipette.dispense(50,pos2.wells(B))
       pipette.blow_out(pos2.wells(B).top(-4))
+      pipette.touch_tip()
 
    quantity = quantity - (times * 50)
 
