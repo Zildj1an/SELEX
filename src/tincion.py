@@ -88,28 +88,25 @@ robot._driver.turn_on_rail_lights()
 # Por columna, 50 de PBS (en el storage 1 columna) hasta llegar a 200 en todas
 # De 50 en 50 por columna (ojo con lo de las pipetas)
 
-'''
 storage_samples('A1', 0)
-
 samples_trash()
 
 # 200 ul de cristal violeta (2a columna), IGUAL que antes pero con la segunda columna del storage
 
 storage_samples('A2', 0)
-'''
+
 # Pause 20 mins
 
-'''
 # Or pause
 if not robot.is_simulating():
     while not gpio.read(gpio.INPUT_PINS['BUTTON_INPUT']):
          print("Waiting...")
-'''
+
 
 # EN LA SIGUIENTE PARTE: Tincion 2
 # Tinte 200ul a la basura
 
-for x in range(1,3):
+for x in range(1,6):
 
     samples_trash()
 
