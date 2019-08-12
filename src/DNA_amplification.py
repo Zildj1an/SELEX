@@ -27,40 +27,51 @@ def next_loc(loc):
         return n_loc
 '''
 
+max_speed_per_axis = {
+    'x': 600, 'y': 500, 'z': 150, 'a': 150, 'b': 40, 'c': 40}
+robot.head_speed(**max_speed_per_axis)
+
+
 def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix):
         # Attempt to connect to the thermocycler
 
-        #if not thermocycler.connected:
-        #        thermocycler.connect()
+        if not thermocycler.connected:
+                thermocycler.connect()
 
+        robot._driver.turn_on_rail_lights()
+        
         #location = 'H1'
         #pipette_r.pick_up_tip(location = tiprack.wells(location))
-        volumes = [5,25,20, [20, 10]]
+        volumes = [[25,25,25],[22, 27],[6,6],[20]]
         dispense_m = {primer_well:[first_mix,second_mix],mm_well:[first_mix,second_mix,third_mix],dna_well:[second_mix],water_well:[first_mix,third_mix]}
 
         # (1) MasterMix
-        for sample in [mm_well,water_well, primer_well, dna_well]:
+        for sample,volume_l in zip([mm_well,water_well, primer_well, dna_well], volumes):
                 
                 #pipette.pick_up_tip(location = tiprack.wells(location))
                 #location = next_loc(location)
                 pipette.pick_up_tip()
                 
-                for wells in dispense_m[sample]:
+                for wells,volume in zip(dispense_m[sample],volume_l):
                         
-                        pipette.aspirate(volumes[1],plate.wells(sample).bottom(1))
-                        pipette.dispense(volumes[1],plate.wells(wells))
+                        pipette.aspirate(volume,plate.wells(sample).bottom(1), rate=0.5)
+                        pipette.dispense(plate.wells(wells))
+                        pipette.blow_out(plate.wells(wells).top(-5))
+                        pipette.touch_tip()
+                        pipette.move_to(plate.wells(wells).top(10))
+                        pipette.delay(seconds=5)
 
                 pipette.drop_tip()
                         
                 #pipette.pick_up_tip(location = tiprack.wells(location))
                         
-        pipette.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'))
+        pipette.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'), blow_out=True)
         #location = next_loc(location)
         #pipette.pick_up_tip(location = tiprack.wells(location))
-        pipette.transfer(50, plate.wells('B1'), thermocycler.labware.wells('A2'))
+        pipette.transfer(50, plate.wells('B1'), thermocycler.labware.wells('A2'), blow_out=True)
         #location = next_loc(location)
         #pipette.pick_up_tip(location = tiprack.wells(location))
-        pipette.transfer(50, plate.wells('C1'), thermocycler.labware.wells('A3'))
+        pipette.transfer(50, plate.wells('C1'), thermocycler.labware.wells('A3'), blow_out=True)
 
         PROGRAM = {'name': 'Heat',
                    'lid_temp': 110,
@@ -71,7 +82,9 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
                            'name': 'Heat',
                            'ramp': 0}]}
 
-        #thermocycler.wait_for_program(PROGRAM)
+        robot._driver.turn_off_rail_lights()
+        
+        thermocycler.wait_for_program(PROGRAM)
         robot.home()
 '''
 def execute_move(function, args):
@@ -110,7 +123,16 @@ def execute_move(function, args):
 
 # Labware and module initialization
 
-plate = labware.load('96-flat', slot='8')
+if "eppendorf_rack" not in labware.list():
+    labware.create(
+        "eppendorf_rack",
+        grid=(12,8),
+        spacing=(9,9),
+        diameter=5,
+        depth=21,
+        volume=50)
+
+plate = labware.load('eppendorf_rack', slot='8')
 tiprack = labware.load('opentrons-tiprack-300ul', slot='6')
 ninja = NinjaPCR(slot='10', simulating = robot.is_simulating())
 
@@ -123,8 +145,7 @@ first_mix = 'A1'
 second_mix = 'B1'
 third_mix = 'C1'
 
-
-pipette_l = instruments.P50_Single(mount='left')
+pipette_l = instruments.P50_Single(mount='left', tip_racks=[tiprack])
 
 args = [plate, pipette_l, tiprack, ninja, primer_well, mm_well, dna_well, water_well, first_mix, second_mix, third_mix]
 

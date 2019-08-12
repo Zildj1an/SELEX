@@ -27,9 +27,9 @@ def graph(url):
         plot_b += [float(status['b'])]
         plot_z += [float(status['z'])]
 
-        #plt.plot(plot_l, label='lid')
+        plt.plot(plot_l, label='lid')
         plt.plot(plot_b, label='base')
-        #plt.plot(plot_z, label='sample')
+        plt.plot(plot_z, label='sample')
 
         plt.xlabel(f'{status["s"]} - {status["p"] if "p" in status.keys() else ""} {"| Remaining time: " + status["r"] if "r" in status.keys() else ""}')
 

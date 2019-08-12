@@ -92,7 +92,7 @@ class NinjaPCR:
                 grid=(4, 4),                    # Amount of (columns, rows)
                 spacing=(9, 9),                 # Distances (mm) between each (column, row)
                 diameter=2,                     # Diameter (mm) of each well on the plate
-                depth=10,                       # Depth (mm) of each well on the plate
+                depth=20,                       # Depth (mm) of each well on the plate
                 volume=50)
 
         self.labware = labware.load(PCR_NAME, slot=slot)
