@@ -3,7 +3,7 @@ Separation of the cells and aptamers
 '''
 
 from opentrons import labware, instruments, modules, robot
-from ninjapcr import NinjaPCR
+from ninjapcr import NinjaPCR, NinjaTempDeck
 
 metadata = {
    'protocolName' : 'Separation',
@@ -13,18 +13,18 @@ metadata = {
 
 
 
-def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipette, md_well, n_well, md_offset):
+def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pipette, md_well, n_well, md_offset, engage_wait_time):
 
     # (1) Mix beads in thermal module
     pipette.pick_up_tip()
-    pipette.mix(3, 50, n_well)
+    pipette.mix(3, 50, td_lab.wells('A1'))
     
     # (2,3) Transfer 300ul beads to magdeck
-    pipette.transfer(300, n_well, md_well)
+    pipette.transfer(300, td_lab.wells('A1'), md_well)
     
     # (4)
     magdeck.engage(offset=md_offset)
-    pipette.delay(seconds=30)
+    pipette.delay(seconds=engage_wait_time)
     
     # (5) Discard 300ul from magdeck
     pipette.transfer(300, md_well, liquid_trash.wells('A1'))
@@ -44,7 +44,7 @@ def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipe
         
         # (10)
         magdeck.engage(offset=md_offset)
-        pipette.delay(seconds=30)
+        pipette.delay(seconds=engage_wait_time)
         
         # (11) Discard 100ul from magdeck
         pipette.transfer(100, md_well, liquid_trash.wells('A1'))
@@ -63,17 +63,19 @@ def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipe
     
     # (17)
     pipette.mix(5, 50, md_well)
+    pipette.move_to(md_well)
 
     # (18) Incubate and mix for 10 minutes
-    for i in range(1,31):
-        pipette.delay(seconds=20)
+    for i in range(1,2): # 10m TODO
+        pipette.delay(seconds=30)
         pipette.mix(1, 50, md_well)
+        pipette.move_to(md_well)
 
     pipette.drop_tip()
         
     # (19)
     magdeck.engage(offset=md_offset)
-    pipette.delay(seconds=30)
+    pipette.delay(seconds=engage_wait_time)
 
     # (20) Discard 150ul
     pipette.transfer(150, md_well, liquid_trash.wells('A1'))
@@ -91,7 +93,7 @@ def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipe
         
         # (24)
         magdeck.engage(offset=md_offset)
-        pipette.delay(seconds=30)
+        pipette.delay(seconds=engage_wait_time)
         
         # (26) Discard 100ul
         pipette.transfer(100, md_well, liquid_trash.wells('A1'))
@@ -110,14 +112,15 @@ def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipe
         pipette.drop_tip()
         
         # (31) Incubate for 4m
-        pipette.delay(minutes=4)
+        pipette.move_to(md_well)
+        pipette.delay(minutes=1) # 4m TODO
         
         # (32)
         magdeck.engage(offset=md_offset)
-        pipette.delay(seconds=30)
+        pipette.delay(seconds=engage_wait_time)
         
         # (33) Store 50ul at 4ºC in well Ai
-        pipette.transfer(50, md_well, n_lab.wells(f'A{i}'))
+        pipette.transfer(50, md_well, td_lab.wells(f'A{i}'))
         
         # (34) Repeat
 
@@ -131,11 +134,12 @@ def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipe
     pipette.drop_tip()
     
     # (38) Incubate for 10m
-    pipette.delay(minutes=10)
+    pipette.move_to(md_well)
+    pipette.delay(minutes=1) # 10m TODO
     
     # (39)
     magdeck.engage(offset=md_offset)
-    pipette.delay(seconds=30)
+    pipette.delay(seconds=engage_wait_time)
     
     # (40) Discard 200ul
     pipette.transfer(200, md_well, liquid_trash.wells('A1'))
@@ -147,7 +151,7 @@ def separate(magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipe
     magdeck.disengage()
     
     # (44) Store 300ul at 4ºC
-    pipette.transfer(300, md_well, n_lab.wells('A1'))
+    pipette.transfer(300, md_well, td_lab.wells('A4'))
 
 
 
@@ -158,7 +162,7 @@ if plate_eppendorf not in labware.list():
       grid = (8,4),
       spacing = (15,20),
       diameter = 10,
-      depth  = 39,
+      depth  = 35,
       volume = 100)
 
 # MagDeck and associated labware
@@ -166,20 +170,25 @@ magdeck       = modules.load('MagDeck', slot=4)
 md_lab        = labware.load('biorad_96_wellplate_200ul_pcr', slot=4, share=True)
 
 # Thermal module. SHOULD REMAIN AT 4ºC DURING THE WHOLE PROTOCOL
-ninja         = None #NinjaPCR(slot=1, simulating = robot.is_simulating())
-n_lab         = labware.load('usascientific_12_reservoir_22ml', slot=11)
+tempdeck      = NinjaTempDeck(slot=1, simulating = True)
+td_lab        = tempdeck.labware
+
+# Thermocycler. Same as above
+thermocycler  = NinjaPCR(slot=10, simulating = True)
+tc_lab        = thermocycler.labware
 
 samples       = labware.load('Eppendorf_Samples', slot=8)
 tiprack       = labware.load('opentrons-tiprack-300ul', slot=6)
 liquid_trash  = labware.load('corning_384_wellplate_112ul_flat', slot = 5)
 
-pipette_l     = instruments.P50_Single(mount='left', tip_racks=[tiprack])
+pipette_l     = instruments.P300_Single(mount='left', tip_racks=[tiprack])
 
 
 md_well = md_lab.wells('A1')
-n_well  = n_lab.wells('A1')
+n_well  = tc_lab.wells('A1')
 md_offset = -10.5
+engage_wait_time = 10
 
-args = [magdeck, md_lab, ninja, n_lab, samples, tiprack, liquid_trash, pipette_l, md_well, n_well, md_offset]
+args = [magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pipette_l, md_well, n_well, md_offset, engage_wait_time]
 
 separate(*args)

@@ -15,6 +15,7 @@ ERROR_STR = "error";
 PAUSED_STR = "paused";
 
 PCR_NAME = "NinjaPCR"
+TEMPDECK_NAME = "NinjaTempDeck"
     
 CONNECTION_MODES = ["external_wifi", "ninja_ap", "opentrons_ap"]
     
@@ -71,7 +72,8 @@ class NinjaModule(ABC):
                  name = 'ninjapcr',
                  connection_mode = 'external_wifi',
                  ssid = None,
-                 psk = None):
+                 psk = None,
+                 lw_name = None):
 
         if connection_mode not in CONNECTION_MODES:
             raise ValueError(f'Invalid connection mode: {connection_mode}')
@@ -85,16 +87,16 @@ class NinjaModule(ABC):
         
         # Define and load associated labware
 
-        if PCR_NAME not in labware.list():
+        if lw_name not in labware.list():
             labware.create(
-                PCR_NAME,                       # Labware Name
+                lw_name,                        # Labware Name
                 grid=(4, 4),                    # Amount of (columns, rows)
                 spacing=(9, 9),                 # Distances (mm) between each (column, row)
                 diameter=2,                     # Diameter (mm) of each well on the plate
                 depth=20,                       # Depth (mm) of each well on the plate
                 volume=50)
 
-        self.labware = labware.load(PCR_NAME, slot=slot)
+        self.labware = labware.load(lw_name, slot=slot)
 
 
     def get_status(self):
@@ -269,6 +271,18 @@ Opentrons driver for NinjaPCR thermocycler
 """ 
 class NinjaPCR(NinjaModule):
 
+    def __init__(self,
+                 simulating = True,
+                 slot = '10',
+                 name = 'ninjapcr',
+                 connection_mode = 'external_wifi',
+                 ssid = None,
+                 psk = None):
+
+        NinjaModule.__init__(self, simulating, slot, name, connection_mode, ssid, psk, PCR_NAME)
+
+        
+
     def wait_for_program(self, program):
 
         if self.simulating:
@@ -315,7 +329,7 @@ class NinjaTempDeck(NinjaModule):
                  psk = None):
     
         self.target = None
-        NinjaModule.__init__(self, simulating, slot, name, connection_mode, ssid, psk)
+        NinjaModule.__init__(self, simulating, slot, name, connection_mode, ssid, psk, TEMPDECK_NAME)
         
     
     def get_temp(self):
