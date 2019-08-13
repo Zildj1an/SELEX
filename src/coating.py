@@ -47,41 +47,56 @@ if plate_eppendorf not in labware.list():
       grid = (8,4),
       spacing = (15,20),
       diameter = 10,
-      depth  = 39,
+      depth  = 35,
       volume = 100)
 
 # [1] Labware
 
-Falcon           = labware.load(plate_falcon,    slot = '2')
+Falcon           = labware.load(plate_falcon,    slot = '8')
 Eppendorf        = labware.load(plate_eppendorf, slot = '5')
-tiprack          = labware.load('tiprack-10ul',  slot = '6')
-trash            =   labware.load('trash-box',    slot = '12', share = True)        # Trash
-plate_samples    = labware.load('96-flat',       slot = '11')                       # Samples
+tiprack          = labware.load('opentrons-tiprack-300ul',  slot = '6')
+trash            = labware.load('trash-box',     slot = '12', share = True)        # Trash
+plate_samples    = labware.load('96-flat',       slot = '2')                      # Samples
 
 # [2] Pipettes
 
-pipette_l = instruments.P50_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
-pipette_l.set_flow_rate(aspirate = 50, dispense = 50)
+pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
 
-volume_50 = 50000
+# Initial volume in the Falcon50 in ul
+volume_50 = 20000
+# Rate of conversion from ul to distance from the bottom of the well
 ml_rate = 9/5000
 
-def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1):
+def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1,new_tip='once'):
 
-   times = quantity // 50
+   times = quantity // pipette.max_volume
 
+   if new_tip == 'once':
+      pipette.pick_up_tip()
+   
    for i in range(1,times+1):
-      pipette.aspirate(50,pos1.wells(A).bottom(depth))
-      pipette.dispense(50,pos2.wells(B))
+      if new_tip == 'always':
+         pipette.pick_up_tip()
+      pipette.aspirate(pipette.max_volume,pos1.wells(A).bottom(depth))
+      pipette.dispense(pipette.max_volume,pos2.wells(B))
       pipette.blow_out(pos2.wells(B).top(-4))
       pipette.touch_tip()
+      if new_tip == 'always':
+         pipette.drop_tip()
 
-   quantity = quantity - (times * 50)
+   quantity = quantity % pipette.max_volume
 
    if quantity > 0:
+      if new_tip == 'always':
+         pipette.pick_up_tip()
       pipette.aspirate(quantity,pos1.wells(A).bottom(depth))
       pipette.dispense(quantity,pos2.wells(B))
       pipette.blow_out(pos2.wells(B).top(-4))
+      if new_tip == 'always':
+         pipette.drop_tip()
+
+   if new_tip == 'once':
+      pipette.drop_tip()
 
 # [3] Execution
 
@@ -97,25 +112,31 @@ val = 0
 
 for falcon in ['C5']:
 
-   custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate)
+   pipette_l.set_flow_rate(aspirate = 150, dispense = 150)
+
+   pipette_l.pick_up_tip()
+
+   custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
    volume_50 -= 1200
 
-   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate)
+   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate, new_tip='never')
    volume_50 -= 1350
 
-   custom_transfer(pipette_l,1450,Falcon,Eppendorf,falcon50,'A3',volume_50*ml_rate)
+   custom_transfer(pipette_l,1450,Falcon,Eppendorf,falcon50,'A3',volume_50*ml_rate, new_tip='never')
    volume_50 -= 1450
 
-   custom_transfer(pipette_l,1470,Falcon,Eppendorf,falcon50,'A4',volume_50*ml_rate)
+   custom_transfer(pipette_l,1470,Falcon,Eppendorf,falcon50,'A4',volume_50*ml_rate, new_tip='never')
    volume_50 -= 1470
    
-   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'A5',volume_50*ml_rate)
+   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'A5',volume_50*ml_rate, new_tip='never')
    volume_50 -= 1350
 
-   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'B2',volume_50*ml_rate)
+   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'B2',volume_50*ml_rate, new_tip='never')
    volume_50 -= 1350
 
+   pipette_l.drop_tip()
 
+   pipette_l.set_flow_rate(aspirate = 50, dispense = 50)
 
    pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells('A1'),new_tip='once', mix_before=(3,50), blow_out=True)
 
@@ -129,51 +150,6 @@ for falcon in ['C5']:
 
 
    pipette_l.transfer(150,Eppendorf.wells('B2'),Eppendorf.wells('A5'),new_tip='once',mix_before=(3,50))
-
-   '''
-   
-   # 1st Eppendorf -> 750 ul of PBS + 750 ul of Falcon15
-   pipette_l.pick_up_tip()
-   custom_transfer(pipette_l,750,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'1',volume_50*ml_rate)
-   volume_50 -= 750
-   pipette_l.drop_tip()
-   pipette_l.pick_up_tip()
-   # pipette_l.mix(3,50,Eppendorf.wells(falcon))
-   pipette_l.transfer(750,Eppendorf.wells(falcon),Eppendorf.wells(chr(ord('A')+ val)+'1'),new_tip='never', mix_before=(3,50), blow_out=True)
-   pipette_l.drop_tip()
-
-   # 2nd Eppendorf -> 1200 ul of PBS + 300 ul of Falcon15
-   pipette_l.pick_up_tip()
-   custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'2',volume_50*ml_rate)
-   volume_50 -= 1200
-   pipette_l.drop_tip()
-   pipette_l.pick_up_tip()
-   #pipette_l.mix(3,50,Eppendorf.wells(falcon))
-   pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells(chr(ord('A')+ val)+'2'),new_tip='never', mix_before=(3,50), blow_out=True)
-   pipette_l.drop_tip()
-
-   # 3rd Eppendorf -> 1350 ul of PBS + 150 ul of Falcon
-   pipette_l.pick_up_tip()
-   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'3',volume_50*ml_rate)
-   volume_50 -= 1350
-   pipette_l.drop_tip()
-   pipette_l.pick_up_tip()
-   #pipette_l.mix(3,50,Eppendorf.wells(falcon))
-   pipette_l.transfer(150,Eppendorf.wells(falcon),Eppendorf.wells(chr(ord('A')+ val)+'3'),new_tip='never', mix_before=(3,50), blow_out=True)
-   pipette_l.drop_tip()
-
-   # 3rd Eppendorf -> 1470 ul of PBS + 30 ul of Falcon
-   pipette_l.pick_up_tip()
-   custom_transfer(pipette_l,1470,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'4',volume_50*ml_rate)
-   volume_50 -= 1470
-   pipette_l.drop_tip()
-   pipette_l.pick_up_tip()
-   #pipette_l.mix(3,50,Eppendorf.wells(falcon))
-   pipette_l.transfer(30,Eppendorf.wells(falcon),Eppendorf.wells(chr(ord('A')+ val)+'4'),new_tip='never', mix_before=(3,50), blow_out=True)
-   pipette_l.drop_tip()
-
-   val += 1
-   '''
 
    
 for j in range(1,6):

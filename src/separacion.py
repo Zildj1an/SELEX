@@ -15,9 +15,13 @@ metadata = {
 
 def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pipette, md_well, n_well, md_offset, engage_wait_time):
 
+    pipette.set_flow_rate(aspirate=200, dispense=200)
+
     # (1) Mix beads in thermal module
     pipette.pick_up_tip()
+    pipette.set_flow_rate(aspirate=50, dispense=50)
     pipette.mix(3, 50, td_lab.wells('A1'))
+    pipette.set_flow_rate(aspirate=200, dispense=200)
     
     # (2,3) Transfer 300ul beads to magdeck
     pipette.transfer(300, td_lab.wells('A1'), md_well)
@@ -39,7 +43,9 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
         magdeck.disengage()
         
         # (9)
+        pipette.set_flow_rate(aspirate=50, dispense=50)
         pipette.mix(3, 50, md_well)
+        pipette.set_flow_rate(aspirate=200, dispense=200)
         pipette.drop_tip()
         
         # (10)
@@ -62,13 +68,17 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
     magdeck.disengage()
     
     # (17)
+    pipette.set_flow_rate(aspirate=50, dispense=50)
     pipette.mix(5, 50, md_well)
+    pipette.set_flow_rate(aspirate=200, dispense=200)
     pipette.move_to(md_well)
 
     # (18) Incubate and mix for 10 minutes
     for i in range(1,2): # 10m TODO
         pipette.delay(seconds=30)
+        pipette.set_flow_rate(aspirate=50, dispense=50)
         pipette.mix(1, 50, md_well)
+        pipette.set_flow_rate(aspirate=200, dispense=200)
         pipette.move_to(md_well)
 
     pipette.drop_tip()
@@ -88,7 +98,9 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
 
         # (23)
         magdeck.disengage()
+        pipette.set_flow_rate(aspirate=50, dispense=50)
         pipette.mix(3,50,md_well)
+        pipette.set_flow_rate(aspirate=200, dispense=200)
         pipette.drop_tip()
         
         # (24)
@@ -108,7 +120,9 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
         
         # (30)
         magdeck.disengage()
+        pipette.set_flow_rate(aspirate=50, dispense=50)
         pipette.mix(5, 50, md_well)
+        pipette.set_flow_rate(aspirate=200, dispense=200)
         pipette.drop_tip()
         
         # (31) Incubate for 4m
@@ -121,6 +135,7 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
         
         # (33) Store 50ul at 4ºC in well Ai
         pipette.transfer(50, md_well, td_lab.wells(f'A{i}'))
+        pipette.blow_out(td_lab.wells(f'A{i}'))
         
         # (34) Repeat
 
@@ -130,7 +145,9 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
     
     # (37)
     magdeck.disengage()
+    pipette.set_flow_rate(aspirate=50, dispense=50)
     pipette.mix(5,50,md_well)
+    pipette.set_flow_rate(aspirate=200, dispense=200)
     pipette.drop_tip()
     
     # (38) Incubate for 10m
@@ -152,6 +169,7 @@ def separate(magdeck, md_lab, td_lab, tc_lab, samples, tiprack, liquid_trash, pi
     
     # (44) Store 300ul at 4ºC
     pipette.transfer(300, md_well, td_lab.wells('A4'))
+    pipette.blow_out(td_lab.wells('A4'))
 
 
 
@@ -168,12 +186,14 @@ if plate_eppendorf not in labware.list():
 # MagDeck and associated labware
 magdeck       = modules.load('MagDeck', slot=4)
 md_lab        = labware.load('biorad_96_wellplate_200ul_pcr', slot=4, share=True)
+# TODO: LOAD ACTUAL LABWARE WITH CORRECT MEASURES AND MAGDECK ENGAGE HEIGHT
 
-# Thermal module. SHOULD REMAIN AT 4ºC DURING THE WHOLE PROTOCOL
+
+# Thermal module. SHOULD REMAIN AT 4ºC DURING THE WHOLE PROTOCOL. TODO
 tempdeck      = NinjaTempDeck(slot=1, simulating = True)
 td_lab        = tempdeck.labware
 
-# Thermocycler. Same as above
+# Thermocycler. Same as above. TODO
 thermocycler  = NinjaPCR(slot=10, simulating = True)
 tc_lab        = thermocycler.labware
 

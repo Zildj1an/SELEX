@@ -15,7 +15,7 @@ def graph(url):
 
         plt.cla()
         
-        plt.axis([0, 100, 0, 120])
+        plt.axis([0, 100, 0, 150])
 
         if len(plot_l) > 99:
             plot_l = plot_l[50:]
