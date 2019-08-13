@@ -2,6 +2,7 @@ from opentrons import labware
 from opentrons.system import nmcli
 import requests, logging
 from time import sleep
+from abc import ABC
 
 log = logging.getLogger('opentrons')
 
@@ -59,12 +60,10 @@ SAMPLE_PROGRAM = {'name': 'Sample program',
                          'name': 'Final Hold',
                          'ramp': 0}]}
                       
-
-class NinjaPCR:
-
-    """
-    Opentrons driver for NinjaPCR
-    """
+"""
+Abstract base class for all NinjaPCR-based modules (thermocycler, thermal modules)
+"""
+class NinjaModule(ABC):
 
     def __init__(self,
                  simulating = True,
@@ -97,68 +96,6 @@ class NinjaPCR:
 
         self.labware = labware.load(PCR_NAME, slot=slot)
 
-
-    def wait_for_program(self, program):
-
-        if self.simulating:
-            return
-            
-        # Starts a program and actively waits until it's finished
-
-        self.send_command('start', program)
-
-        sleep(5)
-
-        status = self.get_status()
-
-        if status['state'] in [LIDWAIT_STR, RUNNING_STR]:
-            log.info(f'NinjaPCR was successfully started and is in state {status["state"]}')
-            keep_going = True
-        else:
-            log.info(f'NinjaPCR did nos start successfully. State: {status["state"]}')
-            keep_going = False
-        
-        while keep_going:
-            sleep(5)
-            status = self.get_status()
-            if status['state'] in [STOPPED_STR, COMPLETE_STR, ERROR_STR]:
-                log.info(f'NinjaPCR stopped in state {status["state"]}')
-                if status['state'] == ERROR_STR:
-                    raise Exception("NinjaPCR error")
-                keep_going = False
-            elif status['state'] == RUNNING_STR:
-                log.info(f'NinjaPCR is running. Remaining time: {status["remaining_time"]}')
-                
-        
-        
-    def send_command(self, cmd, program = None):
-
-        if self.simulating:
-            return
-
-        # Send an HTTP API request to the NinjaPCR with the given command
-        # When cmd == 'start', a program in dict form must be specified
-
-        if not self.connected:
-            raise Exception('NinjaPCR is not connected')
-        
-
-        params = self._build_params(cmd, program)
-
-        response = requests.get(self.local_url + COMMAND_DIR, params=params)
-
-        if response and response.status_code == 200:
-            # We got a response
-            #if '"1"' not in response.text:
-                # Unsuccesful command
-            #    raise Exception(f'Could not execute command {cmd}')
-            log.info(f'Sent command {cmd}')
-                            
-        else:
-            self.connected = False
-            raise Exception(f'Bad connection: {response.status_code}')
-
-        
 
     def get_status(self):
 
@@ -193,6 +130,36 @@ class NinjaPCR:
 
         return status
 
+    
+
+    def send_command(self, cmd, program = None):
+
+        if self.simulating:
+            return
+
+        # Send an HTTP API request to the NinjaPCR with the given command
+        # When cmd == 'start', a program in dict form must be specified
+
+        if not self.connected:
+            raise Exception('NinjaPCR is not connected')
+        
+
+        params = self._build_params(cmd, program)
+
+        response = requests.get(self.local_url + COMMAND_DIR, params=params)
+
+        if response and response.status_code == 200:
+            # We got a response
+            #if '"1"' not in response.text:
+                # Unsuccesful command
+            #    raise Exception(f'Could not execute command {cmd}')
+            log.info(f'Sent command {cmd}')
+                            
+        else:
+            self.connected = False
+            raise Exception(f'Bad connection: {response.status_code}')
+
+        
 
     def _build_params(self, cmd, program):
 
@@ -296,3 +263,104 @@ class NinjaPCR:
 
 
         
+    
+"""
+Opentrons driver for NinjaPCR thermocycler
+""" 
+class NinjaPCR(NinjaModule):
+
+    def wait_for_program(self, program):
+
+        if self.simulating:
+            return
+            
+        # Starts a program and actively waits until it's finished
+
+        self.send_command('start', program)
+
+        sleep(5)
+
+        status = self.get_status()
+
+        if status['state'] in [LIDWAIT_STR, RUNNING_STR]:
+            log.info(f'NinjaPCR was successfully started and is in state {status["state"]}')
+            keep_going = True
+        else:
+            log.info(f'NinjaPCR did nos start successfully. State: {status["state"]}')
+            keep_going = False
+        
+        while keep_going:
+            sleep(5)
+            status = self.get_status()
+            if status['state'] in [STOPPED_STR, COMPLETE_STR, ERROR_STR]:
+                log.info(f'NinjaPCR stopped in state {status["state"]}')
+                if status['state'] == ERROR_STR:
+                    raise Exception("NinjaPCR error")
+                keep_going = False
+            elif status['state'] == RUNNING_STR:
+                log.info(f'NinjaPCR is running. Remaining time: {status["remaining_time"]}')
+                
+
+"""
+Opentrons driver for NinjaPCR-based TempDeck
+"""
+class NinjaTempDeck(NinjaModule):
+
+    def __init__(self,
+                 simulating = True,
+                 slot = '10',
+                 name = 'ninjapcr',
+                 connection_mode = 'external_wifi',
+                 ssid = None,
+                 psk = None):
+    
+        self.target = None
+        NinjaModule.__init__(self, simulating, slot, name, connection_mode, ssid, psk)
+        
+    
+    def get_temp(self):
+
+        if self.simulating:
+            return 0
+
+        status = self.get_status()
+
+        return status['sample_temp']
+    
+        
+    def set_temp(self, temp, lid_temp=110):
+
+        if self.simulating:
+            return
+
+        self.target = temp
+
+        program = {'name': 'Constant temp',
+                      'lid_temp': lid_temp,
+                      'steps': [
+                          {'type': 'step',
+                           'time': 86400,
+                           'temp': temp,
+                           'name': 'Final Hold',
+                           'ramp': 0},
+                      ]}
+        
+        self.send_command('start', program = program)
+        
+
+    def wait_for_temp(self):
+
+        if self.simulating:
+            return
+
+        while(self.get_temp() - self.target > 1):
+            sleep(5)
+        
+
+    def deactivate():
+
+        if self.simulating:
+            return
+
+        self.send_command('stop')
+        self.target = None

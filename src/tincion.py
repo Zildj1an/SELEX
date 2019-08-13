@@ -41,26 +41,32 @@ trash            = labware.load('trash-box',    slot = '12', share = True)      
 pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack,tiprack2], trash_container = trash)
 pipette_r.set_flow_rate(aspirate = 40, dispense = 40)
 
-def samples_trash():
+def samples_trash(vol, discard=False):
 
-   pipette_r.pick_up_tip()
+   if not discard:
+      pipette_r.pick_up_tip()
 
-   for x in range(1,4):
+   for x in range(1,vol+1):
 
       for sample in [('A' + '{}').format(i) for i in range(1, 7)]:
 
+           if discard:
+              pipette_r.pick_up_tip()
            pipette_r.aspirate(50,plate_samples.wells(sample))
            pipette_r.dispense(50,trash_liquid.wells(sample))
            pipette_r.blow_out(trash_liquid.wells(sample))
            pipette_r.touch_tip()
+           if discard:
+              pipette_r.drop_tip()
 
-   pipette_r.drop_tip()
+   if not discard:
+      pipette_r.drop_tip()
 
-def storage_samples(where, bool):
+def storage_samples(where, vol, bool):
 
     pipette_r.pick_up_tip()
 
-    for x in range(1,4):
+    for x in range(1,vol+1):
 
         for sample in [('A' + '{}').format(i) for i in range(1, 7)]:
 
@@ -83,21 +89,26 @@ def storage_samples(where, bool):
 
 robot._driver.turn_on_rail_lights()
 
-samples_trash()
+samples_trash(4)
 
 # Por columna, 50 de PBS (en el storage 1 columna) hasta llegar a 200 en todas
 # De 50 en 50 por columna (ojo con lo de las pipetas)
 
-storage_samples('A1', 0)
-samples_trash()
+storage_samples('A1', 4, 0)
+samples_trash(4)
+
+# Repetimos lavado
+storage_samples('A1', 4, 0)
+samples_trash(4)
 
 # 200 ul de cristal violeta (2a columna), IGUAL que antes pero con la segunda columna del storage
 
-storage_samples('A2', 0)
+storage_samples('A3', 3, 0)
 
 # Pause 20 mins
 
 # Or pause
+# TODO FIX PAUSE
 if not robot.is_simulating():
     while not gpio.read(gpio.INPUT_PINS['BUTTON_INPUT']):
          print("Waiting...")
@@ -106,13 +117,13 @@ if not robot.is_simulating():
 # EN LA SIGUIENTE PARTE: Tincion 2
 # Tinte 200ul a la basura
 
-for x in range(1,6):
-
-    samples_trash()
+for x in range(1,4):
+   
+    samples_trash(3)
 
     # En la 5a columna hay agua
     # 220 ul de agua a cada uno de los pocillos
-
+    # TODO 220UL!!
     storage_samples('A6', 1)
 
 robot._driver.turn_off_rail_lights()

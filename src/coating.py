@@ -95,12 +95,47 @@ robot._driver.turn_on_rail_lights()
 falcon50 = 'A1'
 val = 0
 
-for falcon in ['B5','C5','D5']:
+for falcon in ['C5']:
 
+   custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate)
+   volume_50 -= 1200
+
+   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate)
+   volume_50 -= 1350
+
+   custom_transfer(pipette_l,1450,Falcon,Eppendorf,falcon50,'A3',volume_50*ml_rate)
+   volume_50 -= 1450
+
+   custom_transfer(pipette_l,1470,Falcon,Eppendorf,falcon50,'A4',volume_50*ml_rate)
+   volume_50 -= 1470
+   
+   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'A5',volume_50*ml_rate)
+   volume_50 -= 1350
+
+   custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,'B2',volume_50*ml_rate)
+   volume_50 -= 1350
+
+
+
+   pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells('A1'),new_tip='once', mix_before=(3,50), blow_out=True)
+
+   pipette_l.transfer(150,Eppendorf.wells(falcon),Eppendorf.wells('A2'),new_tip='once', mix_before=(3,50), blow_out=True)
+   
+   pipette_l.transfer(50,Eppendorf.wells(falcon),Eppendorf.wells('A3'),new_tip='once', mix_before=(3,50), blow_out=True)
+
+   pipette_l.transfer(30,Eppendorf.wells(falcon),Eppendorf.wells('A4'),new_tip='once', mix_before=(3,50), blow_out=True)
+
+   pipette_l.transfer(150,Eppendorf.wells(falcon),Eppendorf.wells('B2'),new_tip='once', mix_before=(3,50), blow_out=True)
+
+
+   pipette_l.transfer(150,Eppendorf.wells('B2'),Eppendorf.wells('A5'),new_tip='once',mix_before=(3,50))
+
+   '''
+   
    # 1st Eppendorf -> 750 ul of PBS + 750 ul of Falcon15
    pipette_l.pick_up_tip()
    custom_transfer(pipette_l,750,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'1',volume_50*ml_rate)
-   volume_50 -= 400
+   volume_50 -= 750
    pipette_l.drop_tip()
    pipette_l.pick_up_tip()
    # pipette_l.mix(3,50,Eppendorf.wells(falcon))
@@ -110,7 +145,7 @@ for falcon in ['B5','C5','D5']:
    # 2nd Eppendorf -> 1200 ul of PBS + 300 ul of Falcon15
    pipette_l.pick_up_tip()
    custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'2',volume_50*ml_rate)
-   volume_50 -= 640
+   volume_50 -= 1200
    pipette_l.drop_tip()
    pipette_l.pick_up_tip()
    #pipette_l.mix(3,50,Eppendorf.wells(falcon))
@@ -120,7 +155,7 @@ for falcon in ['B5','C5','D5']:
    # 3rd Eppendorf -> 1350 ul of PBS + 150 ul of Falcon
    pipette_l.pick_up_tip()
    custom_transfer(pipette_l,1350,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'3',volume_50*ml_rate)
-   volume_50 -= 720
+   volume_50 -= 1350
    pipette_l.drop_tip()
    pipette_l.pick_up_tip()
    #pipette_l.mix(3,50,Eppendorf.wells(falcon))
@@ -130,7 +165,7 @@ for falcon in ['B5','C5','D5']:
    # 3rd Eppendorf -> 1470 ul of PBS + 30 ul of Falcon
    pipette_l.pick_up_tip()
    custom_transfer(pipette_l,1470,Falcon,Eppendorf,falcon50,chr(ord('A')+ val)+'4',volume_50*ml_rate)
-   volume_50 -= 784
+   volume_50 -= 1470
    pipette_l.drop_tip()
    pipette_l.pick_up_tip()
    #pipette_l.mix(3,50,Eppendorf.wells(falcon))
@@ -138,29 +173,18 @@ for falcon in ['B5','C5','D5']:
    pipette_l.drop_tip()
 
    val += 1
+   '''
 
-for pos in ['A','B','C']:
+   
+for j in range(1,6):
 
-   init = 1
-   end = 6
-   row = 'A'
+   pipette_l.pick_up_tip()
 
-   if pos == 'B':
-      init = 7
-      end  = 12
+   for i in range(1,7):
+      
+      pipette_l.transfer(200,Eppendorf.wells('A' + str(j)),plate_samples.wells(chr(ord('A')+j-1)+str(i)), new_tip='never', mix_before=(3,50), blow_out=True)
 
-   if pos == 'C':
-      row = 'E'
-
-   for j in range(1,5):
-
-      pipette_l.pick_up_tip()
-
-      for i in range(init,end+1):
-
-         pipette_l.transfer(200,Eppendorf.wells(pos + str(j)),plate_samples.wells(chr(ord(row)+j-1)+str(i)), new_tip='never', mix_before=(3,50), blow_out=True)
-
-      pipette_l.drop_tip()
+   pipette_l.drop_tip()
 
 
 robot._driver.turn_off_rail_lights()
