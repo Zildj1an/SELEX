@@ -1,5 +1,6 @@
 '''
 Applies wax to paper sheets using a custom stamp
+
 '''
 
 from opentrons import labware, instruments, modules, robot
@@ -44,7 +45,7 @@ for i in range(1,5):
     pipette.move_to(wax.wells('A1').top(-2))
     pipette.dispense(30)
     pipette.move_to(wax.wells('A1').top(20))
-    
+
     pipette.move_to(paper.wells(f'A{i}').top())
     pipette.aspirate(30)
     pipette.dispense(30)
