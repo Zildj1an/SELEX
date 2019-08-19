@@ -1,5 +1,6 @@
 '''
 Separation of the cells and aptamers
+
 '''
 
 from opentrons import labware, instruments, modules, robot
@@ -21,20 +22,34 @@ HEAT_PROGRAM = {'name': 'Heat 60',
                     'name': 'Final Hold',
                     'ramp': 0}]}
 
-def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette, md_well, n_well, md_offset, engage_wait_time):
+def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette, md_well, n_well, md_offset, engage_wait_time,plunger_speeds): #TODO args
+
+    # Inner functions
+    def engage():
+        magdeck.engage(offset=md_offset)
+        pipette.delay(seconds=engage_wait_time)
+   
+    def mix(times = 3, quantity = 150, well = md_lab.wells('A1')):
+        pipette.set_flow_rate(aspirate=plunger_speeds['aspirate_mix'],
+                              dispense=plunger_speeds['dispense_mix'])
+        pipette.mix(times, quantity, well)
+        pipette.set_flow_rate(aspirate=plunger_speeds['aspirate_normal'],
+                              dispense=plunger_speeds['dispense_normal'])
+    def stop_thermocycler():
+        # Returns True if the lid is open, False otherwise
+        thermocycler.send_command('stop')
+        sleep(5)
+        status = thermocycler.get_status()
+        return status['lid_closed'] == 0
 
     thermocycler.connect()
 
-    pipette.set_flow_rate(aspirate=200, dispense=200)
-
     # (1) Mix beads in thermal module
     pipette.pick_up_tip()
-    pipette.set_flow_rate(aspirate=50, dispense=50)
-    pipette.mix(3, 300, td_lab.wells('A1'))
-    pipette.set_flow_rate(aspirate=200, dispense=200)
+    mix(3, 300, td_lab.wells('A1'))
 
     # (2,3) Transfer 600ul beads to magdeck
-    magdeck.engage(offset=md_offset)
+    engage()
     pipette.transfer(600, td_lab.wells('A1'), md_well)
 
     # (4)
@@ -53,13 +68,11 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
         magdeck.disengage()
 
         # (9)
-        pipette.set_flow_rate(aspirate=50, dispense=50)
-        pipette.mix(3, 50, md_well)
-        pipette.set_flow_rate(aspirate=200, dispense=200)
+        mix(3, 50, md_well)
         pipette.drop_tip()
 
         # (10)
-        magdeck.engage(offset=md_offset)
+        engage()
         pipette.delay(seconds=engage_wait_time)
 
         # (11) Move 300ul from magdeck
@@ -84,14 +97,14 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     pipette.set_flow_rate(aspirate=50, dispense=50)
 
     for i in range(1,6):
-        pipette.mix(1, 150, md_well)
+        mix(1, 150, md_well)
         sleep(120)
 
     pipette.set_flow_rate(aspirate=200, dispense=200)
     pipette.move_to(md_well)
 
     # (19)
-    magdeck.engage(offset=md_offset)
+    engage()
     pipette.delay(seconds=engage_wait_time)
 
     # (20) Move 150ul to A3
@@ -105,13 +118,11 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (23)
         magdeck.disengage()
-        pipette.set_flow_rate(aspirate=50, dispense=50)
-        pipette.mix(3,200,md_well)
-        pipette.set_flow_rate(aspirate=200, dispense=200)
+        mix(3,200,md_well)
         pipette.drop_tip()
 
         # (24)
-        magdeck.engage(offset=md_offset)
+        engage()
         pipette.delay(seconds=engage_wait_time)
 
         # (26) Move 200ul
@@ -127,17 +138,14 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (30,31)
         magdeck.disengage()
-        pipette.set_flow_rate(aspirate=50, dispense=50)
-
         for x in range(1,5):
-            pipette.mix(5, 50, md_well)
+            mix(5, 50, md_well)
             sleep(60)
 
-        pipette.set_flow_rate(aspirate=200, dispense=200)
         pipette.drop_tip()
 
         # (32)
-        magdeck.engage(offset=md_offset)
+        engage()
         pipette.delay(seconds=engage_wait_time)
 
         # (33) Store 50ul at 4ºC in well Ai
@@ -152,9 +160,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
     # (37)
     magdeck.disengage()
-    pipette.set_flow_rate(aspirate=50, dispense=50)
-    pipette.mix(5, 200, md_well)
-    pipette.set_flow_rate(aspirate=200, dispense=200)
+    mix(5, 200, md_well)
 
     # Incubar a 60ºC: abrir ninja, transferir samples, cerrar ninja
 
@@ -172,10 +178,12 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     pipette.delay(minutes=10)
 
     # (39) Transfer beads to MagDeck and engage
-    thermocycler.send_command('stop')
-    sleep(5)
-    pipette.consolidate(100, tc_lab.wells('A2', 'A3'), md_well)
-    magdeck.engage(offset=md_offset)
+    if stop_thermocycler():
+          pipette.consolidate(100, tc_lab.wells('A2', 'A3'), md_well)
+    else:
+          raise Exception("Could not stop PCR")
+    
+    engage()
     pipette.delay(seconds=engage_wait_time)
 
     # (40) Move 200ul
@@ -184,11 +192,11 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
     # (41,42) Transfer 100ul buffer nº3 beads to magdeck
     pipette.transfer(100, samples.wells('D5'), md_well)
-    pipette.mix(5, 100, md_well)
+    mix(5, 100, md_well)
 
     for m in range(1,4):
         # (43)
-        magdeck.engage()
+        engage()
 
         # (44) Store 300ul at 4ºC
         pipette.transfer(100, md_well, td_lab.wells('A7'))
@@ -198,140 +206,8 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
     # (46) Add 600 ul from A1 to magdeck
     pipette.transfer(600, td_lab.wells('A1'), md_well)
-    pipette.mix(5,600,md_well)
+    mix(5,600,md_well)
     magdeck.disengage()
-
-def separate_test(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette, md_well, n_well, md_offset, engage_wait_time, plunger_speeds, primers):
-
-    # Inner functions: mix, engage, stop thermocycler and clean
-
-    def engage():
-        magdeck.engage(offset=md_offset)
-        pipette.delay(seconds=engage_wait_time)
-
-    def mix(well=md_lab.wells('A1')):
-        pipette.set_flow_rate(aspirate=plunger_speeds['aspirate_mix'],
-                              dispense=plunger_speeds['dispense_mix'])
-        pipette.mix(3, 150, well)
-        pipette.set_flow_rate(aspirate=plunger_speeds['aspirate_normal'],
-                              dispense=plunger_speeds['dispense_normal'])
-
-    def stop_thermocycler():
-        # Returns True if the lid is open, False otherwise
-        thermocycler.send_command('stop')
-        sleep(5)
-        status = thermocycler.get_status()
-        return status['lid_closed'] == 0
-
-    def clean(times, buffer_well, volume):
-
-        for i in range(1,times+1):
-
-            # Transfer another to magdeck
-            pipette.pick_up_tip()
-            pipette.transfer(volume, buffer_well, md_well, new_tip='never')
-
-            # Mix
-            magdeck.disengage()
-            mix()
-            pipette.drop_tip()
-
-            # Engage magdeck
-            engage()
-
-            # (26) Discard buffer
-            pipette.transfer(volume, md_well, tc_lab.wells('A1'))
-
-            # (27) Repeat
-
-    # -------------- Start -----------------
-
-    #thermocycler.connect()
-
-    # Prepare thermocycler: heat to 60º
-    #thermocycler.send_command('start', program = HEAT_PROGRAM)
-
-    pipette.set_flow_rate(aspirate=plunger_speeds['aspirate_normal'],
-                          dispense=plunger_speeds['dispense_normal'])
-
-    # (1) Mix beads in thermal module
-    pipette.pick_up_tip()
-    mix()
-
-    # (4)
-    engage()
-
-    # (5) Store 300ul from magdeck
-    pipette.transfer(300, md_well, td_lab.wells('A1'))
-
-    # Repeat with 3 different dilutions
-
-    for i in range(0,3):
-
-        # Do the whole process twice, one is a control
-
-        for j in ['A','C']:
-
-            # Clean thrice with 0.5x SSC
-            clean(3, samples.wells('D1' if j == 'A' else 'C1'), 300)
-
-            # (13,14) Trasfer 0.5x SSC to magdeck
-            pipette.transfer(100, samples.wells('D1'), md_well)
-
-            # (15) Transfer primer mix to magdeck
-            pipette.pick_up_tip()
-            pipette.transfer(20, primers.wells(f'{j}{2*i+1}'), md_well, new_tip='never')
-
-            # (16)
-            magdeck.disengage()
-
-            # (17)
-            mix()
-            pipette.move_to(md_well)
-
-            # (18) Incubate and mix for 10 minutes
-            pipette.delay(seconds=10)#minutes=10)
-            pipette.drop_tip()
-
-            # (19)
-            engage()
-
-            # (20) Discard 150ul
-            pipette.transfer(150, md_well, tc_lab.wells('A1'))
-
-            # Clean twice with EDTA
-            clean(2, samples.wells('D2'), 100)
-
-            # (35,36) Transfer 200ul ammonium to magdeck
-            pipette.pick_up_tip()
-            pipette.transfer(200, samples.wells('D4'), md_well, new_tip='never')
-
-            # Incubar a 60ºC: parar ninja, transferir samples, iniciar ninja
-            if stop_thermocycler:
-                pipette.distribute(100, md_well, tc_lab.wells(f'{j}{i+2}'), new_tip='never')
-            else:
-                raise Exception("Could not open thermocycler lid. Stopping")
-
-            pipette.drop_tip()
-            thermocycler.send_command('start', program = HEAT_PROGRAM)
-
-            # (37)
-            magdeck.disengage()
-
-            # (38) Incubate for 10m
-            pipette.delay(seconds=10)#minutes=10)
-
-            # (39) Transfer beads to MagDeck and engage
-            if stop_thermocycler:
-                pipette.consolidate(100, tc_lab.wells(f'{j}{i+2}'), md_well)
-            else:
-                raise Exception("Could not open thermocycler lid. Stopping")
-
-            engage()
-
-            # (40) Store 200ul
-            pipette.transfer(200, md_well, td_lab.wells(f'{j}{i+2}'))
-
 
 plate_eppendorf = 'Eppendorf_Samples'
 if plate_eppendorf not in labware.list():
@@ -366,31 +242,32 @@ if "eppendorf_rack" not in labware.list():
 modules.magdeck.LABWARE_ENGAGE_HEIGHT[magdeck_plate] = 10
 
 # MagDeck and associated labware
-magdeck       = modules.load('MagDeck', slot=4)
-md_lab        = labware.load(magdeck_plate, slot=4, share=True)
+magdeck          = modules.load('MagDeck', slot=4)
+md_lab           = labware.load(magdeck_plate, slot=4, share=True)
 
 # Thermal module. SHOULD REMAIN AT 4ºC DURING THE WHOLE PROTOCOL. TODO
-tempdeck      = NinjaTempDeck(slot=1, simulating = True)
-td_lab        = tempdeck.labware
+tempdeck         = NinjaTempDeck(slot=1, simulating = True)
+td_lab           = tempdeck.labware
 
 # Thermocycler.
-thermocycler  = NinjaPCR(slot=10, simulating = robot.is_simulating())
-tc_lab        = thermocycler.labware
+thermocycler     = NinjaPCR(slot=10, simulating = robot.is_simulating())
+tc_lab           = thermocycler.labware
 
-samples       = labware.load('Eppendorf_Samples', slot=8)
-tiprack       = labware.load('opentrons-tiprack-300ul', slot=6)
-tiprack2      = labware.load('opentrons-tiprack-300ul', slot=3)
-liquid_trash  = labware.load('corning_384_wellplate_112ul_flat', slot = 5)
-primers       = labware.load('eppendorf_rack', slot=2)
+samples          = labware.load('Eppendorf_Samples', slot=8)
+tiprack          = labware.load('opentrons-tiprack-300ul', slot=6)
+tiprack2         = labware.load('opentrons-tiprack-300ul', slot=3)
+liquid_trash     = labware.load('corning_384_wellplate_112ul_flat', slot = 5)
+#primers       = labware.load('eppendorf_rack', slot=2)
 
-pipette_l     = instruments.P300_Single(mount='left', tip_racks=[tiprack])#, tiprack2])
+pipette_l        = instruments.P300_Single(mount='left', tip_racks=[tiprack])#, tiprack2])
 
-md_well = md_lab.wells('A1')
-n_well  = tc_lab.wells('A1')
-md_offset = 0
+md_well          = md_lab.wells('A1')
+n_well           = tc_lab.wells('A1')
+md_offset        = 0
 engage_wait_time = 10
-plunger_speeds = {'aspirate_mix': 300, 'dispense_mix': 300, 'aspirate_normal': 150, 'dispense_normal': 150}
+plunger_speeds   = {'aspirate_mix': 300, 'dispense_mix': 300, 'aspirate_normal': 150, 'dispense_normal': 150}
 
-args = [magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette_l, md_well, n_well, md_offset, engage_wait_time, plunger_speeds, primers]
+args = [magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette_l, md_well, n_well, md_offset, engage_wait_time, plunger_speeds]
 
-separate_test(*args)
+separate(*args)
+
