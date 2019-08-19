@@ -5,6 +5,7 @@ VIEW TIPRACK SCHEMA
 '''
 from opentrons import labware, instruments, modules, robot
 from opentrons.data_storage import database
+from time import sleep
 
 metadata = {
    'protocolName' : 'Dyeing',
@@ -39,7 +40,7 @@ pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack,tiprack2],
 
 def samples_trash(vol, discard=False):
 
-   pipette_r.set_flow_rate(aspirate = 10, dispense = 50)
+   pipette_r.set_flow_rate(aspirate = 5, dispense = 50)
 
    if not discard:
       pipette_r.pick_up_tip()
@@ -52,7 +53,7 @@ def samples_trash(vol, discard=False):
 
            if discard:
               pipette_r.pick_up_tip()
-           pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(-0.7))
+           pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(-0.5))
            pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
            pipette_r.blow_out(trash_liquid.wells(sample))
            pipette_r.touch_tip()
@@ -67,7 +68,7 @@ def samples_trash(vol, discard=False):
 
          if discard:
             pipette_r.pick_up_tip()
-         pipette_r.aspirate(vol,plate_samples.wells(sample).bottom(-0.7))
+         pipette_r.aspirate(vol,plate_samples.wells(sample).bottom(-0.5))
          pipette_r.dispense(vol,trash_liquid.wells(sample))
          pipette_r.blow_out(trash_liquid.wells(sample))
          pipette_r.touch_tip()
@@ -80,7 +81,7 @@ def samples_trash(vol, discard=False):
 
 def storage_samples(where, vol):
 
-   pipette_r.set_flow_rate(aspirate = 50, dispense = 10)
+   pipette_r.set_flow_rate(aspirate = 50, dispense = 5)
    
    pipette_r.pick_up_tip()
    
@@ -92,6 +93,7 @@ def storage_samples(where, vol):
 
          pipette_r.aspirate(pipette_r.max_volume,Storage.wells(where))
          pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
+         pipette_r.blow_out(plate_samples.wells(sample))
 
    vol = vol % pipette_r.max_volume
 
@@ -101,7 +103,6 @@ def storage_samples(where, vol):
          pipette_r.aspirate(vol,Storage.wells(where))
          pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
          pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.touch_tip()
 
    pipette_r.drop_tip()
 
@@ -131,8 +132,9 @@ storage_samples('A2', 150)
 
 # Or pause
 if not robot.is_simulating():
-    while not robot._driver.read_button():
-         robot.comment("Waiting...")
+   robot.comment("Waiting...")
+   while not robot._driver.read_button():
+      sleep(0.5)
 
 
 samples_trash(150)
@@ -145,6 +147,7 @@ for i in range(3,6):
     # En la 5a columna hay agua
     # 220 ul de agua a cada uno de los pocillos
     storage_samples(f'A{i}', 220)
+    # AGITAR TODO
     samples_trash(220)
 
 robot._driver.turn_off_rail_lights()
