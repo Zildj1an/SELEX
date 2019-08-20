@@ -124,7 +124,7 @@ class NinjaModule(ABC):
             if status['state'] == RUNNING_STR:
                 status['elapsed_time'] = json['e']
                 status['remaining_time'] = json['r']
-                
+            
             
         else:
             self.connected = False

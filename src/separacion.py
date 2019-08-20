@@ -40,7 +40,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
         thermocycler.send_command('stop')
         sleep(5)
         status = thermocycler.get_status()
-        return status['lid_closed'] == 0
+        return thermocycler.simulating or (status['lid_closed'] == '0')
 
     thermocycler.connect()
 
@@ -49,16 +49,15 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     mix(3, 300, td_lab.wells('A1'))
 
     # (2,3) Transfer 600ul beads to magdeck
-    engage()
     pipette.transfer(600, td_lab.wells('A1'), md_well)
 
     # (4)
-    pipette.delay(seconds=engage_wait_time)
+    engage()
 
-    # (5) Discard 600ul from magdeck
+    # (5) Store 600ul from magdeck
     pipette.transfer(600, md_well, td_lab.wells('A1'))
 
-    for i in range(1,5):
+    for i in range(1,2):#5):
 
         # (6,7) Aspirate buffer and mix with beads
         pipette.pick_up_tip()
@@ -73,7 +72,6 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (10)
         engage()
-        pipette.delay(seconds=engage_wait_time)
 
         # (11) Move 300ul from magdeck
         pipette.transfer(300, md_well, td_lab.wells('A2'))
@@ -88,29 +86,26 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
     # (16) Transfer PCR mix to magdeck
     pipette.pick_up_tip()
+    mix(3,40, n_well)
     pipette.transfer(50, n_well, md_well, new_tip='never')
 
     # Prepare thermocycler: heat to 60º
     thermocycler.send_command('start', program = HEAT_PROGRAM)
 
-    # (17,18)
-    pipette.set_flow_rate(aspirate=50, dispense=50)
-
-    for i in range(1,6):
+    for i in range(1,2):#6):
         mix(1, 150, md_well)
-        sleep(120)
+        pipette.delay(seconds=2)#minutes=2)
 
     pipette.set_flow_rate(aspirate=200, dispense=200)
     pipette.move_to(md_well)
 
     # (19)
     engage()
-    pipette.delay(seconds=engage_wait_time)
 
     # (20) Move 150ul to A3
     pipette.transfer(150, md_well, td_lab.wells('A3'))
 
-    for i in range(1,3):
+    for i in range(1,2):#3):
 
         # (21,22) Transfer another buffer to magdeck
         pipette.pick_up_tip()
@@ -123,14 +118,13 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (24)
         engage()
-        pipette.delay(seconds=engage_wait_time)
 
         # (26) Move 200ul
         pipette.transfer(200, md_well, td_lab.wells('A4'))
 
         # (27) Repeat
 
-    for i in range(1,3):
+    for i in range(1,2):#3):
 
         # (28,29) Transfer 50ul NOOH to magdeck
         pipette.pick_up_tip()
@@ -138,19 +132,18 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (30,31)
         magdeck.disengage()
-        for x in range(1,5):
+        for x in range(1,2):#5):
             mix(5, 50, md_well)
-            sleep(60)
+            pipette.delay(seconds=2)#minutes=1)
 
         pipette.drop_tip()
 
         # (32)
         engage()
-        pipette.delay(seconds=engage_wait_time)
 
-        # (33) Store 50ul at 4ºC in well Ai
-        pipette.transfer(50, md_well, td_lab.wells('A5'))
-        pipette.blow_out(td_lab.wells('A5'))
+        # (33) Store 50ul at 4ºC in well Bi
+        pipette.transfer(50, md_well, td_lab.wells('B1'))
+        pipette.blow_out(td_lab.wells('B1'))# TODO NO TIP HERE!!
 
         # (34) Repeat
 
@@ -164,10 +157,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
     # Incubar a 60ºC: abrir ninja, transferir samples, cerrar ninja
 
-    thermocycler.send_command('open') # TODO do commands open and close
-    sleep(5)
-    status = thermocycler.get_status()
-    if status['lid_closed'] == 0:
+    if stop_thermocycler():
         pipette.distribute(100, md_well, tc_lab.wells('A2', 'A3'))
     else:
         raise Exception("Could not open thermocycler lid. Stopping")
@@ -175,7 +165,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     thermocycler.send_command('start', program = HEAT_PROGRAM)
 
     # (38) Incubate for 10m
-    pipette.delay(minutes=10)
+    pipette.delay(seconds=2)#minutes=10)
 
     # (39) Transfer beads to MagDeck and engage
     if stop_thermocycler():
@@ -184,30 +174,33 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
           raise Exception("Could not stop PCR")
     
     engage()
-    pipette.delay(seconds=engage_wait_time)
 
     # (40) Move 200ul
-    pipette.transfer(200, md_well, tc_lab.wells('A6'))
-    magdeck.disengage()
+    pipette.transfer(200, md_well, tc_lab.wells('B2'))
 
-    # (41,42) Transfer 100ul buffer nº3 beads to magdeck
-    pipette.transfer(100, samples.wells('D5'), md_well)
-    mix(5, 100, md_well)
 
-    for m in range(1,4):
+    for m in range(1,2):#4):
         # (43)
-        engage()
+        magdeck.disengage()
 
+        pipette.transfer(100, samples.wells('D5'), md_well)
+
+        mix
+
+        engage()
+        
         # (44) Store 300ul at 4ºC
-        pipette.transfer(100, md_well, td_lab.wells('A7'))
-        pipette.blow_out(td_lab.wells('A7'))
+        pipette.transfer(100, md_well, td_lab.wells('B3'))
+        pipette.blow_out(td_lab.wells('B3'))
 
         # (45) Repeat
 
     # (46) Add 600 ul from A1 to magdeck
     pipette.transfer(600, td_lab.wells('A1'), md_well)
-    mix(5,600,md_well)
+    mix(5,300,md_well)
     magdeck.disengage()
+
+    
 
 plate_eppendorf = 'Eppendorf_Samples'
 if plate_eppendorf not in labware.list():
