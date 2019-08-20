@@ -22,13 +22,13 @@ HEAT_PROGRAM = {'name': 'Heat 60',
                     'name': 'Final Hold',
                     'ramp': 0}]}
 
-def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette, md_well, n_well, md_offset, engage_wait_time,plunger_speeds): #TODO args
+def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pipette, md_well, n_well, md_offset, engage_wait_time,plunger_speeds):
 
     # Inner functions
     def engage():
         magdeck.engage(offset=md_offset)
         pipette.delay(seconds=engage_wait_time)
-   
+
     def mix(times = 3, quantity = 150, well = md_lab.wells('A1')):
         pipette.set_flow_rate(aspirate=plunger_speeds['aspirate_mix'],
                               dispense=plunger_speeds['dispense_mix'])
@@ -57,7 +57,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     # (5) Store 600ul from magdeck
     pipette.transfer(600, md_well, td_lab.wells('A1'))
 
-    for i in range(1,2):#5):
+    for i in range(1,5):
 
         # (6,7) Aspirate buffer and mix with beads
         pipette.pick_up_tip()
@@ -92,9 +92,9 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     # Prepare thermocycler: heat to 60º
     thermocycler.send_command('start', program = HEAT_PROGRAM)
 
-    for i in range(1,2):#6):
+    for i in range(1,6):
         mix(1, 150, md_well)
-        pipette.delay(seconds=2)#minutes=2)
+        pipette.delay(120)
 
     pipette.set_flow_rate(aspirate=200, dispense=200)
     pipette.move_to(md_well)
@@ -105,7 +105,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     # (20) Move 150ul to A3
     pipette.transfer(150, md_well, td_lab.wells('A3'))
 
-    for i in range(1,2):#3):
+    for i in range(1,3):
 
         # (21,22) Transfer another buffer to magdeck
         pipette.pick_up_tip()
@@ -124,7 +124,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (27) Repeat
 
-    for i in range(1,2):#3):
+    for i in range(1,3):
 
         # (28,29) Transfer 50ul NOOH to magdeck
         pipette.pick_up_tip()
@@ -132,9 +132,9 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         # (30,31)
         magdeck.disengage()
-        for x in range(1,2):#5):
+        for x in range(1,5):
             mix(5, 50, md_well)
-            pipette.delay(seconds=2)#minutes=1)
+            pipette.delay(60)
 
         pipette.drop_tip()
 
@@ -142,8 +142,9 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
         engage()
 
         # (33) Store 50ul at 4ºC in well Bi
-        pipette.transfer(50, md_well, td_lab.wells('B1'))
-        pipette.blow_out(td_lab.wells('B1'))# TODO NO TIP HERE!!
+        pipette.pick_up_tip()
+        pipette.transfer(50, md_well, td_lab.wells('B1'), new_tip='never')
+        pipette.blow_out(td_lab.wells('B1'))
 
         # (34) Repeat
 
@@ -165,21 +166,20 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     thermocycler.send_command('start', program = HEAT_PROGRAM)
 
     # (38) Incubate for 10m
-    pipette.delay(seconds=2)#minutes=10)
+    pipette.delay(600)
 
     # (39) Transfer beads to MagDeck and engage
     if stop_thermocycler():
           pipette.consolidate(100, tc_lab.wells('A2', 'A3'), md_well)
     else:
           raise Exception("Could not stop PCR")
-    
+
     engage()
 
     # (40) Move 200ul
     pipette.transfer(200, md_well, tc_lab.wells('B2'))
 
-
-    for m in range(1,2):#4):
+    for m in range(1,4):
         # (43)
         magdeck.disengage()
 
@@ -188,7 +188,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
         mix
 
         engage()
-        
+
         # (44) Store 300ul at 4ºC
         pipette.transfer(100, md_well, td_lab.wells('B3'))
         pipette.blow_out(td_lab.wells('B3'))
@@ -199,8 +199,6 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     pipette.transfer(600, td_lab.wells('A1'), md_well)
     mix(5,300,md_well)
     magdeck.disengage()
-
-    
 
 plate_eppendorf = 'Eppendorf_Samples'
 if plate_eppendorf not in labware.list():
