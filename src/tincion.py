@@ -63,7 +63,7 @@ def samples_trash(vol, discard=False):
    vol = vol % pipette_r.max_volume
 
    if vol > 0:
-      
+
       for sample in [f'A{i}' for i in range(1, 7)]:
 
          if discard:
@@ -77,19 +77,19 @@ def samples_trash(vol, discard=False):
 
    if not discard:
       pipette_r.drop_tip()
-      
+
 
 def storage_samples(where, vol):
 
    pipette_r.set_flow_rate(aspirate = 50, dispense = 5)
-   
+
    pipette_r.pick_up_tip()
-   
+
    times = vol // pipette_r.max_volume
 
    for x in range(1,times+1):
 
-      for sample in [f'A{i}' for i in range(1, 7)]:
+      for sample in [f'A{i}' for i in range(1, 4)]:
 
          pipette_r.aspirate(pipette_r.max_volume,Storage.wells(where))
          pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
@@ -99,7 +99,7 @@ def storage_samples(where, vol):
 
    if vol > 0:
 
-      for sample in [f'A{i}' for i in range(1, 7)]:
+      for sample in [f'A{i}' for i in range(1, 4)]:
          pipette_r.aspirate(vol,Storage.wells(where))
          pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
          pipette_r.blow_out(plate_samples.wells(sample))
@@ -138,7 +138,7 @@ if not robot.is_simulating():
 
 
 samples_trash(150)
-         
+
 # EN LA SIGUIENTE PARTE: Tincion 2
 # Tinte 200ul a la basura
 
