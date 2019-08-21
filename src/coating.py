@@ -52,19 +52,17 @@ if plate_eppendorf not in labware.list():
 
 # [1] Labware
 
-Falcon           = labware.load(plate_falcon,    slot = '8')
+Falcon           = labware.load(plate_falcon,    slot = '1')
 Eppendorf        = labware.load(plate_eppendorf, slot = '5')
 tiprack          = labware.load('opentrons-tiprack-300ul',  slot = '6')
-trash            = labware.load('trash-box',     slot = '12', share = True)        # Trash
-plate_samples    = labware.load('96-flat',       slot = '2')                      # Samples
-Storage          = labware.load('usascientific_12_reservoir_22ml', slot = '11')
+plate_samples    = labware.load('96-flat',       slot = '3')                      # Samples
 
 # [2] Pipettes
 
-pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack], trash_container = trash)
+pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack])
 
 # Initial volume in the Falcon50 in ul
-volume_50 = 20000
+volume_50 = 30000
 # Rate of conversion from ul to distance from the bottom of the well
 ml_rate = 9/5000
 
@@ -112,6 +110,22 @@ falcon50 = 'A1'
 val      = 0
 falcon   = 'C5'
 
+
+pipette_l.set_flow_rate(aspirate = 300, dispense = 300)
+
+pipette_l.pick_up_tip()
+custom_transfer(pipette_l,1600,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
+volume_50 -= 1600
+pipette_l.drop_tip()
+
+pipette_l.set_flow_rate(aspirate = 50, dispense = 50)
+
+pipette_l.transfer(400,Eppendorf.wells(falcon),Eppendorf.wells('A1'),new_tip='once',  mix_before=(3,50), blow_out=True)
+
+
+
+'''
+
 pipette_l.set_flow_rate(aspirate = 150, dispense = 150)
 pipette_l.pick_up_tip()
 custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
@@ -137,6 +151,7 @@ pipette_l.transfer(30,Eppendorf.wells(falcon),Eppendorf.wells('A4'), new_tip='on
 pipette_l.transfer(150,Eppendorf.wells(falcon),Eppendorf.wells('B2'),new_tip='once',  mix_before=(3,50), blow_out=True)
 pipette_l.transfer(150,Eppendorf.wells('B2'),Eppendorf.wells('A5'),  new_tip='once',  mix_before=(3,50))
 
+'''
 
 for j in range(1,4):
 
@@ -148,18 +163,6 @@ for j in range(1,4):
 
     pipette_l.drop_tip()
 
-# Lavado
-for i in range(1,4):
-
-    pipette_l.pick_up_tip()
-
-    # En la 1a columna hay Tween + PBS
-    # 220 ul de agua a cada uno de los pocillos
-
-    for i in range(1,4):
-      storage_samples(f'A{i}', 200)
-      # AGITAR TODO
-      samples_trash(200)
 
 
 robot._driver.turn_off_rail_lights()
