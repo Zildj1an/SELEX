@@ -30,7 +30,7 @@ You can load the protocol in the Opentrons application, available <a href = "htt
 Repository currently location: https://github.com/anamatesanz/Nemesis_AEGIS/
 The main contributor and person in charge of this algorithm is [Ana Matesaz](https://github.com/anamatesanz). It is a Generative adversarial network.
 
-
+![Output sample](https://github.com/Zildj1an/SELEX/blob/master/img/molecule2.gif)
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
