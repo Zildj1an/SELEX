@@ -32,6 +32,7 @@ The main contributor and person in charge of this algorithm is [Ana Matesaz](htt
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/img/molecule2.gif" alt="" width="400"/></p>
 
+_Generated aptamer_
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
