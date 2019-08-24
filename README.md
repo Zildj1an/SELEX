@@ -9,7 +9,7 @@ These are biotechnological protocols for obtaining trained libraries of DNA apta
 
 ## Artificial Intelligence Algorithm
 
-Repository currently location: https://github.com/anamatesanz/Nemesis_AEGIS/
+Repository currently located at: https://github.com/anamatesanz/Nemesis_AEGIS/
 The main contributor and person in charge of this algorithm is [Ana Matesaz](https://github.com/anamatesanz). It is a Generative adversarial network.
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/img/molecule2.gif" alt="" width="400"/></p>
