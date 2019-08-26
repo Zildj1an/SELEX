@@ -118,9 +118,9 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
       # Support for different origins
       where *= 3
    
-   for sample,origin in zip([f'A{i}' for i in range(1, 4)], where):
+   for sample,origin in zip([f'D{i}' for i in range(1, 4)], where):
 
-      # For every well in A1 - A3
+      # For every well in D1 - D3
 
       for x in range(1,times+1):
 
@@ -131,7 +131,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
          pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
          pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
          pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.touch_tip(plate_samples.wells(sample).bottom())
+         pipette_r.blow_out(plate_samples.wells(sample))
 
       if vol > 0:
          if mix:
@@ -140,7 +140,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
          pipette_r.aspirate(vol,module.wells(origin))
          pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
          pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.touch_tip(plate_samples.wells(sample).bottom())
+         pipette_r.blow_out(plate_samples.wells(sample))
 
    if new_tip == 'once':
       pipette_r.drop_tip()
@@ -159,7 +159,7 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15):
    if new_tip == 'once':
       pipette_r.pick_up_tip()
    
-   for sample in [f'A{i}' for i in range(1, 4)]:
+   for sample in [f'D{i}' for i in range(1, 4)]:
 
       if new_tip == 'always':
          pipette_r.pick_up_tip()
@@ -192,10 +192,27 @@ robot._driver.turn_on_rail_lights()
 pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
 
-# (1) 200ul of PBS 1x BSA 5% to plate
-storage_samples(['A1','A2','A3'],200, module = plate_buffers, safe_flow_rate=5, mix=True)
 
-# (2) Estructurizar aptamers y retirar PBS - PAUSE (Hand made)
+# (-2)
+samples_trash(200)
+
+# (-1) Lavado x3 con PBS 1x tween 0.1
+for x in range(1,4):
+    storage_samples(['A5'],200)
+    #samples_trash(200) MANUAL
+
+    if not robot.is_simulating():
+       robot.comment("Waiting...")
+       robot._driver.turn_on_red_button_light()
+       while not robot._driver.read_button():
+          sleep(0.5)
+          
+       robot._driver.turn_on_blue_button_light()
+
+# (1) 200ul of PBS 1x BSA 5% to plate
+storage_samples(['A1','A2','A3'],200, module = plate_buffers, safe_flow_rate=15, mix=True)
+
+# (2) Incubar 1h y estructurizar aptamers y retirar PBS - PAUSE (Hand made)
 if not robot.is_simulating():
    robot.comment("Waiting...")
    robot._driver.turn_on_red_button_light()
@@ -218,20 +235,11 @@ for x in range(1,4):
           sleep(0.5)
           
        robot._driver.turn_on_blue_button_light()
-    
 
-# (4) Retirar a mano - PAUSE (Hand made)
-if not robot.is_simulating():
-   robot.comment("Waiting...")
-   robot._driver.turn_on_red_button_light()
-   while not robot._driver.read_button():
-      sleep(0.5)
-          
-   robot._driver.turn_on_blue_button_light()
-
+       
 # (5) Add 100ul from each apt to the plates
 
-for epp,dest in [('A1','A'), ('A2','B'), ('A2','D'), ('A2','E'), ('C2','C')]:
+for epp,dest in [('A1','D'), ('A2','E'), ('A2','G'), ('A2','H'), ('A3','F')]:
    # source, dest
 
      pipette_l.pick_up_tip()
@@ -244,7 +252,7 @@ for epp,dest in [('A1','A'), ('A2','B'), ('A2','D'), ('A2','E'), ('C2','C')]:
          
      pipette_l.drop_tip()
 
-# Pausar para incubar - PAUSE (Hand made)
+# Pausar para incubar 1h - PAUSE (Hand made)
 if not robot.is_simulating():
    robot.comment("Waiting...")
    robot._driver.turn_on_red_button_light()
@@ -253,6 +261,7 @@ if not robot.is_simulating():
           
    robot._driver.turn_on_blue_button_light()
 
+   
 # (6) Lavado x3 con tween
 
 for x in range(1,4):
@@ -267,33 +276,29 @@ for x in range(1,4):
          
       robot._driver.turn_on_blue_button_light()
 
-# Pausar para fregadero - PAUSE (Hand made)
-if not robot.is_simulating():
-   robot.comment("Waiting...")
-   robot._driver.turn_on_red_button_light()
-   while not robot._driver.read_button():
-      sleep(0.5)
-          
-   robot._driver.turn_on_blue_button_light()
+      
 
 # (7) Eppendorf con anticuerpo A todos (en módulo térmico!)
 
-for well in [f'{j}{i}' for i in range(1, 4) for j in ['A','C']]:
+for well in [f'{j}{i}' for i in range(1, 4) for j in ['D','E','F','H']]:
+   pipette_l.pick_up_tip()
    pipette_l.mix(3,50,td_lab.wells(well))
    pipette_l.set_flow_rate(dispense=20)
-   # TODO HACER DOS TRANSFERS EN LUGAR DE DISTRIBUTE
-   pipette_l.distribute(100,td_lab.wells(well),plate_samples.wells([well,addrow(well, 1 if well[0] == 'A' else 2)]), new_tip='once', blow_out=True)
+   pipette_l.transfer(100,Eppendorf.wells('B1'),plate_samples.wells(well), new_tip='never', blow_out=True)
    pipette_l.set_flow_rate(dispense=200)
-   
+   pipette_l.drop_tip()
+
+
 for i in range(1,4):
-   # TODO CONSOLIDATE INSTEAD OF FOR LOOP?
-   pipette_l.mix(3,50,td_lab.wells('C2'))
+   pipette_l.pick_up_tip()
+   pipette_l.mix(3,50,Eppendorf.wells('A3'))
    pipette_l.set_flow_rate(dispense=20)
-   pipette_l.distribute(100,Eppendorf.wells('C2'),plate_samples.wells(f'D{i}'), new_tip='once', blow_out=True)
+   pipette_l.transfer(100,Eppendorf.wells('A3'),plate_samples.wells(f'D{i}'), new_tip='never', blow_out=True)
    pipette_l.set_flow_rate(dispense=200)
+   pipette_l.drop_tip()
    
 
-# Pausar para incubar - PAUSE (Hand made)
+# Pausar para incubar 1h - PAUSE (Hand made)
 if not robot.is_simulating():
    robot.comment("Waiting...")
    robot._driver.turn_on_red_button_light()
@@ -305,25 +310,23 @@ if not robot.is_simulating():
 
 # (8) Lavado x3 con PBS 1x tween 0.1
 for x in range(1,4):
-    storage_samples(['A5'],200)
-    #samples_trash(200) MANUAL
+   storage_samples(['A5'],200)
+   #samples_trash(200) MANUAL
     
-    if not robot.is_simulating():
-       robot.comment("Waiting...")
-       while not robot._driver.read_button():
-          sleep(0.5)
+   # Pausar para fregadero - PAUSE (Hand made)
+   if not robot.is_simulating():
+      robot.comment("Waiting...")
+      robot._driver.turn_on_red_button_light()
+      while not robot._driver.read_button():
+         sleep(0.5)
 
+      robot._driver.turn_on_blue_button_light()
+      
 
-# Pausar para fregadero - PAUSE (Hand made)
-if not robot.is_simulating():
-   robot.comment("Waiting...")
-   robot._driver.turn_on_red_button_light()
-   while not robot._driver.read_button():
-      sleep(0.5)
-          
-   robot._driver.turn_on_blue_button_light()
       
 # (9) Add 100ul of ABTS
 storage_samples(['A4','A5','A6'],100, module = plate_buffers)
+
+robot.turn_off_rail_lights()
 
 robot._driver.home()
