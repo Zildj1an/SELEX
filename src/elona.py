@@ -69,11 +69,9 @@ pipette_r = instruments.P50_Multi(mount = 'right')
 
 flow_rate = {'a_l': 300, 'd_l': 10, 'a_r': 50, 'd_r': 50}
 
-
 def addrow(well, num):
    # addrow('A1',1) -> 'B1'
    return chr(ord(well[0])+num) + well[1:]
-
 
 # Right pipette will pick up tips in this order: E1,E2...E12,A1,A2....
 # This way we can use a whole tiprack while only picking up four tips
@@ -83,9 +81,9 @@ multi_tip_loc = ['E',1]
 def pick_up_multi():
 
    global multi_tip_loc
-   
+
    pipette_r.pick_up_tip(location = tiprack_r.wells(''.join(map(str,multi_tip_loc))))
-   
+
    if multi_tip_loc[1] == 12:
       if multi_tip_loc[0] == 'A':
          raise Exception("Multichannel out of tips")
@@ -94,22 +92,16 @@ def pick_up_multi():
    else:
       multi_tip_loc[1] += 1
 
-
-
-
-
 def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate=10, mix=False):
 
    # Where is an array: ['A1'] will always aspirate from that well. ['A1','A2','A3'] will transfer
    # from well A1 in module to first row in samples, A2 to second row, etc
 
    # safe_flow_rate sets the dispense rate
-   
-   
 
    if new_tip == 'once':
       pick_up_multi()
-   
+
    times = vol // pipette_r.max_volume
 
    vol = vol % pipette_r.max_volume
@@ -117,7 +109,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
    if len(where) < 3:
       # Support for different origins
       where *= 3
-   
+
    for sample,origin in zip([f'A{i}' for i in range(1, 4)], where):
 
       # For every well in A1 - A3
@@ -146,7 +138,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
       pipette_r.drop_tip()
 
    pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
-         
+
 
 def samples_trash(vol, new_tip='once', safe_flow_rate=10):
 
@@ -158,14 +150,13 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=10):
 
    if new_tip == 'once':
       pick_up_multi()
-   
+
    for sample in [f'A{i}' for i in range(1, 4)]:
 
       if new_tip == 'always':
          pick_up_multi()
-      
       for x in range(1,times+1):
-         
+
          pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(-0.5))
          pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
          pipette_r.blow_out(trash_liquid.wells(sample))
@@ -176,21 +167,39 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=10):
          pipette_r.dispense(vol,trash_liquid.wells(sample))
          pipette_r.blow_out(trash_liquid.wells(sample))
          pipette_r.touch_tip()
-         
+
       if new_tip == 'always':
          pipette_r.drop_tip()
 
    if new_tip == 'once':
       pick_up_multi()
-      
-   pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
-   
-      
-robot._driver.turn_on_rail_lights()
 
+   pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
+
+robot._driver.turn_on_rail_lights()
 
 pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
+# (0) Samples to trash (Retirar coating buffer) y Lavado x3 con PBS 1x tween 0.1
+
+samples_trash(200)
+
+for x in range(1,4):
+    storage_samples(['A5'],200)
+    #samples_trash(200) MANUAL
+    pipette_l.set_flow_rate(aspirate = 300, dispense = 10)
+    pipette_l.transfer(200, Storage.wells('A5'), plate_samples.wells('E1'))
+    #pipette_l.set_flow_rate(aspirate = 10, dispense = 300)
+    #pipette_l.transfer(200, plate_samples.wells('E1'), trash_liquid.wells('A1'))
+    pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
+
+    if not robot.is_simulating():
+       robot.comment("Waiting...")
+       robot._driver.turn_on_red_button_light()
+       while not robot._driver.read_button():
+          sleep(0.5)
+
+       robot._driver.turn_on_blue_button_light()
 
 # (1) 200ul of PBS 1x BSA 5% to plate
 storage_samples(['A1','A2','A3'],200, module = plate_buffers, safe_flow_rate=5, mix=True)
@@ -204,9 +213,7 @@ if not robot.is_simulating():
    robot._driver.turn_on_red_button_light()
    while not robot._driver.read_button():
       sleep(0.5)
-          
    robot._driver.turn_on_blue_button_light()
-
 
 
 # (3) Lavado x3 con PBS 1x tween 0.1
@@ -224,9 +231,8 @@ for x in range(1,4):
        robot._driver.turn_on_red_button_light()
        while not robot._driver.read_button():
           sleep(0.5)
-          
+
        robot._driver.turn_on_blue_button_light()
-    
 
 # (4) Retirar a mano - PAUSE (Hand made)
 if not robot.is_simulating():
@@ -234,7 +240,7 @@ if not robot.is_simulating():
    robot._driver.turn_on_red_button_light()
    while not robot._driver.read_button():
       sleep(0.5)
-          
+
    robot._driver.turn_on_blue_button_light()
 
 # (5) Add 100ul from each apt to the plates
@@ -272,15 +278,13 @@ if not robot.is_simulating():
    robot._driver.turn_on_red_button_light()
    while not robot._driver.read_button():
       sleep(0.5)
-          
+
    robot._driver.turn_on_blue_button_light()
 
 # (7) Eppendorf con anticuerpo A todos (en módulo térmico!)
 
 for well in [f'{j}{i}' for i in range(1, 4) for j in ['A','C']]:
    pipette_l.distribute(100,td_lab.wells(well),plate_samples.wells([well,addrow(well, 1)]), new_tip='once', mix_before=(3,50), blow_out=True)
-   
-   
 
 # Pausar para incubar - PAUSE (Hand made)
 if not robot.is_simulating():
@@ -288,7 +292,7 @@ if not robot.is_simulating():
    robot._driver.turn_on_red_button_light()
    while not robot._driver.read_button():
       sleep(0.5)
-          
+
    robot._driver.turn_on_blue_button_light()
 
 
