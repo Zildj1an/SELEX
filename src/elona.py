@@ -1,5 +1,5 @@
 '''
- Elona Protocol
+ Elona Protocol (Elisa for aptamers)
 
  Coating -> Dyeing (optional) -> Elona
 
@@ -94,18 +94,12 @@ def pick_up_multi():
    else:
       multi_tip_loc[1] += 1
 
-
-
-
-
 def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate=15, mix=False):
 
    # Where is an array: ['A1'] will always aspirate from that well. ['A1','A2','A3'] will transfer
    # from well A1 in module to first row in samples, A2 to second row, etc
 
-   # safe_flow_rate sets the dispense rate
-   
-   
+   # safe_flow_rate sets the dispense rate 
 
    if new_tip == 'once':
       pipette_r.pick_up_tip()
@@ -185,22 +179,22 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15):
       
    pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
    
-      
-robot._driver.turn_on_rail_lights()
+def tween_wash():
 
+    # (3) Lavado x3 con PBS 1x tween 0.1
+    for x in range(1,4):
+        storage_samples(['A5'],200)
+        #samples_trash(200) MANUAL
 
-pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
+        if not robot.is_simulating():
+           robot.comment("Waiting...")
+           robot._driver.turn_on_red_button_light()
+           while not robot._driver.read_button():
+          sleep(0.5)
+          
+           robot._driver.turn_on_blue_button_light()
 
-
-
-# (-2)
-samples_trash(200)
-
-# (-1) Lavado x3 con PBS 1x tween 0.1
-for x in range(1,4):
-    storage_samples(['A5'],200)
-    #samples_trash(200) MANUAL
-
+def robot_wait():
     if not robot.is_simulating():
        robot.comment("Waiting...")
        robot._driver.turn_on_red_button_light()
@@ -208,35 +202,22 @@ for x in range(1,4):
           sleep(0.5)
           
        robot._driver.turn_on_blue_button_light()
+
+
+robot._driver.turn_on_rail_lights()
+pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
+
+# (-2)
+samples_trash(200)
+
+tween_wash()
 
 # (1) 200ul of PBS 1x BSA 5% to plate
 storage_samples(['A1','A2','A3'],200, module = plate_buffers, safe_flow_rate=15, mix=True)
 
 # (2) Incubar 1h y estructurizar aptamers y retirar PBS - PAUSE (Hand made)
-if not robot.is_simulating():
-   robot.comment("Waiting...")
-   robot._driver.turn_on_red_button_light()
-   while not robot._driver.read_button():
-      sleep(0.5)
-          
-   robot._driver.turn_on_blue_button_light()
-
-
-
-# (3) Lavado x3 con PBS 1x tween 0.1
-for x in range(1,4):
-    storage_samples(['A5'],200)
-    #samples_trash(200) MANUAL
-
-    if not robot.is_simulating():
-       robot.comment("Waiting...")
-       robot._driver.turn_on_red_button_light()
-       while not robot._driver.read_button():
-          sleep(0.5)
-          
-       robot._driver.turn_on_blue_button_light()
-
-       
+robot_wait()
+      
 # (5) Add 100ul from each apt to the plates
 
 for epp,dest in [('A1','D'), ('A2','E'), ('A2','G'), ('A2','H'), ('A3','F')]:
@@ -253,31 +234,11 @@ for epp,dest in [('A1','D'), ('A2','E'), ('A2','G'), ('A2','H'), ('A3','F')]:
      pipette_l.drop_tip()
 
 # Pausar para incubar 1h - PAUSE (Hand made)
-if not robot.is_simulating():
-   robot.comment("Waiting...")
-   robot._driver.turn_on_red_button_light()
-   while not robot._driver.read_button():
-      sleep(0.5)
-          
-   robot._driver.turn_on_blue_button_light()
+robot_wait()
 
-   
 # (6) Lavado x3 con tween
-
-for x in range(1,4):
-   storage_samples(['A5'],200)
-   #samples_trash(200) MANUAL
-   
-   if not robot.is_simulating():
-      robot.comment("Waiting...")
-      robot._driver.turn_on_red_button_light()
-      while not robot._driver.read_button():
-         sleep(0.5)
-         
-      robot._driver.turn_on_blue_button_light()
-
+tween_wash()
       
-
 # (7) Eppendorf con anticuerpo A todos (en módulo térmico!)
 
 for well in [f'{j}{i}' for i in range(1, 4) for j in ['D','E','F','H']]:
@@ -297,32 +258,11 @@ for i in range(1,4):
    pipette_l.set_flow_rate(dispense=200)
    pipette_l.drop_tip()
    
-
 # Pausar para incubar 1h - PAUSE (Hand made)
-if not robot.is_simulating():
-   robot.comment("Waiting...")
-   robot._driver.turn_on_red_button_light()
-   while not robot._driver.read_button():
-      sleep(0.5)
-          
-   robot._driver.turn_on_blue_button_light()
-
+robot_wait()
 
 # (8) Lavado x3 con PBS 1x tween 0.1
-for x in range(1,4):
-   storage_samples(['A5'],200)
-   #samples_trash(200) MANUAL
-    
-   # Pausar para fregadero - PAUSE (Hand made)
-   if not robot.is_simulating():
-      robot.comment("Waiting...")
-      robot._driver.turn_on_red_button_light()
-      while not robot._driver.read_button():
-         sleep(0.5)
-
-      robot._driver.turn_on_blue_button_light()
-      
-
+tween_wash()
       
 # (9) Add 100ul of ABTS
 storage_samples(['A4','A5','A6'],100, module = plate_buffers)
@@ -330,3 +270,4 @@ storage_samples(['A4','A5','A6'],100, module = plate_buffers)
 robot.turn_off_rail_lights()
 
 robot._driver.home()
+
