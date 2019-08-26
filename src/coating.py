@@ -23,7 +23,6 @@ metadata = {
 
 # X,Y,Z,A speeds for lateral,front and vertical motion for left and right
 # B,C plunger speed for motor
-#max_speed_per_axis = {'x': 600,'y': 400,'z': 125,'a': 125,'b': 40,'c': 40}
 max_speed_per_axis = {'x': 600,'y': 400,'z': 125,'a': 125,'b': 40,'c': 40}
 robot.head_speed(**max_speed_per_axis)
 '''
@@ -110,19 +109,22 @@ falcon50 = 'A1'
 val      = 0
 falcon   = 'C5'
 
-
+'''
 pipette_l.set_flow_rate(aspirate = 300, dispense = 300)
 
 pipette_l.pick_up_tip()
-custom_transfer(pipette_l,1600,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
-volume_50 -= 1600
+custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
+volume_50 -= 1200
+custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate, new_tip='never')
+volume_50 -= 1200
 pipette_l.drop_tip()
 
 pipette_l.set_flow_rate(aspirate = 50, dispense = 50)
 
-pipette_l.transfer(400,Eppendorf.wells(falcon),Eppendorf.wells('A1'),new_tip='once',  mix_before=(3,50), blow_out=True)
+pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells('A1'),new_tip='once',  mix_before=(3,50), blow_out=True)
+pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells('A2'),new_tip='once',  mix_before=(3,50), blow_out=True)
 
-
+'''
 
 '''
 
@@ -153,17 +155,27 @@ pipette_l.transfer(150,Eppendorf.wells('B2'),Eppendorf.wells('A5'),  new_tip='on
 
 '''
 
-for j in range(1,4):
+for j in range(1,3):
 
-    pipette_l.pick_up_tip()
+   pipette_l.pick_up_tip()
+   
+   for i in range(1,4):
+      
+      pipette_l.transfer(200,Eppendorf.wells('A' + str(j)),plate_samples.wells(chr(ord('F')+j-1)+str(i)), new_tip='never', mix_before=(3,50), blow_out=True)
 
-    for i in range(1,4):
-
-       pipette_l.transfer(200,Eppendorf.wells('A' + str(j)),plate_samples.wells(chr(ord('A')+j-1)+str(i)), new_tip='never', mix_before=(3,50), blow_out=True)
-
-    pipette_l.drop_tip()
+   pipette_l.drop_tip()
 
 
+'''
+pipette_l.pick_up_tip()
+
+for i in range(1,4):
+
+   pipette_l.transfer(200,Eppendorf.wells('A3'),plate_samples.wells('H'+str(i)), new_tip='never', mix_before=(3,50), blow_out=True)
+
+pipette_l.drop_tip()
+
+'''
 
 robot._driver.turn_off_rail_lights()
 robot._driver.home()
