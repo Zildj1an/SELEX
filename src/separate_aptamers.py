@@ -81,7 +81,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
     # (13,14) Trasfer buffer to magdeck
     pipette.transfer(100, samples.wells('D1'), md_well)
 
-    # (15)
+    # (15) HASTA AQUI ACTIVACION MAGNETIC BEADS (bolas)
     magdeck.disengage()
 
     # (16) Transfer PCR mix to magdeck
