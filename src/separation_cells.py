@@ -23,6 +23,7 @@ if plate_eppendorf not in labware.list():
       volume = 100)
 
 def robot_wait():
+
     if not robot.is_simulating():
        robot.comment("Waiting...")
        robot._driver.turn_on_red_button_light()
@@ -30,6 +31,16 @@ def robot_wait():
           sleep(0.5)
 
        robot._driver.turn_on_blue_button_light()
+
+def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False):
+
+     if not reuse_tip :
+         pipette.pick_up_tip()
+     pipette.transfer(quantity, from_w,to_w)
+     if blow_out == True:
+        pipette.blow_out(to_w)
+     if not reuse_tip:
+        pipette_drop_tip()
 
 # Labware
 
@@ -46,20 +57,12 @@ pipette.set_flow_rate(aspirate=15,dispense=15)
 robot._driver.turn_on_rail_lights()
 
 # (0) Add 500 ul from A1,A2 to magdeck
-pipette.pick_up_tip()
-pipette.transfer(500, samples.wells('A1'), md_lab.wells('A1'))
-pipette_drop_tip()
-pipette.pick_up_tip()
-pipette.transfer(500, samples.wells('A2'), md_lab.wells('A2'))
-pipette.drop_tip()
+custom_pick(500, samples.wells('A1'), md_lab.wells('A1'))
+custom_pick(500, samples.wells('A2'), md_lab.wells('A2'))
 
 # (1) Move 150ul from A3 to each of the magdeck
-pipette.pick_up_tip()
-pipette.transfer(150, samples.wells('A3'), md_lab.wells('A1'))
-pipette.drop_tip()
-pipette.pick_up_tip()
-pipette.transfer(150, samples.wells('A3'), md_lab.wells('A2'))
-pipette.drop_tip()
+custom_pick(150, samples.wells('A3'), md_lab.wells('A1'))
+custom_pick(150, samples.wells('A3'), md_lab.wells('A2'))
 
 # (2) 1h incubate
 robot_wait()
@@ -79,29 +82,16 @@ for x in range(1,5):
       p2 = 4
 
     # (4) Move 650 from A1,A2 to B1,B2
-    pipette.pick_up_tip()
-    pipette.transfer(amount, md_lab.wells('A1'), samples.wells('B' + chr(p1)))
-    pipette.drop_tip()
-
-    pipette.pick_up_tip()
-    pipette.transfer(amount, md_lab.wells('A2'), samples.wells('B' + chr(p2)))
+    custom_pick(amount, md_lab.wells('A1'), samples.wells('B' + chr(p1)))
+    custom_pick(amount, md_lab.wells('A2'), samples.wells('B' + chr(p2)))
     magdeck.disengage()
-    pipette.drop_tip()
 
     if x < 4:
 
        # (5) Move 500ul of PBS to A1,A2
        pipette.delay(seconds=15)
-
-       pipette.pick_up_tip()
-       pipette.transfer(500, samples.wells('A4'), md_lab.wells('A1'))
-       pipette.blow_out(md_lab.wells('A1'))
-       pipette.drop_tip()
-
-       pipette.pick_up_tip()
-       pipette.transfer(500, samples.wells('A4'), md_lab.wells('A2'))
-       pipette.blow_out(md_lab.wells('A2'))
-       pipette.drop_tip()
+       custom_pick(500, samples.wells('A4'), md_lab.wells('A1'),blow_out=True)
+       custom_pick(500, samples.wells('A4'), md_lab.wells('A2'),blow_out=True)
 
        # (6) Engage 3 mins
        magdeck.engage()
@@ -110,60 +100,30 @@ for x in range(1,5):
 # (7) Move 100ul of elution buffer A5 to A1,A2
 pipette.delay(seconds=20)
 
-pipette.pick_up_tip()
-pipette.transfer(100, samples.wells('A5'), md_lab.wells('A1'))
-pipette.blow_out(md_lab.wells('A1'))
-pipette_drop_tip()
-
-pipette.pick_up_tip()
-pipette.transfer(100, samples.wells('A5'), md_lab.wells('A2'))
-pipette.blow_out(md_lab.wells('A2'))
-pipette.drop_tip()
+custom_pick(100, samples.wells('A5'), md_lab.wells('A1'),blow_out=True)
+custom_pick(100, samples.wells('A5'), md_lab.wells('A2'),blow_out=True)
 
 # (8) Engage 1.5 mins
 magdeck.engage()
 pipette.delay(seconds=90)
 
 # (9) Move 100ul from A1,A2 to C1,C2
-pipette.pick_up_tip()
-pipette.transfer(100, md_lab.wells('A1'), samples.wells('C1'))
-pipette.drop_tip()
-
-pipette.pick_up_tip()
-pipette.transfer(100, md_lab.wells('A2'), samples.wells('C2'))
+custom_pick(100, md_lab.wells('A1'), samples.wells('C1'))
+custom_pick(100, md_lab.wells('A2'), samples.wells('C2'))
 magdeck.disengage()
-pipette.drop_tip()
 
 # (10) Move 100ul from  A6 eppendorf to A1,A2
-pipette.pick_up_tip()
-pipette.transfer(100, samples.wells('A6'), md_lab.wells('A1'))
-pipette.blow_out(md_lab.wells('A1'))
-pipette.drop_tip()
-
-pipette.pick_up_tip()
-pipette.transfer(100, samples.wells('A6'), md_lab.wells('A2'))
-pipette.blow_out(md_lab.wells('A2'))
-pipette.drop_tip()
+custom_pick(100, samples.wells('A6'), md_lab.wells('A1'),blow_out=True)
+custom_pick(100, samples.wells('A6'), md_lab.wells('A2'),blow_out=True)
 
 # (11) Dilution
-pipette.pick_up_tip()
-pipette.transfer(100, md_lab.wells('A1'), samples.wells('D1'))
-pipette.blow_out(samples.wells('D1'))
-pipette.drop_tip()
-
-pipette.pick_up_tip()
-pipette.transfer(100, md_lab.wells('A2'), samples.wells('D2'))
-pipette.blow_out(samples.wells('D2'))
-pipette.drop_tip()
+custom_pick(100, md_lab.wells('A1'), samples.wells('D1'),blow_out=True)
+custom_pick(100, md_lab.wells('A2'), samples.wells('D2'),blow_out=True)
 
 for pos in ['A','B','C','D']:
 
-    pipette.pick_up_tip()
-    pipette.transfer(100,samples.wells(pos+chr(1)),samples2.wells(pos + chr(1)))
-    pipette.blow_out(samples2.wells(pos+chr(1)))
-    pipette.transfer(100,samples.wells(pos+chr(2)),samples2.wells(pos + chr(2)))
-    pipette.blow_out(samples2.wells(pos+chr(1)))
-    pipette.blow_out(samples2.wells(pos+chr(2)))
+    custom_pick(100,samples.wells(pos+chr(1)),samples2.wells(pos + chr(1)),blow_out=True)
+    custom_pick(100,samples.wells(pos+chr(2)),samples2.wells(pos + chr(2)),blow_out=True)
 
 for pos in ['C','D','A','B']:
 
@@ -172,30 +132,34 @@ for pos in ['C','D','A','B']:
 
     for x in range(1,4):
 
-       pipette.transfer(100,samples2.wells(pos+chr(pos1)),samples2.wells(pos + chr(pos1 + 2)))
-       pipette.transfer(100,samples2.wells(pos+chr(pos2)),samples2.wells(pos + chr(pos2 + 2)))
-       pipette.blow_out(samples2.wells(pos + chr(pos1 + 2)))
-       pipette.blow_out(samples2.wells(pos + chr(pos2 + 2)))
+       pipette.pick_up_tip()
+       custom_pick(100,samples2.wells(pos+chr(pos1)),samples2.wells(pos + chr(pos1 + 2)),blow_out=True, reuse_tip=True)
        pos1 = pos1 + 2
+       pipette.drop_tip()
+
+    for x in range(1,4):
+
+       pipette.pick_up_tip()
+       custom_pick(100,samples2.wells(pos+chr(pos2)),samples2.wells(pos + chr(pos2 + 2)),blow_out=True,reuse_tip=True)
        pos2 = pos2 + 2
+       pipette.drop_tip()
 
-pipette.transfer(100,samples.wells('B3'),samples.wells('B5')
-pipette.transfer(100,samples.wells('B4'),samples.wells('B6')
-pipette.blow_out(samples.wells('B5'))
-pipette.blow_out(samples.wells('B6'))
-pipette.transfer(100,samples.wells('B5'),samples.wells('B7')
-pipette.transfer(100,samples.wells('B6'),samples.wells('B8')
-pipette.blow_out(samples.wells('B7'))
-pipette.blow_out(samples.wells('B8'))
-pipette.transfer(100,samples.wells('B7'),samples.wells('C3')
-pipette.transfer(100,samples.wells('B8'),samples.wells('C4')
-pipette.blow_out(samples.wells('C3'))
-pipette.blow_out(samples.wells('C4'))
-pipette.transfer(100,samples.wells('C3'),samples.wells('C5')
-pipette.transfer(100,samples.wells('C4'),samples.wells('C6')
-pipette.blow_out(samples.wells('C5'))
-pipette.blow_out(samples.wells('C6'))
+# B3
+pipette.pick_up_tip()
 
+for x, y in [('B3','B5'),('B5,B7'),('B7,C3'),('C3,C5')]:
+   custom_pick(100,samples.wells(x),samples.wells(y),blow_out=True,reuse_tip=True)
+
+pipette.drop_tip()
+
+# B4
+pipette.pick_up_tip()
+
+for x, y in [('B4','B6'),('B6,B8'),('B8,C4'),('C4,C6')]:
+    custom_pick(100,samples.wells(x),samples.wells(y),blow_out=True,reuse_tip=True)
+
+pipette.drop_tip()
 
 robot._driver.turn_off_rail_lights()
+
 
