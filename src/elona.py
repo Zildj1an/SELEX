@@ -58,12 +58,13 @@ td_lab           = labware.load(ninja_name, slot=10)
 Eppendorf        = labware.load('Eppendorf_Samples', slot = 4)
 tiprack_l        = labware.load('opentrons-tiprack-300ul', slot=9)
 tiprack_r        = labware.load('opentrons-tiprack-10ul', slot=6)
+tiprack_r2       = labware.load('opentrons-tiprack-10ul', slot=11)
 # Note: tiprack_r is actually an 'opentrons-
 
 # [2] Pipettes
 
 pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack_l])
-pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack_r])
+pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack_r, tiprack_r2])
 
 # Pipette flow rates: left and right, aspirate and dispense
 
@@ -142,7 +143,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
    pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
          
 
-def samples_trash(vol, new_tip='once', safe_flow_rate=15):
+def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
 
    # safe_flow_rate sets the aspirate rate
 
@@ -160,13 +161,13 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15):
       
       for x in range(1,times+1):
          
-         pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(-0.5))
+         pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(downto))
          pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
          pipette_r.blow_out(trash_liquid.wells(sample))
          pipette_r.touch_tip()
 
       if vol > 0:
-         pipette_r.aspirate(vol,plate_samples.wells(sample).bottom(-0.5))
+         pipette_r.aspirate(vol,plate_samples.wells(sample).bottom(downto))
          pipette_r.dispense(vol,trash_liquid.wells(sample))
          pipette_r.blow_out(trash_liquid.wells(sample))
          pipette_r.touch_tip()
@@ -175,24 +176,24 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15):
          pipette_r.drop_tip()
 
    if new_tip == 'once':
-      pipette_r.pick_up_tip()
+      pipette_r.drop_tip()
       
    pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
    
 def tween_wash():
 
-    # (3) Lavado x3 con PBS 1x tween 0.1
-    for x in range(1,4):
-        storage_samples(['A5'],200)
-        #samples_trash(200) MANUAL
+   # (3) Lavado x3 con PBS 1x tween 0.1
+   for x in range(1,4):
+      storage_samples(['A5'],200)
+      #samples_trash(200) MANUAL
 
-        if not robot.is_simulating():
-           robot.comment("Waiting...")
-           robot._driver.turn_on_red_button_light()
-           while not robot._driver.read_button():
-          sleep(0.5)
+      if not robot.is_simulating():
+         robot.comment("Waiting...")
+         robot._driver.turn_on_red_button_light()
+         while not robot._driver.read_button():
+            sleep(0.5)
           
-           robot._driver.turn_on_blue_button_light()
+         robot._driver.turn_on_blue_button_light()
 
 def robot_wait():
     if not robot.is_simulating():
@@ -206,9 +207,9 @@ def robot_wait():
 
 robot._driver.turn_on_rail_lights()
 pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
-
+'''
 # (-2)
-samples_trash(200)
+#samples_trash(200, downto = -5)
 
 tween_wash()
 
@@ -217,6 +218,9 @@ storage_samples(['A1','A2','A3'],200, module = plate_buffers, safe_flow_rate=15,
 
 # (2) Incubar 1h y estructurizar aptamers y retirar PBS - PAUSE (Hand made)
 robot_wait()
+'''
+# (3) Lavado con tween
+tween_wash()
       
 # (5) Add 100ul from each apt to the plates
 
@@ -241,22 +245,23 @@ tween_wash()
       
 # (7) Eppendorf con anticuerpo A todos (en módulo térmico!)
 
-for well in [f'{j}{i}' for i in range(1, 4) for j in ['D','E','F','H']]:
+for j in ['D','E','F','H']:
    pipette_l.pick_up_tip()
-   pipette_l.mix(3,50,td_lab.wells(well))
-   pipette_l.set_flow_rate(dispense=20)
-   pipette_l.transfer(100,Eppendorf.wells('B1'),plate_samples.wells(well), new_tip='never', blow_out=True)
+   for well in [f'{j}{i}' for i in range(1, 4)]:
+      pipette_l.mix(3,50,Eppendorf.wells('B1'))
+      pipette_l.set_flow_rate(dispense=20)
+      pipette_l.transfer(100,Eppendorf.wells('B1'),plate_samples.wells(well), new_tip='never', blow_out=True)
    pipette_l.set_flow_rate(dispense=200)
-   pipette_l.drop_tip()
 
 
+
+pipette_l.pick_up_tip()
 for i in range(1,4):
-   pipette_l.pick_up_tip()
    pipette_l.mix(3,50,Eppendorf.wells('A3'))
    pipette_l.set_flow_rate(dispense=20)
-   pipette_l.transfer(100,Eppendorf.wells('A3'),plate_samples.wells(f'D{i}'), new_tip='never', blow_out=True)
+   pipette_l.transfer(100,Eppendorf.wells('A3'),plate_samples.wells(f'G{i}'), new_tip='never', blow_out=True)
    pipette_l.set_flow_rate(dispense=200)
-   pipette_l.drop_tip()
+pipette_l.drop_tip()
    
 # Pausar para incubar 1h - PAUSE (Hand made)
 robot_wait()
