@@ -8,8 +8,8 @@
 '''
 
 from opentrons import labware, instruments, modules, robot
-from opentrons.data_storage import database
-from time import sleep
+from time import sleep, monotonic
+import logging
 
 metadata = {
    'protocolName' : 'ELONA',
@@ -17,9 +17,12 @@ metadata = {
    'source'       : 'https://github.com/Zildj1an/SELEX'
 }
 
+
+logging.basicConfig(filename='/root/elona')
+log = logging.getLogger('elona')
+
 # [1] Labware
 
-database.delete_container('96-flat-1')
 
 storage_name = 'Storage_Module'
 if storage_name not in labware.list():
@@ -47,31 +50,36 @@ if plate_name not in labware.list():
       plate_name,                        # Labware Name
       grid=(12, 8),                    # Amount of (columns, rows)
       spacing=(9, 9),                 # Distances (mm) between each (column, row)
-      diameter=7,                     # Diameter (mm) of each well on the plate
+      diameter=3,                     # Diameter (mm) of each well on the plate
       depth=10,                       # Depth (mm) of each well on the plate
       volume=50)
 
 Storage          = labware.load(storage_name, slot = 5)
-plate_samples    = labware.load('96-flat',       slot = 2)
-plate_buffers    = labware.load('96-flat-1',     slot = 3)
+plate_samples    = labware.load('96-flat-1',       slot = 2)
+plate_buffers    = labware.load('96-flat',     slot = 3)
 trash_liquid     = labware.load('corning_384_wellplate_112ul_flat', slot = 1)
-td_lab           = labware.load(ninja_name, slot=10)
+#td_lab           = labware.load(ninja_name, slot=10)
 Eppendorf        = labware.load('Eppendorf_Samples', slot = 4)
 tiprack_l        = labware.load('opentrons-tiprack-300ul', slot=9)
 tiprack_r        = labware.load('opentrons-tiprack-10ul', slot=6)
 tiprack_r2       = labware.load('opentrons-tiprack-10ul', slot=11)
-#tiprack_r3       = labware.load('opentrons-tiprack-10ul', slot=7)
+tiprack_r3       = labware.load('opentrons-tiprack-10ul', slot=10)
+tiprack_r4       = labware.load('opentrons-tiprack-10ul', slot=8)
 
-# Note: tiprack_r is actually an 'opentrons-
+# Note: tiprack_r is actually an 'opentrons-tiprack-300ul', but its name must be
+# different than tiprack_l's to prevent calibration issues
 
 # [2] Pipettes
 
 pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack_l])
-pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack_r, tiprack_r2])#,tiprack_r3])
+pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack_r2,tiprack_r3, tiprack_r4])
 
 # Pipette flow rates: left and right, aspirate and dispense
 
-flow_rate = {'a_l': 200, 'd_l': 200, 'a_r': 50, 'd_r': 50}
+flow_rate = {'a_l': 300, 'd_l': 300, 'a_r': 100, 'd_r': 100}
+
+max_speed_per_axis = {'x': 600,'y': 400,'z': 125,'a': 125,'b': 40,'c': 40}
+robot.head_speed(**max_speed_per_axis)
 
 def addrow(well, num):
    # addrow('A1',1) -> 'B1'
@@ -96,10 +104,10 @@ def pick_up_multi():
    else:
       multi_tip_loc[1] += 1
 
-def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate=15, mix=False):
+def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate=15, mix=False, measure_time=True):
 
    # Where is an array: ['A1'] will always aspirate from that well. ['A1','A2','A3'] will transfer
-   # from well A1 in module to first row in samples, A2 to second row, etc
+   # from well A1 in module to first col in samples, A2 to second col, etc
 
    # safe_flow_rate sets the dispense rate
 
@@ -113,6 +121,9 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
       # Support for different origins
       where *= 3
 
+   first_dispense=True
+   start_time=0
+   
    for sample,origin in zip([f'A{i}' for i in range(1, 4)], where):
 
       # For every well in A1 - A3
@@ -124,18 +135,28 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
             pipette_r.mix(3,25,module.wells(origin))
             pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
          pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
-         pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
-         pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.blow_out(plate_samples.wells(sample))
+         pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom())
+         if measure_time:
+       	    if first_dispense:
+               start_time = monotonic()
+               first_dispense = False
+            end_time = monotonic()
+            log.info(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
+         pipette_r.blow_out(plate_samples.wells(sample).bottom())
+         pipette_r.touch_tip()
 
       if vol > 0:
          if mix:
             pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
             pipette_r.mix(3,25,module.wells(origin))
-            pipette_r.aspirate(vol,module.wells(origin))
-         pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
-         pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.blow_out(plate_samples.wells(sample))
+            pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
+         pipette_r.aspirate(vol,module.wells(origin))
+         pipette_r.dispense(vol,plate_samples.wells(sample).bottom())
+         if measure_time:
+            end_time = monotonic()
+            log.info(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
+         pipette_r.blow_out(plate_samples.wells(sample).bottom())
+         pipette_r.touch_tip()
 
    if new_tip == 'once':
       pipette_r.drop_tip()
@@ -153,20 +174,24 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
    if new_tip == 'once':
       pipette_r.pick_up_tip()
 
+
    for sample in [f'A{i}' for i in range(1, 4)]:
 
       if new_tip == 'always':
          pipette_r.pick_up_tip()
-      pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(downto))
-      pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
-      pipette_r.blow_out(trash_liquid.wells(sample))
-      pipette_r.touch_tip()
+
+      for x in range(1,times+1):
+
+         pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(downto))
+         pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
+         pipette_r.blow_out(trash_liquid.wells(sample))
+         pipette_r.touch_tip()
 
       if vol > 0:
          pipette_r.aspirate(vol,plate_samples.wells(sample).bottom(downto))
-      pipette_r.dispense(vol,trash_liquid.wells(sample))
-      pipette_r.blow_out(trash_liquid.wells(sample))
-      pipette_r.touch_tip()
+         pipette_r.dispense(vol,trash_liquid.wells(sample))
+         pipette_r.blow_out(trash_liquid.wells(sample))
+         pipette_r.touch_tip()
 
       if new_tip == 'always':
          pipette_r.drop_tip()
@@ -192,7 +217,7 @@ def tween_wash():
          robot._driver.turn_on_blue_button_light()
 
       if x < 3:
-         samples_trash(200, new_tip='once', downto = -5)
+         samples_trash(200, new_tip='always', downto = -5)
 
 def robot_wait():
     if not robot.is_simulating():
@@ -207,7 +232,7 @@ robot._driver.turn_on_rail_lights()
 pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
 # (-2)
-samples_trash(200, new_tip='once', downto = -5)
+samples_trash(200, new_tip='always', downto = -5)
 tween_wash()
 
 # (1) 200ul of PBS 1x BSA 5% to plate
@@ -265,7 +290,7 @@ robot_wait()
 tween_wash()
 
 # (9) Add 100ul of ABTS
-storage_samples(['A10','A11','A12'],100, module = plate_buffers, safe_flow_rate=30)
+storage_samples(['A10','A11','A12'],100, module = plate_buffers, safe_flow_rate=30, measure_time=True)
 
 robot.turn_off_rail_lights()
 

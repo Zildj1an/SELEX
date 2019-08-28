@@ -65,7 +65,7 @@ volume_50 = 30000
 # Rate of conversion from ul to distance from the bottom of the well
 ml_rate = 9/5000
 
-def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1,new_tip='once'):
+def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1,new_tip='once', mix=False):
 
    times = quantity // pipette.max_volume
 
@@ -75,6 +75,10 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1,new_tip='once'):
    for i in range(1,times+1):
       if new_tip == 'always':
          pipette.pick_up_tip()
+      if mix:
+         pipette.set_flow_rate(aspirate = 300, dispense = 300)
+         pipette.mix(3,50,pos1.wells(A).bottom(depth))
+         pipette.set_flow_rate(aspirate = 50, dispense = 50)
       pipette.aspirate(pipette.max_volume,pos1.wells(A).bottom(depth))
       pipette.dispense(pipette.max_volume,pos2.wells(B))
       pipette.blow_out(pos2.wells(B).top(-4))
@@ -87,9 +91,14 @@ def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1,new_tip='once'):
    if quantity > 0:
       if new_tip == 'always':
          pipette.pick_up_tip()
+      if mix:
+         pipette.set_flow_rate(aspirate = 300, dispense = 300)
+         pipette.mix(3,50,pos1.wells(A).bottom(depth))
+         pipette.set_flow_rate(aspirate = 50, dispense = 50)
       pipette.aspirate(quantity,pos1.wells(A).bottom(depth))
       pipette.dispense(quantity,pos2.wells(B))
       pipette.blow_out(pos2.wells(B).top(-4))
+      pipette.touch_tip()
       if new_tip == 'always':
          pipette.drop_tip()
 
@@ -109,22 +118,20 @@ falcon50 = 'A1'
 val      = 0
 falcon   = 'C5'
 
-'''
+
 pipette_l.set_flow_rate(aspirate = 300, dispense = 300)
 
 pipette_l.pick_up_tip()
-custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
-volume_50 -= 1200
-custom_transfer(pipette_l,1200,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate, new_tip='never')
-volume_50 -= 1200
+custom_transfer(pipette_l,1500,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
+volume_50 -= 1500
+custom_transfer(pipette_l,1500,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate, new_tip='never')
+volume_50 -= 1500
 pipette_l.drop_tip()
 
-pipette_l.set_flow_rate(aspirate = 50, dispense = 50)
 
-pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells('A1'),new_tip='once',  mix_before=(3,50), blow_out=True)
-pipette_l.transfer(300,Eppendorf.wells(falcon),Eppendorf.wells('A2'),new_tip='once',  mix_before=(3,50), blow_out=True)
+custom_transfer(pipette_l, 500, Eppendorf, Eppendorf, falcon, 'A1' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 500, Eppendorf, Eppendorf, falcon, 'A2' , new_tip='once', mix=True)
 
-'''
 
 '''
 
@@ -155,13 +162,16 @@ pipette_l.transfer(150,Eppendorf.wells('B2'),Eppendorf.wells('A5'),  new_tip='on
 
 '''
 
-for j in range(1,3):
+destination_A1 = plate_samples.wells('A3','B3')
+destination_A2 = plate_samples.wells('A2','B2','C2','D2','E2','F2','C3')
+
+for source, dest in [(Eppendorf.wells('A1'), destination_A1),
+                     (Eppendorf.wells('A2'), destination_A2),
+                     (Falcon.wells(falcon50), plate_samples.wells('D3','E3','F3'))]: 
 
    pipette_l.pick_up_tip()
    
-   for i in range(1,4):
-      
-      pipette_l.transfer(200,Eppendorf.wells('A' + str(j)),plate_samples.wells(chr(ord('F')+j-1)+str(i)), new_tip='never', mix_before=(3,50), blow_out=True)
+   pipette_l.transfer(200,source,dest, new_tip='never', mix_before=(3,50), blow_out=True)
 
    pipette_l.drop_tip()
 
