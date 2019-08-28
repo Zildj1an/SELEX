@@ -123,19 +123,19 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
             pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
             pipette_r.mix(3,25,module.wells(origin))
             pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
-            pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
-            pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
-            pipette_r.blow_out(plate_samples.wells(sample))
-            pipette_r.blow_out(plate_samples.wells(sample))
+         pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
+         pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
+         pipette_r.blow_out(plate_samples.wells(sample))
+         pipette_r.blow_out(plate_samples.wells(sample))
 
       if vol > 0:
          if mix:
             pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
             pipette_r.mix(3,25,module.wells(origin))
             pipette_r.aspirate(vol,module.wells(origin))
-            pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
-            pipette_r.blow_out(plate_samples.wells(sample))
-            pipette_r.blow_out(plate_samples.wells(sample))
+         pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
+         pipette_r.blow_out(plate_samples.wells(sample))
+         pipette_r.blow_out(plate_samples.wells(sample))
 
    if new_tip == 'once':
       pipette_r.drop_tip()
