@@ -115,7 +115,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
 
    for sample,origin in zip([f'A{i}' for i in range(1, 4)], where):
 
-      # For every well in D1 - D3
+      # For every well in A1 - A3
 
       for x in range(1,times+1):
 
@@ -158,7 +158,7 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
       if new_tip == 'always':
          pipette_r.pick_up_tip()
 
-      for x in range(1,times+1):
+      or x in range(1,times+1):
 
          pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(downto))
          pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
@@ -239,7 +239,7 @@ for epp,dest in [('A1','A1'), ('A2','D1'), ('A2','D2'), ('A2','D3'), ('A3','A2')
       pipette_l.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)), new_tip='never', blow_out=True)
       pipette_l.set_flow_rate(dispense=200)
 
-     pipette_l.drop_tip()
+   pipette_l.drop_tip()
 
 # Pausar para incubar 1h - PAUSE (Hand made)
 robot_wait()
@@ -261,7 +261,7 @@ for epp,dest in [('B1','A1'), ('B1','D1'), ('B1','A2'), ('B1','D3'), ('B2','A3')
       pipette_l.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)), new_tip='never', blow_out=True)
       pipette_l.set_flow_rate(dispense=200)
 
-     pipette_l.drop_tip()
+   pipette_l.drop_tip()
 
 # Pausar para incubar 1h - PAUSE (Hand made)
 robot_wait()
