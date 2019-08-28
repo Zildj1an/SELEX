@@ -14,6 +14,7 @@ from time import sleep
 metadata = {
    'protocolName' : 'ELONA',
    'description'  : 'Aptamer binding',
+   'author'       : 'Carlos Bilbao, Pablo Villalobos',
    'source'       : 'https://github.com/Zildj1an/SELEX'
 }
 
