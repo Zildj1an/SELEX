@@ -32,6 +32,45 @@ $ sudo pip install opentrons subprocess time os
 ```
 The robot uses the audio robot.mp3 and gets it from Robot Raspberry's /mnt/usbdrive/ (put it there or edit the location).
 You can load the protocol in the Opentrons application, available <a href = "https://opentrons.com/ot-app">here</a>.
+We also recommend the usage of an external Raspberry Pi to uninterruptedly provide the robot with Wi-Fi. Once you have stablished the Wi-Fi network at the Raspberry, you can connect the Robot too:
+
+```
+# nmcli dev wifi connect <userSSID> password <passwdSSID>
+```
+After the last update of the Robot -by the time this is written- the SSH connection has changed and now you need to exchange with it a public key for a more secure connection. Then when connected the robot will request the passphrase, at least the first time. Here is how you create the public key (you probably already have one):
+
+```
+$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/.ssh/id_rsa):
+/home/pepe/.ssh/id_rsa already exists.
+Overwrite (y/n)?
+Enter passphrase (empty for no passphrase):
+Your identification has been saved in /home/.ssh/id_rsa.
+Your public key has been saved in /home/.ssh/id_rsa.pub.
+The key fingerprint is:
+a9:49:2e:2a:5e:33:3e:a9:de:4e:77:11:58:b6:90:26 pepe@remote_host
+The key's randomart image is:
++--[ RSA 2048]----+
+|     ..o         |
+|   E o= .        |
+|    o. o         |
+|        ..       |
+|      ..S        |
+|     o o.        |
+|   =o.+.         |
+|. =++..          |
+|o=++.            |
++-----------------+
+```
+## Other suggested custom hardware
+
+We also handcrafted some modules from ourselves to make things easier and make them fit in the robot. We used a 3D-printer for some of our designs to store Eppendorf and Falcon tipracks. We also deisgned a PCB for a potenciostat microcontroller Teensy 3.0 and an auxiliar thermic module to cool to 4 degrees Celsius, and so on.
+
+The 3D-designs will be made available for public use at https://cad.onshape.com/documents?nodeId=a2079861d9f4b3ba70dc3807&resourceType=folder
+
+<img src="https://github.com/Zildj1an/SELEX/blob/master/img/potencio.png" alt="" width="350" height = "320"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/termaux.png" alt="" width="350" height = "320"/>
+<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/img/custom_print.png" alt="" width="350"/></p>
 
 
 ## Authors
