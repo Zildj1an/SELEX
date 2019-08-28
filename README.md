@@ -41,6 +41,11 @@ $ sudo pip install opentrons subprocess time os
 ```
 The robot uses the audio robot.mp3 and gets it from Robot Raspberry's /mnt/usbdrive/ (put it there or edit the location).
 You can load the protocol in the Opentrons application, available <a href = "https://opentrons.com/ot-app">here</a>.
+We also recommend the usage of an external Raspberry Pi to uninterruptedly provide the robot with Wi-Fi. Once you have stablished the Wi-Fi network at the Raspberry, you can connect the Robot too:
+
+```
+# nmcli dev wifi connect <userSSID> password <passwdSSID>
+```
 
 
 ## Authors
