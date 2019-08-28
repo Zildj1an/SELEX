@@ -46,6 +46,32 @@ We also recommend the usage of an external Raspberry Pi to uninterruptedly provi
 ```
 # nmcli dev wifi connect <userSSID> password <passwdSSID>
 ```
+After the last update of the Robot -by the time this is written- the SSH connection has changed and now you need to exchange with it a public key for a more secure connection. Then when connected the robot will request the passphrase, at least the first time. Here is how you create the public key (you probably already have one):
+
+```
+$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/.ssh/id_rsa):
+/home/pepe/.ssh/id_rsa already exists.
+Overwrite (y/n)?
+Enter passphrase (empty for no passphrase):
+Your identification has been saved in /home/.ssh/id_rsa.
+Your public key has been saved in /home/.ssh/id_rsa.pub.
+The key fingerprint is:
+a9:49:2e:2a:5e:33:3e:a9:de:4e:77:11:58:b6:90:26 pepe@remote_host
+The key's randomart image is:
++--[ RSA 2048]----+
+|     ..o         |
+|   E o= .        |
+|    o. o         |
+|        ..       |
+|      ..S        |
+|     o o.        |
+|   =o.+.         |
+|. =++..          |
+|o=++.            |
++-----------------+
+```
 
 
 ## Authors
