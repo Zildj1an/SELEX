@@ -19,6 +19,8 @@ metadata = {
 
 # [1] Labware
 
+database.delete_container('96-flat-1')
+
 storage_name = 'Storage_Module'
 if storage_name not in labware.list():
    Storage = labware.create(
@@ -39,12 +41,11 @@ if ninja_name not in labware.list():
       depth=20,                       # Depth (mm) of each well on the plate
       volume=50)
 
-
 plate_name = "96-flat-1"
 if plate_name not in labware.list():
    labware.create(
       plate_name,                        # Labware Name
-      grid=(8, 12),                    # Amount of (columns, rows)
+      grid=(12, 8),                    # Amount of (columns, rows)
       spacing=(9, 9),                 # Distances (mm) between each (column, row)
       diameter=7,                     # Diameter (mm) of each well on the plate
       depth=10,                       # Depth (mm) of each well on the plate
@@ -52,7 +53,7 @@ if plate_name not in labware.list():
 
 Storage          = labware.load(storage_name, slot = 5)
 plate_samples    = labware.load('96-flat',       slot = 2)
-plate_buffers    = labware.load('96-flat-1',       slot = 3)
+plate_buffers    = labware.load('96-flat-1',     slot = 3)
 trash_liquid     = labware.load('corning_384_wellplate_112ul_flat', slot = 1)
 td_lab           = labware.load(ninja_name, slot=10)
 Eppendorf        = labware.load('Eppendorf_Samples', slot = 4)
@@ -106,7 +107,6 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
       pipette_r.pick_up_tip()
 
    times = vol // pipette_r.max_volume
-
    vol = vol % pipette_r.max_volume
 
    if len(where) < 3:
@@ -157,9 +157,6 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
 
       if new_tip == 'always':
          pipette_r.pick_up_tip()
-
-      or x in range(1,times+1):
-
          pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(downto))
          pipette_r.dispense(pipette_r.max_volume,trash_liquid.wells(sample))
          pipette_r.blow_out(trash_liquid.wells(sample))
