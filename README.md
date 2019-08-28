@@ -22,15 +22,6 @@ Aptamers are a cutting-edge technology that is revolutionizing biotechnology, fr
 
 _The SELEX process_
 
-## Other suggested custom hardware
-
-We also handcrafted some modules from ourselves to make things easier and make them fit in the robot. We used a 3D-printer for some of our designs to store Eppendorf and Falcon tipracks. We also deisgned a PCB for a potenciostat microcontroller Teensy 3.0 and an auxiliar thermic module to cool to 4 degrees Celsius, and so on.
-
-The 3D-designs will be made available for public use at https://cad.onshape.com/documents?nodeId=a2079861d9f4b3ba70dc3807&resourceType=folder
-
-<img src="https://github.com/Zildj1an/SELEX/blob/master/img/potencio.png" alt="" width="350" height = "320"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/termaux.png" alt="" width="350" height = "320"/>
-<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/img/custom_print.png" alt="" width="350"/></p>
-
 ## Installation and Usage
 
 You can clone this repo or download the zip. Make sure all the dependencies are covered. First line is for installation of pip at most Linux distributions.
@@ -72,6 +63,14 @@ The key's randomart image is:
 |o=++.            |
 +-----------------+
 ```
+## Other suggested custom hardware
+
+We also handcrafted some modules from ourselves to make things easier and make them fit in the robot. We used a 3D-printer for some of our designs to store Eppendorf and Falcon tipracks. We also deisgned a PCB for a potenciostat microcontroller Teensy 3.0 and an auxiliar thermic module to cool to 4 degrees Celsius, and so on.
+
+The 3D-designs will be made available for public use at https://cad.onshape.com/documents?nodeId=a2079861d9f4b3ba70dc3807&resourceType=folder
+
+<img src="https://github.com/Zildj1an/SELEX/blob/master/img/potencio.png" alt="" width="350" height = "320"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/termaux.png" alt="" width="350" height = "320"/>
+<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/img/custom_print.png" alt="" width="350"/></p>
 
 
 ## Authors
