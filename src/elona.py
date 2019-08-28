@@ -104,7 +104,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
 
    if new_tip == 'once':
       pipette_r.pick_up_tip()
-   
+      
    times = vol // pipette_r.max_volume
 
    vol = vol % pipette_r.max_volume
@@ -112,8 +112,8 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
    if len(where) < 3:
       # Support for different origins
       where *= 3
-   
-   for sample,origin in zip([f'D{i}' for i in range(1, 4)], where):
+      
+   for sample,origin in zip([f'A{i}' for i in range(1, 4)], where):
 
       # For every well in D1 - D3
 
@@ -122,26 +122,26 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
          if mix:
             pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
             pipette_r.mix(3,25,module.wells(origin))
-         pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
-         pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
-         pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
-         pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.blow_out(plate_samples.wells(sample))
+            pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
+            pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
+            pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom(3))
+            pipette_r.blow_out(plate_samples.wells(sample))
+            pipette_r.blow_out(plate_samples.wells(sample))
 
       if vol > 0:
          if mix:
             pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
             pipette_r.mix(3,25,module.wells(origin))
-         pipette_r.aspirate(vol,module.wells(origin))
-         pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
-         pipette_r.blow_out(plate_samples.wells(sample))
-         pipette_r.blow_out(plate_samples.wells(sample))
+            pipette_r.aspirate(vol,module.wells(origin))
+            pipette_r.dispense(vol,plate_samples.wells(sample).bottom(3))
+            pipette_r.blow_out(plate_samples.wells(sample))
+            pipette_r.blow_out(plate_samples.wells(sample))
 
    if new_tip == 'once':
       pipette_r.drop_tip()
 
    pipette_r.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
-         
+   
 
 def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
 
@@ -153,12 +153,12 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
 
    if new_tip == 'once':
       pipette_r.pick_up_tip()
-   
-   for sample in [f'D{i}' for i in range(1, 4)]:
+      
+   for sample in [f'A{i}' for i in range(1, 4)]:
 
       if new_tip == 'always':
          pipette_r.pick_up_tip()
-      
+         
       for x in range(1,times+1):
          
          pipette_r.aspirate(pipette_r.max_volume,plate_samples.wells(sample).bottom(downto))
@@ -192,8 +192,11 @@ def tween_wash():
          robot._driver.turn_on_red_button_light()
          while not robot._driver.read_button():
             sleep(0.5)
-          
+            
          robot._driver.turn_on_blue_button_light()
+
+      if x < 3:
+         samples_trash(200, new_tip='always', downto = -5)
 
 def robot_wait():
     if not robot.is_simulating():
@@ -207,34 +210,36 @@ def robot_wait():
 
 robot._driver.turn_on_rail_lights()
 pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
-'''
+
 # (-2)
-#samples_trash(200, downto = -5)
+samples_trash(200, new_tip='always', downto = -5)
 
 tween_wash()
 
 # (1) 200ul of PBS 1x BSA 5% to plate
-storage_samples(['A1','A2','A3'],200, module = plate_buffers, safe_flow_rate=15, mix=True)
+storage_samples(['A7','A8','A9'],200, module = plate_buffers, safe_flow_rate=15, mix=True)
 
 # (2) Incubar 1h y estructurizar aptamers y retirar PBS - PAUSE (Hand made)
 robot_wait()
-'''
+
 # (3) Lavado con tween
 tween_wash()
-      
+
 # (5) Add 100ul from each apt to the plates
 
-for epp,dest in [('A1','D'), ('A2','E'), ('A2','G'), ('A2','H'), ('A3','F')]:
+for epp,dest in [('A1','A1'), ('A2','D1'), ('A2','D2'), ('A2','D3'), ('A3','A2'), ('A3','A3')]:
    # source, dest
-
-     pipette_l.pick_up_tip()
-
-     for pos in range(1,4):
-        pipette_l.mix(3,50,Eppendorf.wells(epp))
-        pipette_l.set_flow_rate(dispense=20)
-        pipette_l.transfer(100,Eppendorf.wells(epp),plate_samples.wells(dest + str(pos)), new_tip='never', blow_out=True)
-        pipette_l.set_flow_rate(dispense=200)
-         
+   
+   pipette_l.pick_up_tip()
+   
+   for pos in range(1,4):
+      if '3' not in epp:
+         # Don't mix aptamer buffer
+         pipette_l.mix(3,50,Eppendorf.wells(epp))
+      pipette_l.set_flow_rate(dispense=20)
+      pipette_l.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)), new_tip='never', blow_out=True)
+      pipette_l.set_flow_rate(dispense=200)
+        
      pipette_l.drop_tip()
 
 # Pausar para incubar 1h - PAUSE (Hand made)
@@ -242,35 +247,32 @@ robot_wait()
 
 # (6) Lavado x3 con tween
 tween_wash()
-      
+
 # (7) Eppendorf con anticuerpo A todos (en módulo térmico!)
 
-for j in ['D','E','F','H']:
+for epp,dest in [('B1','A1'), ('B1','D1'), ('B1','A2'), ('B1','D3'), ('B2','A3'), ('B2','D2')]:
+   
    pipette_l.pick_up_tip()
-   for well in [f'{j}{i}' for i in range(1, 4)]:
-      pipette_l.mix(3,50,Eppendorf.wells('B1'))
+   
+   for pos in range(1,4):
+      if '3' not in epp:
+         # Don't mix aptamer buffer
+         pipette_l.mix(3,50,Eppendorf.wells(epp))
       pipette_l.set_flow_rate(dispense=20)
-      pipette_l.transfer(100,Eppendorf.wells('B1'),plate_samples.wells(well), new_tip='never', blow_out=True)
-   pipette_l.set_flow_rate(dispense=200)
-
-
-
-pipette_l.pick_up_tip()
-for i in range(1,4):
-   pipette_l.mix(3,50,Eppendorf.wells('A3'))
-   pipette_l.set_flow_rate(dispense=20)
-   pipette_l.transfer(100,Eppendorf.wells('A3'),plate_samples.wells(f'G{i}'), new_tip='never', blow_out=True)
-   pipette_l.set_flow_rate(dispense=200)
-pipette_l.drop_tip()
+      pipette_l.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)), new_tip='never', blow_out=True)
+      pipette_l.set_flow_rate(dispense=200)
+        
+     pipette_l.drop_tip()
+     
    
 # Pausar para incubar 1h - PAUSE (Hand made)
 robot_wait()
 
 # (8) Lavado x3 con PBS 1x tween 0.1
 tween_wash()
-      
+
 # (9) Add 100ul of ABTS
-storage_samples(['A4','A5','A6'],100, module = plate_buffers)
+storage_samples(['A10','A11','A12'],100, module = plate_buffers, safe_flow_rate=30)
 
 robot.turn_off_rail_lights()
 
