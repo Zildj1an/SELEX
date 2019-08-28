@@ -33,6 +33,9 @@ $ sudo pip install opentrons subprocess time os
 The robot uses the audio robot.mp3 and gets it from Robot Raspberry's /mnt/usbdrive/ (put it there or edit the location).
 You can load the protocol in the Opentrons application, available <a href = "https://opentrons.com/ot-app">here</a>.
 
+## Other suggested custom hardware
+
+We also handcrafted some modules from ourselves to make things easier and make them fit in the robot. We used a 3D-printed for some of our designs for storing Eppendorf and Falcon tipracks. We also deisgned a PCB for a potenciostat microcontroller and an auxiliar thermic module to cool to 4 degrees Celsius, and so on.
 
 ## Authors
 * [Pablo Villalobos](https://github.com/pablo-vs)
