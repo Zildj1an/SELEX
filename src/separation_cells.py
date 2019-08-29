@@ -63,10 +63,13 @@ robot._driver.turn_on_rail_lights()
 tempdeck.set_temp(temp=4)
 
 # (0) Add 500 ul from A1,A2 to magdeck
+pipette.blow_out(samples.wells('A1'))
 custom_pick(500, samples.wells('A1'), md_lab.wells('A1'))
+pipette.blow_out(samples.wells('A2'))
 custom_pick(500, samples.wells('A2'), md_lab.wells('A2'))
 
 # (1) Move 150ul from A3 to each of the magdeck
+pipette.blow_out(td_lab.wells('A1'))
 custom_pick(150, td_lab.wells('A1'), md_lab.wells('A1'))
 custom_pick(150, td_lab.wells('A1'), md_lab.wells('A2'))
 
@@ -167,5 +170,4 @@ for x, y in [('B4','B6'),('B6,B8'),('B8,C4'),('C4,C6')]:
 pipette.drop_tip()
 
 robot._driver.turn_off_rail_lights()
-
 
