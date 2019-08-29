@@ -44,33 +44,39 @@ def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False):
 
 # Labware
 
-magdeck          = modules.load('MagDeck', slot=4)
-md_lab           = labware.load(magdeck_plate, slot=4, share=True)
+magdeck          = modules.load('MagDeck',           slot=4)
+md_lab           = labware.load(magdeck_plate,       slot=4, share=True)
 tiprack          = labware.load('opentrons-tiprack-300ul', slot=6)
 samples          = labware.load('Eppendorf_Samples', slot=8)
+thermic_module   = labware.load(ninja_name,          slot =1)
 samples2         = labware.load('Eppendorf_Samples', slot=9)
+tempdeck         = NinjaTempDeck(slot=1, simulating = True)
 
 # Pipette
 pipette          = instruments.P300_Single(mount='left', tip_racks=[tiprack])
 
+tempdeck         = NinjaTempDeck(slot=1, simulating = robot.is_simulating())
+td_lab           = tempdeck.labware
+
 pipette.set_flow_rate(aspirate=15,dispense=15)
 robot._driver.turn_on_rail_lights()
+tempdeck.set_temp(temp=4)
 
 # (0) Add 500 ul from A1,A2 to magdeck
 custom_pick(500, samples.wells('A1'), md_lab.wells('A1'))
 custom_pick(500, samples.wells('A2'), md_lab.wells('A2'))
 
 # (1) Move 150ul from A3 to each of the magdeck
-custom_pick(150, samples.wells('A3'), md_lab.wells('A1'))
-custom_pick(150, samples.wells('A3'), md_lab.wells('A2'))
+custom_pick(150, td_lab.wells('A1'), md_lab.wells('A1'))
+custom_pick(150, td_lab.wells('A1'), md_lab.wells('A2'))
 
 # (2) 1h incubate
 robot_wait()
 
-# (3) Engage 3 mins
+# (3) Engage 2 mins
 magdeck.engage()
-pipette.delay(seconds=180)
-amount = 650
+pipette.delay(seconds=120)
+amount = 600
 p1 = 1
 p2 = 2
 
@@ -81,7 +87,7 @@ for x in range(1,5):
       p1 = 3
       p2 = 4
 
-    # (4) Move 650 from A1,A2 to B1,B2
+    # (4) Move 600 from A1,A2 to B1,B2
     custom_pick(amount, md_lab.wells('A1'), samples.wells('B' + chr(p1)))
     custom_pick(amount, md_lab.wells('A2'), samples.wells('B' + chr(p2)))
     magdeck.disengage()
@@ -91,30 +97,30 @@ for x in range(1,5):
        # (5) Move 500ul of PBS to A1,A2
        pipette.delay(seconds=15)
        custom_pick(500, samples.wells('A4'), md_lab.wells('A1'),blow_out=True)
-       custom_pick(500, samples.wells('A4'), md_lab.wells('A2'),blow_out=True)
+       custom_pick(500, samples.wells('A5'), md_lab.wells('A2'),blow_out=True)
 
-       # (6) Engage 3 mins
+       # (6) Engage 2 mins
        magdeck.engage()
-       pipette.delay(seconds=180)
+       pipette.delay(seconds=120)
 
-# (7) Move 100ul of elution buffer A5 to A1,A2
+# (7) Move 100ul of elution buffer A6 to A1,A2
 pipette.delay(seconds=20)
 
-custom_pick(100, samples.wells('A5'), md_lab.wells('A1'),blow_out=True)
-custom_pick(100, samples.wells('A5'), md_lab.wells('A2'),blow_out=True)
+custom_pick(100, samples.wells('A6'), md_lab.wells('A1'),blow_out=True)
+custom_pick(100, samples.wells('A6'), md_lab.wells('A2'),blow_out=True)
 
-# (8) Engage 1.5 mins
+# (8) Engage 1 mins
 magdeck.engage()
-pipette.delay(seconds=90)
+pipette.delay(seconds=60)
 
 # (9) Move 100ul from A1,A2 to C1,C2
 custom_pick(100, md_lab.wells('A1'), samples.wells('C1'))
 custom_pick(100, md_lab.wells('A2'), samples.wells('C2'))
 magdeck.disengage()
 
-# (10) Move 100ul from  A6 eppendorf to A1,A2
-custom_pick(100, samples.wells('A6'), md_lab.wells('A1'),blow_out=True)
-custom_pick(100, samples.wells('A6'), md_lab.wells('A2'),blow_out=True)
+# (10) Move 100ul from  A7 eppendorf to A1,A2
+custom_pick(100, samples.wells('A7'), md_lab.wells('A1'),blow_out=True)
+custom_pick(100, samples.wells('A7'), md_lab.wells('A2'),blow_out=True)
 
 # (11) Dilution
 custom_pick(100, md_lab.wells('A1'), samples.wells('D1'),blow_out=True)

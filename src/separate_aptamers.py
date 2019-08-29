@@ -185,7 +185,7 @@ def separate(magdeck, thermocycler, md_lab, td_lab, tc_lab, samples, tiprack, pi
 
         pipette.transfer(100, samples.wells('D5'), md_well)
 
-        mix
+        #mix --que coño es esto y que hace aqui fdo Carlos
 
         engage()
 
