@@ -18,9 +18,9 @@ metadata = {
    'source'       : 'https://github.com/Zildj1an/SELEX'
 }
 
-
-logging.basicConfig(filename='/root/elona')
-log = logging.getLogger('elona')
+if not robot.is_simulating:
+   logging.basicConfig(filename='/root/elona')
+   log = logging.getLogger('elona')
 
 # [1] Labware
 
@@ -137,7 +137,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
             pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
          pipette_r.aspirate(pipette_r.max_volume,module.wells(origin))
          pipette_r.dispense(pipette_r.max_volume,plate_samples.wells(sample).bottom())
-         if measure_time:
+         if measure_time and not robot.is_simulating:
        	    if first_dispense:
                start_time = monotonic()
                first_dispense = False
@@ -153,7 +153,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
             pipette_r.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
          pipette_r.aspirate(vol,module.wells(origin))
          pipette_r.dispense(vol,plate_samples.wells(sample).bottom())
-         if measure_time:
+         if measure_time and not robot.is_simulating:
             end_time = monotonic()
             log.warning(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
          pipette_r.blow_out(plate_samples.wells(sample).bottom())
@@ -206,7 +206,7 @@ def tween_wash():
 
    # (3) Lavado x3 con PBS 1x tween 0.1
    for x in range(1,4):
-      storage_samples(['A5'],200)
+      storage_samples(['A5'],200, new_tip='always')
       #samples_trash(200) MANUAL
 
       if not robot.is_simulating():
