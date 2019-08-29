@@ -73,7 +73,7 @@ tiprack_r4       = labware.load('opentrons-tiprack-10ul', slot=8)
 # [2] Pipettes
 
 pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack_l])
-pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack_r2,tiprack_r3, tiprack_r4])
+pipette_r = instruments.P50_Multi(mount = 'right', tip_racks=[tiprack_r, tiprack_r2,tiprack_r3, tiprack_r4])
 
 # Pipette flow rates: left and right, aspirate and dispense
 
@@ -142,7 +142,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
                start_time = monotonic()
                first_dispense = False
             end_time = monotonic()
-            log.info(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
+            log.warning(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
          pipette_r.blow_out(plate_samples.wells(sample).bottom())
          pipette_r.touch_tip()
 
@@ -155,7 +155,7 @@ def storage_samples(where, vol, new_tip='once', module = Storage, safe_flow_rate
          pipette_r.dispense(vol,plate_samples.wells(sample).bottom())
          if measure_time:
             end_time = monotonic()
-            log.info(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
+            log.warning(f'Dispensed from {module.get_name()}:{origin} to {sample} at T={end_time-start_time}')
          pipette_r.blow_out(plate_samples.wells(sample).bottom())
          pipette_r.touch_tip()
 
