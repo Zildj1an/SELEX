@@ -34,6 +34,18 @@ def robot_wait():
 
        robot._driver.turn_on_blue_button_light()
 
+def incubate(x):
+
+  for x in range(1,x + 1):
+
+     pipette.pick_up_tip()
+     pipette.blow_out(md_lab.wells('A1'))
+     pipette.drop_tip()
+     pipette.pick_up_tip()
+     pipette.blow_out(md_lab.wells('A2'))
+     pipette.delay(seconds=30)
+     pipette.drop_tip()
+
 def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False):
 
      if not reuse_tip :
@@ -66,77 +78,70 @@ pipette.set_flow_rate(aspirate=15,dispense=15)
 robot._driver.turn_on_rail_lights()
 tempdeck.set_temp(temp=4)
 
-# (-1) Move 50ul from A3 to each of the magdeck
+# (-1) Move 100ul from A3 to each of the magdeck
 pipette.blow_out(td_lab.wells('A1'))
-custom_pick(50, td_lab.wells('A1'), md_lab.wells('A1'))
-custom_pick(50, td_lab.wells('A1'), md_lab.wells('A2'))
+custom_pick(100, td_lab.wells('A1'), md_lab.wells('A1'))
+custom_pick(100, td_lab.wells('A1'), md_lab.wells('A2'))
 
 # (0) Remove liquid beads
 magdeck.engage()
 pipette.delay(seconds=120)
 pipette.pick_up_tip()
-custom_pick(50, md_lab.wells('A1'), trash_liquid.wells('A1'),reuse_tip=False)
-custom_pick(50, md_lab.wells('A2'), trash_liquid.wells('A2'),reuse_tip=False)
+custom_pick(100, md_lab.wells('A1'), trash_liquid.wells('A1'),reuse_tip=False)
+custom_pick(100, md_lab.wells('A2'), trash_liquid.wells('A2'),reuse_tip=False)
 pipette.drop_tip()
 magdeck.disengage()
 
-# (1) Add 500 ul from A1,A2 to magdeck
+# (1) Add 700 ul from A1,A2 to magdeck
+
 pipette.pick_up_tip()
 pipette.blow_out(samples.wells('A1'))
-custom_pick(500, samples.wells('A1'), md_lab.wells('A1'),blow_out=True,reuse_tip=False)
+custom_pick(700, samples.wells('A1'), md_lab.wells('A1'),blow_out=True,reuse_tip=False)
 pipette.drop_tip()
 
 pipette.pick_up_tip()
 pipette.blow_out(samples.wells('A2'))
-custom_pick(500, samples.wells('A2'), md_lab.wells('A2'),blow_out=True,reuse_tip=False)
+custom_pick(700, samples.wells('A2'), md_lab.wells('A2'),blow_out=True,reuse_tip=False)
 pipette.drop_tip()
 
-# (2) 10min incubate
-for x in range(1,11):
-
-     pipette.pick_up_tip()
-     pipette.blow_out(md_lab.wells('A1'))
-     pipette.drop_tip()
-     pipette.pick_up_tip()
-     pipette.blow_out(md_lab.wells('A2'))
-     pipette.delay(seconds=30)
-     pipette.drop_tip()
+# (2) 10 min incubate
+incubate(10)
 
 # (3) Engage 2 mins
 magdeck.engage()
 pipette.delay(seconds=120)
-amount = 600
+amount = 700
 p1 = 1
 p2 = 2
 
 for x in range(1,5):
 
     if x > 1:
-      amount = 500
+      amount = 400
       p1 = 3
       p2 = 4
 
-    # (4) Move 600 from A1,A2 to B1,B2
+    # (4) Move amount from A1,A2 to B1,B2
     custom_pick(amount, md_lab.wells('A1'), samples.wells('B' + chr(p1)))
     custom_pick(amount, md_lab.wells('A2'), samples.wells('B' + chr(p2)))
     magdeck.disengage()
 
     if x < 4:
 
-       # (5) Move 500ul of PBS to A1,A2
+       # (5) Move 400ul of PBS to A1,A2
        pipette.delay(seconds=15)
-       custom_pick(500, samples.wells('A4'), md_lab.wells('A1'),blow_out=True)
-       custom_pick(500, samples.wells('A5'), md_lab.wells('A2'),blow_out=True)
+       custom_pick(400, samples.wells('A4'), md_lab.wells('A1'),blow_out=True)
+       custom_pick(400, samples.wells('A5'), md_lab.wells('A2'),blow_out=True)
 
        # (6) Engage 2 mins
        magdeck.engage()
        pipette.delay(seconds=120)
 
-# (7) Move 100ul of elution buffer A6 to A1,A2
+# (7) Elution, move 100ul of elution buffer A6 to A1,A2
 pipette.delay(seconds=20)
-
 custom_pick(100, samples.wells('A6'), md_lab.wells('A1'),blow_out=True)
 custom_pick(100, samples.wells('A6'), md_lab.wells('A2'),blow_out=True)
+incubate(5)
 
 # (8) Engage 1 mins
 magdeck.engage()
