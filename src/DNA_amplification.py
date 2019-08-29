@@ -39,7 +39,7 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
                 thermocycler.connect()
 
         robot._driver.turn_on_rail_lights()
-        
+
         #location = 'H1'
         #pipette_r.pick_up_tip(location = tiprack.wells(location))
 
@@ -66,7 +66,6 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
                 #pipette.pick_up_tip(location = tiprack.wells(location))
 
-                        
         #pipette.transfer(50, plate.wells('A1'), thermocycler.labware.wells('A1'), blow_out=True)
         #location = next_loc(location)
         #pipette.pick_up_tip(location = tiprack.wells(location))
@@ -86,7 +85,6 @@ def pcr(plate, pipette, tiprack, thermocycler, primer_well, mm_well, dna_well, w
 
 
         robot._driver.turn_off_rail_lights()
-        
         thermocycler.wait_for_program(PROGRAM)
         robot.home()
 
