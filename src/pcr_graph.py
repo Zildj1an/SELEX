@@ -2,7 +2,7 @@ import requests
 from matplotlib import pyplot as plt
 from time import sleep
 
-def graph(url):
+def graph(url, type='pcr'):
 
     plot_l, plot_b, plot_z = [0], [0], [0]
 
@@ -18,16 +18,19 @@ def graph(url):
         plt.axis([0, 100, 0, 150])
 
         if len(plot_l) > 99:
-            plot_l = plot_l[50:]
+            if type == 'pcr':
+                plot_l = plot_l[50:]
             plot_b = plot_b[50:]
             plot_z = plot_z[50:]
 
         
-        plot_l += [float(status['l'])]
+        if type == 'pcr':
+            plot_l += [float(status['l'])]
         plot_b += [float(status['b'])]
         plot_z += [float(status['z'])]
 
-        plt.plot(plot_l, label='lid')
+        if type == 'pcr':
+            plt.plot(plot_l, label='lid')
         plt.plot(plot_b, label='base')
         plt.plot(plot_z, label='sample')
 
