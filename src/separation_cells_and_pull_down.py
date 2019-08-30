@@ -95,7 +95,7 @@ md_lab           = labware.load(magdeck_plate,       slot=7, share=True)
 tiprack          = labware.load('opentrons-tiprack-300ul', slot=6)
 samples          = labware.load('Eppendorf_Samples', slot=4)
 samples2         = labware.load('96-flat', slot=5)
-tempdeck         = NinjaTempDeck(slot=1, simulating = robot.is_simulating())
+tempdeck         = NinjaTempDeck(slot=10, simulating = robot.is_simulating())
 td_lab           = tempdeck.labware
 
 # Pipette
