@@ -46,10 +46,12 @@ def incubate(x):
      pipette.delay(seconds=15)
      pipette.drop_tip()
 
-def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_after=False):
+def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_after=False, mix_before=True):
 
      if not reuse_tip :
          pipette.pick_up_tip()
+     if mix_before:
+        pipette.mix(3,100,from_w)
      pipette.transfer(quantity, from_w,to_w)
      if mix_after:
         pipette.mix(3,100,to_w)
@@ -164,11 +166,11 @@ custom_pick(100, md_lab.wells('A2'), samples.wells('D2'),blow_out=True)
 
 for pos in ['A','B','C','D']:
 
-    custom_pick(100,samples.wells(pos+chr(1)),samples2.wells(pos + chr(1)),blow_out=True)
-    custom_pick(100,samples.wells(pos+chr(2)),samples2.wells(pos + chr(2)),blow_out=True)
+    custom_pick(100,samples.wells(pos+chr(1)),samples2.wells(pos + chr(1)),blow_out=True,mix_before=True)
+    custom_pick(100,samples.wells(pos+chr(2)),samples2.wells(pos + chr(2)),blow_out=True,mix_before=True)
 
-custom_pick(100,samples.wells('B3'),samples2.wells('E1'),blow_out=True)
-custom_pick(100,samples.wells('B4'),samples2.wells('E2'),blow_out=True)
+custom_pick(100,samples.wells('B3'),samples2.wells('E1'),blow_out=True,mix_before=True)
+custom_pick(100,samples.wells('B4'),samples2.wells('E2'),blow_out=True,mix_before=True)
 
 for pos in ['C','D','A','B','E']:
 
@@ -176,18 +178,18 @@ for pos in ['C','D','A','B','E']:
     pos2 = 2
 
     for x in range(1,6):
-
-       pipette.pick_up_tip()
-       custom_pick(100,samples2.wells(pos+chr(pos1)),samples2.wells(pos + chr(pos1 + 2)),blow_out=True, reuse_tip=True,mix_after=True)
-       pos1 = pos1 + 2
-       pipette.drop_tip()
+       if pos != 'D' or x < 2: 
+          pipette.pick_up_tip()
+          custom_pick(100,samples2.wells(pos+chr(pos1)),samples2.wells(pos + chr(pos1 + 2)),blow_out=True, reuse_tip=True,mix_after=True)
+          pos1 = pos1 + 2
+          pipette.drop_tip()
 
     for x in range(1,6):
-
-       pipette.pick_up_tip()
-       custom_pick(100,samples2.wells(pos+chr(pos2)),samples2.wells(pos + chr(pos2 + 2)),blow_out=True,reuse_tip=True,mix_after=True)
-       pos2 = pos2 + 2
-       pipette.drop_tip()
+       if pos != 'D' or x < 2: 
+         pipette.pick_up_tip()
+         custom_pick(100,samples2.wells(pos+chr(pos2)),samples2.wells(pos + chr(pos2 + 2)),blow_out=True,reuse_tip=True,mix_after=True)
+         pos2 = pos2 + 2
+         pipette.drop_tip()
 
 robot._driver.turn_off_rail_lights()
 
