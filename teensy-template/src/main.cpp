@@ -1,5 +1,17 @@
 #include "WProgram.h"
+/*
+	int16_t adc_read(uint8_t mux) {
+	  uint8_t low;
 
+	  ADCSRA = (1<<ADEN) | ADC_PRESCALER;             // enable ADC
+	  ADCSRB = (1<<ADHSM) | (mux & 0x20);             // high speed mode
+	  ADMUX = aref | (mux & 0x1F);                    // configure mux input
+	  ADCSRA = (1<<ADEN) | ADC_PRESCALER | (1<<ADSC); // start the conversion
+ 	  while (ADCSRA & (1<<ADSC)) ;                    // wait for result
+	    low = ADCL;                                     // must read LSB first
+	  return (ADCH << 8) | low;                       // must read MSB only once!
+	}
+*/
 extern "C" int main(void)
 {
 #ifdef USING_MAKEFILE
@@ -14,13 +26,26 @@ extern "C" int main(void)
 
   	analogWriteResolution(12);
 
+
+	Serial.begin(9600);
+
+	pinMode(13, OUTPUT);
+	pinMode(A10, INPUT);
+
 	while(1) {
+	  digitalWrite(13,HIGH);
+	  int val = analogRead(A10);
+	  Serial.println(val);
+	  delay(500);
+	  digitalWrite(13,LOW);
+          delay(500);
+	  /*
   	  float val = sin(phase) * 2000.0 + 2050.0;
   	  analogWrite(A14, (int)val);
   	  phase = phase + 0.02;
   	  if (phase >= twopi) phase = 0;
   	  while (usec < 500) ; // wait
-  	  usec = usec - 500;
+  	  usec = usec - 500;*/
 	}
 
 #else

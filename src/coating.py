@@ -65,6 +65,10 @@ volume_50 = 30000
 # Rate of conversion from ul to distance from the bottom of the well
 ml_rate = 9/5000
 
+def addrow(well, num):
+   # addrow('A1',1) -> 'B1'
+   return chr(ord(well[0])+num) + well[1:]
+
 def custom_transfer(pipette,quantity,pos1,pos2,A,B,depth=1,new_tip='once', mix=False):
 
    times = quantity // pipette.max_volume
@@ -122,15 +126,33 @@ falcon   = 'C5'
 pipette_l.set_flow_rate(aspirate = 300, dispense = 300)
 
 pipette_l.pick_up_tip()
-custom_transfer(pipette_l,1500,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
-volume_50 -= 1500
-custom_transfer(pipette_l,1500,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate, new_tip='never')
-volume_50 -= 1500
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'A1',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'A2',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'A3',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'A4',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'A5',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'B1',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'B2',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
+custom_transfer(pipette_l,900,Falcon,Eppendorf,falcon50,'B3',volume_50*ml_rate, new_tip='never')
+volume_50 -= 900
 pipette_l.drop_tip()
 
 
-custom_transfer(pipette_l, 500, Eppendorf, Eppendorf, falcon, 'A1' , new_tip='once', mix=True)
-custom_transfer(pipette_l, 500, Eppendorf, Eppendorf, falcon, 'A2' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, 'C4', 'A1' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, 'C4', 'A2' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, 'C4', 'A3' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, 'C4', 'A4' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, falcon, 'A5' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, falcon, 'B1' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, falcon, 'B2' , new_tip='once', mix=True)
+custom_transfer(pipette_l, 300, Eppendorf, Eppendorf, falcon, 'B3' , new_tip='once', mix=True)
 
 
 '''
@@ -162,19 +184,24 @@ pipette_l.transfer(150,Eppendorf.wells('B2'),Eppendorf.wells('A5'),  new_tip='on
 
 '''
 
-destination_A1 = plate_samples.wells('A3','B3')
-destination_A2 = plate_samples.wells('A2','B2','C2','D2','E2','F2','C3')
+matrix = [('A1', 'A1'),('A2', 'A2'),('A3', 'A3'),('A4', 'A4'),('A5', 'A5'),('B1', 'A6'),('B2', 'A7'),('B3', 'A9'),]
 
-for source, dest in [(Eppendorf.wells('A1'), destination_A1),
-                     (Eppendorf.wells('A2'), destination_A2),
-                     (Falcon.wells(falcon50), plate_samples.wells('D3','E3','F3'))]: 
+for source, dest in matrix: 
 
    pipette_l.pick_up_tip()
+
+   for i in range(1,6):
    
-   pipette_l.transfer(200,source,dest, new_tip='never', mix_before=(3,50), blow_out=True)
+      pipette_l.transfer(200,Eppendorf.wells(source),plate_samples.wells(addrow(dest,i-1)), new_tip='never', mix_before=(3,50), blow_out=True)
 
    pipette_l.drop_tip()
 
+
+pipette_l.pick_up_tip()
+for i in range(1,6):
+   custom_transfer(pipette_l,200,Falcon,plate_samples,falcon50,addrow('A8', i-1),volume_50*ml_rate, new_tip='never')
+   volume_50 -= 200
+pipette_l.drop_tip()
 
 '''
 pipette_l.pick_up_tip()
