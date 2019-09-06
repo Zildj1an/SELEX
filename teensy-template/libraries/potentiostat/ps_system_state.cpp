@@ -53,28 +53,6 @@ namespace ps
             return status;
         }
 
-        if (multiplexer_.isRunning())
-        {
-            if (!(test_ -> isMuxCompatible()))
-            {
-                status.success = false;
-                status.message = String("test, ") + (test_ -> getName()) + String(", is not mux compatible");
-                return status;
-            }
-            if (multiplexer_.numEnabledWrkElect() <= 0)
-            {
-                status.success = false;
-                status.message = String("mux running, but no enabled working electrode channels");
-                return status;
-            }
-            else
-            {
-                multiplexer_.connectCtrElect();
-                multiplexer_.connectRefElect();
-                multiplexer_.connectFirstEnabledWrkElect();
-            }
-        }
-
         startTest();
         return status;
     }
@@ -310,22 +288,8 @@ namespace ps
         if (test_ != nullptr)
         {
             timerCnt_ = 0;
-            analogSubsystem_.autoVoltRange(test_ -> getMinValue(), test_ -> getMaxValue());
 
             test_ -> reset();
-            if (multiplexer_.isRunning())
-            {
-                for (int i=0; i<NumMuxChan; i++)
-                {
-                    currLowPass_[i].reset();
-                }
-                lowPassDtSec_ = (1.0e-6*TestTimerPeriod)*float(multiplexer_.numEnabledWrkElect());    
-            }
-            else
-            {
-                currLowPass_[0].reset();
-                lowPassDtSec_ = 1.0e-6*TestTimerPeriod;    
-            }
 
             testInProgress_ = true;
             testTimer_.begin(testTimerCallback_, TestTimerPeriod);
@@ -338,14 +302,6 @@ namespace ps
         testTimer_.end();
         testInProgress_ = false;
         lastSampleFlag_ = true;
-        analogSubsystem_.setVolt(0.0);
-
-        if (multiplexer_.isRunning())
-        {
-            multiplexer_.disconnectWrkElect();
-            multiplexer_.disconnectRefElect();
-            multiplexer_.disconnectCtrElect();
-        }
     }
 
 

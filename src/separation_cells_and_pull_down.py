@@ -11,31 +11,7 @@ from opentrons.system import nmcli
 import requests, logging, time
 from abc import ABC
 
-metadata = {
-   'protocolName' : 'Separation of cells',
-   'description'  : 'Separation of cells and pull down',
-   'source'       : 'https://github.com/Zildj1an/SELEX'
-}
 
-magdeck_plate = 'MagDeck_24'
-if magdeck_plate not in labware.list():
-    labware.create(
-        magdeck_plate,
-        grid = (6,4),
-        spacing = (18, 18),
-        diameter = 10,
-        depth = 41,
-        volume = 1500)
-
-plate_eppendorf = 'Eppendorf_Samples'
-if plate_eppendorf not in labware.list():
-   Eppendorf = labware.create(
-      plate_eppendorf,
-      grid = (8,4),
-      spacing = (15,20),
-      diameter = 10,
-      depth  = 35,
-      volume = 100)
 
 STOPPED_STR = "stopped";
 LIDWAIT_STR = "lidwait";
@@ -472,6 +448,43 @@ class NinjaTempDeck(NinjaModule):
         self.target = None
 
 
+
+
+
+
+
+
+metadata = {
+   'protocolName' : 'Separation of cells',
+   'description'  : 'Separation of cells and pull down',
+   'source'       : 'https://github.com/Zildj1an/SELEX'
+}
+
+magdeck_plate = 'MagDeck_24'
+if magdeck_plate not in labware.list():
+    labware.create(
+        magdeck_plate,
+        grid = (6,4),
+        spacing = (18, 18),
+        diameter = 10,
+        depth = 41,
+        volume = 1500)
+
+plate_eppendorf = 'Eppendorf_Samples'
+if plate_eppendorf not in labware.list():
+   Eppendorf = labware.create(
+      plate_eppendorf,
+      grid = (8,4),
+      spacing = (15,20),
+      diameter = 10,
+      depth  = 35,
+      volume = 100)
+
+
+
+
+
+        
 def robot_wait():
 
     if not robot.is_simulating():
@@ -510,7 +523,7 @@ def wash(pos='D', ini=3,fin=4, amount_init = 700):
 
         # (6) Engage 2 mins
         magdeck.engage()
-        pipette.delay(minutes=0)#2)
+        pipette.delay(minutes=2)
 
 def incubate(mins, secs=0, ar=100, dr=100):
     
@@ -597,11 +610,11 @@ custom_pick(700, samples.wells('A1'), md_lab.wells('A1'),blow_out=True,mix_befor
 custom_pick(700, samples.wells('A2'), md_lab.wells('A2'),blow_out=True,mix_before=True)
 
 # (2) 10 min incubate
-incubate(1)#10)
+incubate(10)
 
 # (3) Engage 2 mins
 magdeck.engage()
-pipette.delay(minutes=0)#2)
+pipette.delay(minutes=2)
 
 # (4,5,6) Wash I
 wash()
@@ -613,9 +626,9 @@ custom_pick(700, samples.wells('B8'), md_lab.wells('A1'), blow_out=True, **rates
 custom_pick(700, samples.wells('B8'), md_lab.wells('A2'), blow_out=True, **rates)
 
 # (8) Incubation and take pull-down out
-incubate(1)#20)
+incubate(20)
 magdeck.engage()
-pipette.delay(minutes=0)#2)
+pipette.delay(minutes=2)
 
 rates['tr_asp_rate'] = 15
 custom_pick(700, md_lab.wells('A1'), samples.wells('C1'), blow_out=True, **rates)
@@ -629,11 +642,11 @@ wash(pos='C',ini=5,fin=6, amount_init=400)
 pipette.delay(seconds=20)
 custom_pick(100, samples.wells('A7'), md_lab.wells('A1'),blow_out=True)
 custom_pick(100, samples.wells('A7'), md_lab.wells('A2'),blow_out=True)
-incubate(1)#5)
+incubate(5)
 
 # (13) Engage 1 mins
 magdeck.engage()
-pipette.delay(minutes=0)#1)
+pipette.delay(minutes=1)
 
 # (14) Move 100ul from A1,A2 to C1,C2
 custom_pick(100, md_lab.wells('A1'), samples.wells('D5'), blow_out=True, **rates)

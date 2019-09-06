@@ -25,27 +25,28 @@ extern "C" int main(void)
 	elapsedMicros usec = 0;
 
   	analogWriteResolution(12);
-
+	analogReadResolution(10);
+        analogReference(DEFAULT);
 
 	Serial.begin(9600);
 
 	pinMode(13, OUTPUT);
 	pinMode(A10, INPUT);
 
+
 	while(1) {
 	  digitalWrite(13,HIGH);
-	  int val = analogRead(A10);
-	  Serial.println(val);
-	  delay(500);
+	  int rval = analogRead(A10);
+	  Serial.println(rval);
+	  delay(1000);
 	  digitalWrite(13,LOW);
-          delay(500);
-	  /*
+          delay(1000);
   	  float val = sin(phase) * 2000.0 + 2050.0;
   	  analogWrite(A14, (int)val);
-  	  phase = phase + 0.02;
+  	  phase = phase + twopi/4;
   	  if (phase >= twopi) phase = 0;
   	  while (usec < 500) ; // wait
-  	  usec = usec - 500;*/
+  	  usec = usec - 501;
 	}
 
 #else

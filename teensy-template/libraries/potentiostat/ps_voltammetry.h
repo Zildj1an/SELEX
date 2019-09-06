@@ -40,8 +40,6 @@ namespace ps
             ConstantTest constantTest;
             SquareWaveTest squareWaveTest;
             LinearSweepTest linearSweepTest;
-            MultiStepTest<2> chronoampTest;
-            MultiStepTest<MultiStepMaxSize> multiStepTest;
 
             static const String TestKey;
 

@@ -62,7 +62,7 @@ plate_buffers    = labware.load('96-flat',     slot = 6)
 td_lab           = labware.load(ninja_name, slot=1)
 Eppendorf        = labware.load('Eppendorf_Samples', slot = 4)
 tiprack_l        = labware.load('opentrons-tiprack-300ul', slot=5)
-tiprack_r        = labware.load('opentrons-tiprack-10ul', slot=9)
+tiprack_r        = labware.load('opentrons-tiprack-300ul', slot=9)
 # Note: tiprack_r is actually an 'opentrons-tiprack-300ul', but its name must be
 # different than tiprack_l's to prevent calibration issues
 
@@ -254,7 +254,7 @@ def tween_wash(times=3):
       robot_wait()
       
       if x < 3:
-         samples_trash(200, new_tip='always', downto = 0)
+         pass#samples_trash(200, new_tip='always', downto = 0)
 
    end_time = perf_counter()
    log.warning(f'Tween wash duration: {end_time-start_time}')
@@ -281,7 +281,10 @@ pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 # (-2)
 # TODO ESTE PASO TIENE QUE ASPIRAR CASI AL FONDO. CALIBRAR A 10.7 mm bajo el tope del pozo
 #samples_trash(200, new_tip='always', downto = 0)
-tween_wash()
+#tween_wash()
+
+storage_samples(['A1'],200, new_tip='once', downto = 11.7)
+robot_wait()
 
 # (1) 200ul of PBS 1x BSA 5% to plate
 # TODO BAJAR MAS
@@ -295,7 +298,7 @@ tween_wash()
 
 # (5) Add 100ul from each apt to the plates
 
-for epp,dest in [('A1','A1')]:#, ('A2','A2'), ('A3','A3'), ('A4','A7'), ('A4','A8'), ('A5','A4'), ('A6','A5'), ('A7','A6'), ('A7','A9')]:
+for epp,dest in [('A1','A1'), ('A2','A2'), ('A3','A3'), ('A4','A7'), ('A4','A8'), ('A5','A4'), ('A6','A5'), ('A7','A6'), ('A7','A9')]:
    # source, dest
 
    pipette_l.pick_up_tip()
@@ -311,10 +314,13 @@ for epp,dest in [('A1','A1')]:#, ('A2','A2'), ('A3','A3'), ('A4','A7'), ('A4','A
    pipette_l.drop_tip()
 
 # Pausar para incubar 1h - PAUSE (Hand made)
-robot_wait(func=dilutions, timer=1) # TODO MOVE DILUTIONS AFTER WASH
+robot_wait()
 
 # (6) Lavado x3 con tween
 tween_wash()
+
+# (6.5) Diluciones anticuerpos
+dilutions()
 
 # (7) Eppendorf con anticuerpo A todos (en módulo térmico!)
 
@@ -336,11 +342,10 @@ for epp,dest in [('B1','A1'), ('B1','A2'), ('B1','A3'), ('B2','A4'), ('B2','A5')
 robot_wait()
 
 # (8) Lavado x3 con PBS 1x tween 0.1
-tween_wash(1)
+tween_wash()
 
 # (9) Add 100ul of ABTS
 storage_samples(['A1','A2','A3','A4','A5','A6','A7','A8','A9'],100, module = plate_buffers, safe_flow_rate=30, measure_time=True, downto=10)
 
 robot.turn_off_rail_lights()
 robot._driver.home()
-

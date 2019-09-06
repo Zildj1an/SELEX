@@ -17,7 +17,7 @@ def graph(url, type='pcr'):
         
         plt.axis([0, 100, 0, 150])
 
-        if len(plot_l) > 99:
+        if len(plot_b) > 99:
             if type == 'pcr':
                 plot_l = plot_l[50:]
             plot_b = plot_b[50:]

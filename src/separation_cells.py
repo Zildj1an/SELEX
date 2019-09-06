@@ -12,9 +12,6 @@ from abc import ABC
 
 
 
-
-
-
 STOPPED_STR = "stopped";
 LIDWAIT_STR = "lidwait";
 RUNNING_STR = "running";
@@ -510,7 +507,7 @@ def incubate(mins, secs=0, ar=100, dr=100):
       
       elapsed_time = time.perf_counter() - start_time
 
-def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_after=False, mix_before=False, mix_asp_rate=100, mix_dis_rate=100, tr_asp_rate=100, tr_dis_rate=100):
+def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_after=False, mix_before=False, mix_asp_rate=100, mix_dis_rate=100, tr_asp_rate=100, tr_dis_rate=100, mix_after_params=(3,100)):
 
    if not reuse_tip:
       pipette.pick_up_tip()
@@ -521,7 +518,7 @@ def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_aft
    pipette.transfer(quantity, from_w,to_w, new_tip='never')
    if mix_after:
       pipette.set_flow_rate(aspirate=mix_asp_rate, dispense=mix_dis_rate)
-      pipette.mix(3,100,to_w)
+      pipette.mix(mix_after_params[0],mix_after_params[1],to_w)
    if blow_out:
       pipette.blow_out(to_w)
    if not reuse_tip:
@@ -534,7 +531,8 @@ magdeck          = modules.load('MagDeck',           slot=4)
 md_lab           = labware.load(magdeck_plate,       slot=4, share=True)
 tiprack          = labware.load('opentrons-tiprack-300ul', slot=6)
 tiprack2         = labware.load('opentrons-tiprack-300ul', slot=11)
-tiprack3         = labware.load('opentrons-tiprack-300ul', slot=8)
+tiprack3         = labware.load('opentrons-tiprack-300ul', slot=9)
+tiprack_m        = labware.load('opentrons-tiprack-10ul', slot=8)
 trash_liquid     = labware.load('corning_384_wellplate_112ul_flat', slot = 3)
 samples          = labware.load('Eppendorf_Samples', slot=7)
 samples2         = labware.load('96-flat', slot=5)
@@ -543,6 +541,7 @@ td_lab           = tempdeck.labware
 
 # Pipette
 pipette          = instruments.P300_Single(mount='left', tip_racks=[tiprack, tiprack2, tiprack3])
+pipette_multi    = instruments.P50_Multi(mount='right', tip_racks=[tiprack_m])
 
 modules.magdeck.LABWARE_ENGAGE_HEIGHT[magdeck_plate] = 30
 
@@ -641,6 +640,25 @@ for pos in ['A','B','C']:
 custom_pick(100,samples.wells('B3'),samples2.wells('E1'),blow_out=True,mix_before=True)
 custom_pick(100,samples.wells('B4'),samples2.wells('E2'),blow_out=True,mix_before=True)
 
+
+# Dilution
+
+pipette_multi.set_flow_rate(aspirate=100, dispense=100)
+pipette_multi.pick_up_tip()
+for i in range(1,10,2):
+    pipette_multi.transfer(50, samples2.wells(f'A{i}'), samples2.wells(f'A{i+2}'), blow_out=True, mix_before=(2,50), new_tip='never')
+pipette_multi.mix(2,50,samples2.wells('A11'))
+pipette_multi.drop_tip()
+
+pipette_multi.pick_up_tip()
+for i in range(2,11,2):
+    pipette_multi.transfer(50, samples2.wells(f'A{i}'), samples2.wells(f'A{i+2}'), blow_out=True, mix_before=(2,50), new_tip='never')
+pipette_multi.mix(2,50,samples2.wells('A12'))
+pipette_multi.drop_tip()
+
+
+
+'''
 for pos in ['C','D','A','B','E']:
 
     pos1 = 1
@@ -659,6 +677,6 @@ for pos in ['C','D','A','B','E']:
          custom_pick(100,samples2.wells(pos+str(pos2)),samples2.wells(pos + str(pos2 + 2)),blow_out=True,reuse_tip=True,mix_after=True)
          pos2 = pos2 + 2
          pipette.drop_tip()
-
+'''
 robot._driver.turn_off_rail_lights()
 

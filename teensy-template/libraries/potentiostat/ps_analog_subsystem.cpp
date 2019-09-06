@@ -11,36 +11,6 @@ namespace ps
 
     void AnalogSubsystem::initialize()
     {
-        // Setup analog subsystem. This method must be called (typically setup)
-        // before the AnalogSubsystem can be used. 
-        
-        // Set  Dac gain seletion IO pins to output
-        pinMode(AD8250_GAIN_A0,OUTPUT);
-        pinMode(AD8250_GAIN_A1,OUTPUT);
-
-        // Set TIA (current) gain selection IO pins for switch 1 to output
-        pinMode(TIA_SW1_IN1,OUTPUT);
-        pinMode(TIA_SW1_IN2,OUTPUT);
-        pinMode(TIA_SW1_IN3,OUTPUT);
-        pinMode(TIA_SW1_IN4,OUTPUT);
-
-        // Set TIA (current) gain selection IO pins for switch 2 to output
-        pinMode(TIA_SW2_IN1,OUTPUT);
-        pinMode(TIA_SW2_IN2,OUTPUT);
-        pinMode(TIA_SW2_IN3,OUTPUT);
-        pinMode(TIA_SW2_IN4,OUTPUT);
-
-        // Set to voltage and current range to defaults
-        setVoltRange(VoltRange1V);
-#if defined CURRENT_VARIANT_MICRO_AMP
-        setCurrRange(CurrRange10uA);
-#elif defined CURRENT_VARIANT_NANO_AMP
-        setCurrRange(CurrRange10uA);
-#elif defined CURRENT_VARIANT_MILL_AMP
-        setCurrRange(CurrRange1000uA);
-#else
-#   error "CURRENT_VARIANT must be specified"
-#endif
         // Initialize analog input/output subsystem
         analogWriteResolution(DefaultAnalogWriteResolution);
         analogReadResolution(DefaultAnalogReadResolution);

@@ -8,16 +8,11 @@ namespace ps
 
     Voltammetry::Voltammetry()
     {
-        chronoampTest.setNumStep(2);
-        chronoampTest.setName("chronoamp");
-
         availableTests_.push_back(&cyclicTest);
         availableTests_.push_back(&sinusoidTest);
         availableTests_.push_back(&constantTest);
         availableTests_.push_back(&squareWaveTest);
         availableTests_.push_back(&linearSweepTest);
-        availableTests_.push_back(&chronoampTest);
-        availableTests_.push_back(&multiStepTest);
     }
             
 
