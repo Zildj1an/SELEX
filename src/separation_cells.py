@@ -627,21 +627,21 @@ magdeck.disengage()
 # (10) Move 100ul from  A7 eppendorf to A1,A2
 pipette.pick_up_tip()
 custom_pick(100, samples.wells('A7'), md_lab.wells('A1'),blow_out=True,mix_after=True, reuse_tip=True)
-custom_pick(100, md_lab.wells('A1'), samples2.wells('D1'),blow_out=True, reuse_tip=True)
+custom_pick(100, md_lab.wells('A1'), samples2.wells('E1'),blow_out=True, reuse_tip=True)
 pipette.drop_tip()
 pipette.pick_up_tip()
 custom_pick(100, samples.wells('A7'), md_lab.wells('A2'),blow_out=True,mix_after=True, reuse_tip=True)
-custom_pick(100, md_lab.wells('A2'), samples2.wells('D2'),blow_out=True, reuse_tip=True)
+custom_pick(100, md_lab.wells('A2'), samples2.wells('E2'),blow_out=True, reuse_tip=True)
 pipette.drop_tip()
 
 
-for pos in ['A','B','C']:
+for orig, dest in [('A','A'),('B','B'),('C','D')]:
 
-    custom_pick(100,samples.wells(pos+str(1)),samples2.wells(pos + str(1)),blow_out=True,mix_before=True)
-    custom_pick(100,samples.wells(pos+str(2)),samples2.wells(pos + str(2)),blow_out=True,mix_before=True)
-
-custom_pick(100,samples.wells('B3'),samples2.wells('E1'),blow_out=True,mix_before=True)
-custom_pick(100,samples.wells('B4'),samples2.wells('E2'),blow_out=True,mix_before=True)
+    custom_pick(100,samples.wells(orig+str(1)),samples2.wells(dest + str(1)),blow_out=True,mix_before=True)
+    custom_pick(100,samples.wells(orig+str(2)),samples2.wells(dest + str(2)),blow_out=True,mix_before=True)
+    
+custom_pick(100,samples.wells('B3'),samples2.wells('C1'),blow_out=True,mix_before=True)
+custom_pick(100,samples.wells('B4'),samples2.wells('C2'),blow_out=True,mix_before=True)
 
 
 # Dilution
