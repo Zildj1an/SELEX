@@ -490,7 +490,7 @@ def robot_wait():
        robot._driver.turn_on_blue_button_light()
 
 def incubate(mins, secs=0, ar=100, dr=100):
-   
+    
    duration = 60*mins + secs
    start_time = time.perf_counter()
    elapsed_time = 0
@@ -502,11 +502,11 @@ def incubate(mins, secs=0, ar=100, dr=100):
       pipette.drop_tip()
       pipette.pick_up_tip()
       pipette.mix(2,100,md_lab.wells('A2'))
-      #pipette.delay(seconds=15)
+      pipette.delay(seconds=15)
       pipette.drop_tip()
-      
-      if robot.is_simulating:
-          elapsed_time = elapsed_time + 30
+
+      if robot.is_simulating():
+          elapsed_time += 30
       else:
           elapsed_time = time.perf_counter() - start_time
 

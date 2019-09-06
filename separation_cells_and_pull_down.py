@@ -1,14 +1,15 @@
 '''
-Separate cells (Laura)
+ Separate cells (Laura)
+ AND pull down
 
 '''
 from opentrons import labware, instruments, modules, robot
+#from ninjapcr import NinjaPCR, NinjaTempDeck
 from time import sleep
+from opentrons import labware
 from opentrons.system import nmcli
 import requests, logging, time
 from abc import ABC
-
-
 
 
 
@@ -224,9 +225,6 @@ class NinjaModule(ABC):
     
     def connect(self):
         # Attempt to connect to the NinjaPCR. This should be called before attempting to send any command
-        if self.simulating:
-            self.connected = True
-            return
         
         if self.connection_mode == 'ninja_ap':
             self._connect_to_ap()
@@ -456,16 +454,21 @@ class NinjaTempDeck(NinjaModule):
 
 
 
-
-
-
-
-
 metadata = {
    'protocolName' : 'Separation of cells',
-   'description'  : 'Separation of cells',
+   'description'  : 'Separation of cells and pull down',
    'source'       : 'https://github.com/Zildj1an/SELEX'
 }
+
+magdeck_plate = 'MagDeck_24'
+if magdeck_plate not in labware.list():
+    labware.create(
+        magdeck_plate,
+        grid = (6,4),
+        spacing = (18, 18),
+        diameter = 10,
+        depth = 41,
+        volume = 1500)
 
 plate_eppendorf = 'Eppendorf_Samples'
 if plate_eppendorf not in labware.list():
@@ -477,8 +480,11 @@ if plate_eppendorf not in labware.list():
       depth  = 35,
       volume = 100)
 
-# FUNCTIONS ························································································
 
+
+
+
+        
 def robot_wait():
 
     if not robot.is_simulating():
@@ -489,8 +495,38 @@ def robot_wait():
 
        robot._driver.turn_on_blue_button_light()
 
+def wash(pos='D', ini=3,fin=4, amount_init = 700):
+
+   amount = amount_init
+   p1 = 1
+   p2 = 2
+
+   # "Lavados"
+   for x in range(1,5):
+
+      if x > 1:
+         amount = 400
+         p1 = 3
+         p2 = 4
+
+      # (4) Move amount from A1,A2 to B1,B2
+      custom_pick(amount, md_lab.wells('A1'), samples.wells(pos + str(p1)), blow_out=True, tr_asp_rate=15)
+      custom_pick(amount, md_lab.wells('A2'), samples.wells(pos + str(p2)), blow_out=True, tr_asp_rate=15)
+      magdeck.disengage()
+
+      if x < 4:
+
+        # (5) Move 400ul of PBS to A1,A2
+        pipette.delay(seconds=15)
+        custom_pick(400, samples.wells('A'+str(ini)), md_lab.wells('A1'),blow_out=True,mix_after=True,mix_after_params=(3,200))
+        custom_pick(400, samples.wells('A'+str(fin)), md_lab.wells('A2'),blow_out=True,mix_after=True, mix_after_params=(3,200))
+
+        # (6) Engage 2 mins
+        magdeck.engage()
+        pipette.delay(minutes=2)
+
 def incubate(mins, secs=0, ar=100, dr=100):
-   
+    
    duration = 60*mins + secs
    start_time = time.perf_counter()
    elapsed_time = 0
@@ -498,14 +534,14 @@ def incubate(mins, secs=0, ar=100, dr=100):
       
       pipette.set_flow_rate(aspirate=ar, dispense=dr)
       pipette.pick_up_tip()
-      pipette.mix(2,100,md_lab.wells('A1'))
+      pipette.mix(2,200,md_lab.wells('A1'))
       pipette.drop_tip()
       pipette.pick_up_tip()
-      pipette.mix(2,100,md_lab.wells('A2'))
-      #pipette.delay(seconds=15)
+      pipette.mix(2,200,md_lab.wells('A2'))
       pipette.drop_tip()
+      pipette.delay(seconds=15)
       
-      if robot.is_simulating:
+      if robot.is_simulating():
           elapsed_time = elapsed_time + 30
       else:
           elapsed_time = time.perf_counter() - start_time
@@ -516,7 +552,7 @@ def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_aft
       pipette.pick_up_tip()
    if mix_before:
       pipette.set_flow_rate(aspirate=mix_asp_rate, dispense=mix_dis_rate)
-      pipette.mix(3,100,from_w)
+      pipette.mix(3, 100, from_w)
    pipette.set_flow_rate(aspirate=tr_asp_rate, dispense=tr_dis_rate)
    pipette.transfer(quantity, from_w,to_w, new_tip='never')
    if mix_after:
@@ -528,7 +564,6 @@ def custom_pick(quantity, from_w, to_w, blow_out=False, reuse_tip=False, mix_aft
       pipette.drop_tip()
 
 # Labware
-magdeck_plate='MagDeck_24'
 
 magdeck          = modules.load('MagDeck',           slot=4)
 md_lab           = labware.load(magdeck_plate,       slot=4, share=True)
@@ -536,18 +571,16 @@ tiprack          = labware.load('opentrons-tiprack-300ul', slot=6)
 tiprack2         = labware.load('opentrons-tiprack-300ul', slot=11)
 tiprack3         = labware.load('opentrons-tiprack-300ul', slot=9)
 tiprack_m        = labware.load('opentrons-tiprack-10ul', slot=8)
-trash_liquid     = labware.load('corning_384_wellplate_112ul_flat', slot = 3)
 samples          = labware.load('Eppendorf_Samples', slot=7)
 samples2         = labware.load('96-flat', slot=5)
 tempdeck         = NinjaTempDeck(slot=1, simulating = True)
 td_lab           = tempdeck.labware
 
 # Pipette
-pipette          = instruments.P300_Single(mount='left', tip_racks=[tiprack, tiprack2, tiprack3])
+pipette          = instruments.P300_Single(mount='left', tip_racks=[tiprack,tiprack2, tiprack3])
 pipette_multi    = instruments.P50_Multi(mount='right', tip_racks=[tiprack_m])
 
 modules.magdeck.LABWARE_ENGAGE_HEIGHT[magdeck_plate] = 30
-
 
 # START RUN ························································································
 
@@ -567,8 +600,8 @@ rates['tr_asp_rate'] = 15
 magdeck.engage()
 pipette.delay(minutes=2)
 pipette.pick_up_tip()
-custom_pick(100, md_lab.wells('A1'), samples.wells('A3'), blow_out=True, reuse_tip=True, **rates)
-custom_pick(100, md_lab.wells('A2'), samples.wells('A3'), blow_out=True, reuse_tip=True, **rates)
+custom_pick(100, md_lab.wells('A1'), samples.wells('B1'), blow_out=True, reuse_tip=True, **rates)
+custom_pick(100, md_lab.wells('A2'), samples.wells('B1'), blow_out=True, reuse_tip=True, **rates)
 pipette.drop_tip()
 magdeck.disengage()
 
@@ -582,69 +615,59 @@ incubate(10)
 # (3) Engage 2 mins
 magdeck.engage()
 pipette.delay(minutes=2)
-amount = 700
-p1 = 1
-p2 = 2
 
-for x in range(1,5):
+# (4,5,6) Wash I
+wash()
 
-    if x > 1:
-      amount = 400
-      p1 = 3
-      p2 = 4
+# (7) Pull-down
+rates['tr_asp_rate'] = 200
+rates['tr_dis_rate'] = 200
+custom_pick(700, samples.wells('B8'), md_lab.wells('A1'), blow_out=True, **rates)
+custom_pick(700, samples.wells('B8'), md_lab.wells('A2'), blow_out=True, **rates)
 
-    # (4) Move amount from A1,A2 to B1,B2
-    custom_pick(amount, md_lab.wells('A1'), samples.wells('B' + str(p1)), blow_out=True, **rates)
-    custom_pick(amount, md_lab.wells('A2'), samples.wells('B' + str(p2)), blow_out=True, **rates)
-    magdeck.disengage()
+# (8) Incubation and take pull-down out
+incubate(20)
+magdeck.engage()
+pipette.delay(minutes=2)
 
-    if x < 4:
+rates['tr_asp_rate'] = 15
+custom_pick(700, md_lab.wells('A1'), samples.wells('C1'), blow_out=True, **rates)
+custom_pick(700, md_lab.wells('A2'), samples.wells('C2'), blow_out=True, **rates)
+magdeck.disengage()
 
-       # (5) Move 400ul of PBS to A1,A2
-       pipette.delay(seconds=15)
-       custom_pick(400, samples.wells('A4'), md_lab.wells('A1'),blow_out=True,mix_after=True)
-       custom_pick(400, samples.wells('A5'), md_lab.wells('A2'),blow_out=True,mix_after=True)
+# (9,10,11) Wash II
+wash(pos='C',ini=5,fin=6, amount_init=400)
 
-       # (6) Engage 2 mins
-       magdeck.engage()
-       pipette.delay(minutes=2)
-
-# (7) Elution, move 100ul of elution buffer A6 to A1,A2
+# (12) Elution, move 100ul of elution buffer A6 to A1,A2
 pipette.delay(seconds=20)
-custom_pick(100, samples.wells('A6'), md_lab.wells('A1'),blow_out=True, mix_after=True)
-custom_pick(100, samples.wells('A6'), md_lab.wells('A2'),blow_out=True, mix_after=True)
+custom_pick(100, samples.wells('A7'), md_lab.wells('A1'),blow_out=True)
+custom_pick(100, samples.wells('A7'), md_lab.wells('A2'),blow_out=True)
 incubate(5)
 
-# (8) Engage 1 mins
+# (13) Engage 1 mins
 magdeck.engage()
 pipette.delay(minutes=1)
 
-# (9) Move 100ul from A1,A2 to C1,C2
-custom_pick(100, md_lab.wells('A1'), samples.wells('C1'), blow_out=True, **rates)
-custom_pick(100, md_lab.wells('A2'), samples.wells('C2'), blow_out=True, **rates)
+# (14) Move 100ul from A1,A2 to C1,C2
+custom_pick(100, md_lab.wells('A1'), samples.wells('D5'), blow_out=True, **rates)
+custom_pick(100, md_lab.wells('A2'), samples.wells('D6'), blow_out=True, **rates)
 magdeck.disengage()
 
-# (10) Move 100ul from  A7 eppendorf to A1,A2
-pipette.pick_up_tip()
-custom_pick(100, samples.wells('A7'), md_lab.wells('A1'),blow_out=True,mix_after=True, reuse_tip=True)
-custom_pick(100, md_lab.wells('A1'), samples2.wells('D1'),blow_out=True, reuse_tip=True)
-pipette.drop_tip()
-pipette.pick_up_tip()
-custom_pick(100, samples.wells('A7'), md_lab.wells('A2'),blow_out=True,mix_after=True, reuse_tip=True)
-custom_pick(100, md_lab.wells('A2'), samples2.wells('D2'),blow_out=True, reuse_tip=True)
-pipette.drop_tip()
+# (15) Move 100ul from  A7 eppendorf to A1,A2
+custom_pick(100, samples.wells('A8'), md_lab.wells('A1'),blow_out=True,mix_after=True)
+custom_pick(100, samples.wells('A8'), md_lab.wells('A2'),blow_out=True,mix_after=True)
 
+# (16) Traspaso
 
-for pos in ['A','B','C']:
+custom_pick(100, md_lab.wells('A1'), samples2.wells('G1'),blow_out=True)
+custom_pick(100, md_lab.wells('A2'), samples2.wells('G2'),blow_out=True)
 
-    custom_pick(100,samples.wells(pos+str(1)),samples2.wells(pos + str(1)),blow_out=True,mix_before=True)
-    custom_pick(100,samples.wells(pos+str(2)),samples2.wells(pos + str(2)),blow_out=True,mix_before=True)
+matrix = [('A1','A1'),('A2','A2'),('C1','F1'),('C2','F2'),('C3','D1'),('C4','D2'),('D1','B1'),('D2','B2'),('D3','C1'),('D4','C2'),('D5','E1'),('D6','E2')]
 
-custom_pick(100,samples.wells('B3'),samples2.wells('E1'),blow_out=True,mix_before=True)
-custom_pick(100,samples.wells('B4'),samples2.wells('E2'),blow_out=True,mix_before=True)
+for orig,end in matrix:
+        custom_pick(100,samples.wells(orig),samples2.wells(end),blow_out=True)
 
-
-# Dilution
+# (17) Dilution
 
 pipette_multi.set_flow_rate(aspirate=100, dispense=100)
 pipette_multi.pick_up_tip()
@@ -658,28 +681,34 @@ for i in range(2,11,2):
     pipette_multi.transfer(50, samples2.wells(f'A{i}'), samples2.wells(f'A{i+2}'), blow_out=True, mix_before=(2,50), new_tip='never')
 pipette_multi.mix(2,50,samples2.wells('A12'))
 pipette_multi.drop_tip()
+    
+                                    
 
+'''                                         
+end = 6
 
-
-'''
-for pos in ['C','D','A','B','E']:
+for pos in ['C','D','A','B','E','F','G']:
 
     pos1 = 1
     pos2 = 2
 
-    for x in range(1,6):
-       if pos != 'D' or x < 2: 
-          pipette.pick_up_tip()
-          custom_pick(100,samples2.wells(pos+str(pos1)),samples2.wells(pos + str(pos1 + 2)),blow_out=True, reuse_tip=True,mix_after=True)
-          pos1 = pos1 + 2
-          pipette.drop_tip()
+    if pos == 'G':
+       end = 3
 
-    for x in range(1,6):
-       if pos != 'D' or x < 2: 
-         pipette.pick_up_tip()
-         custom_pick(100,samples2.wells(pos+str(pos2)),samples2.wells(pos + str(pos2 + 2)),blow_out=True,reuse_tip=True,mix_after=True)
-         pos2 = pos2 + 2
-         pipette.drop_tip()
+    for x in range(1,end):
+
+       pipette.pick_up_tip()
+       custom_pick(100,samples2.wells(pos+str(pos1)),samples2.wells(pos + str(pos1 + 2)),blow_out=True, reuse_tip=True,mix_after=True)
+       pos1 = pos1 + 2
+       pipette.drop_tip()
+
+    for x in range(1,end):
+
+       pipette.pick_up_tip()
+       custom_pick(100,samples2.wells(pos+str(pos2)),samples2.wells(pos + str(pos2 + 2)),blow_out=True,reuse_tip=True,mix_after=True)
+       pos2 = pos2 + 2
+       pipette.drop_tip()
 '''
+
 robot._driver.turn_off_rail_lights()
 
