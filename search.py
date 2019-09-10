@@ -110,6 +110,7 @@ for link in urls:
                       results.append(link)
                       if file_s == "y":
                         file.write(link)
+                        file.write("\n")
                       print(link)
 
 if file_s == "y":
