@@ -6,13 +6,12 @@ Author:  Carlos Bilbao
 Version: 2.0
 ----------------------------------------------
 '''
-import sys,time
 from bs4 import BeautifulSoup
 from colorama import init
 init(strip=not sys.stdout.isatty())
 from termcolor import cprint
 from pyfiglet import figlet_format
-import datetime, urllib2, requests
+import sys,time,datetime, urllib2, requests,threading, os, subprocess
 
 cprint(figlet_format('iGEM Search', font='starwars'),'yellow', 'on_red', attrs=['bold'])
 URL_s     = ".igem.org/Special:AllPages"
@@ -24,6 +23,7 @@ file_s    = 'x'
 file_name = 'default'
 urls      = []
 results   = []
+threads   = []
 
 # [1] Delete years that are before 2008 to the current year
 
@@ -89,32 +89,65 @@ print("###################################################")
 time.sleep(1)
 
 if file_s == "y":
-   file = open(file_name, "w")
+   file0 = open(file_name + "0", "w")
+   file1 = open(file_name + "1", "w")
+   file2 = open(file_name + "2", "w")
 
-for link in urls:
+size = len(urls) / 3
+url_chunk = []
 
-	try:
-        	response = requests.get(link, headers=headers, timeout=0.5, allow_redirects=False)
-	except requests.exceptions.RequestException as e:
-	     if verbose == "y":
-    		 print(e)
-                 print("Connection error with link " + link)
-	     continue
+# [5] Divide work weight in three threads
 
-	soup = BeautifulSoup(response.text, "html.parser")
+for i in range(0, len(urls), size):
+    url_chunk.append(urls[i:i + size])
 
-	for line in soup.find_all(text = True):
+thread1 = threading.Thread(target = search,the_urls=url_chunk[0], filen = file_name + "0")
+thread2 = threading.Thread(target = search,the_urls=url_chunk[1], filen = file_name + "1")
+thread3 = threading.Thread(target = search,the_urls=url_chunk[2], filen = file_name + "2")
+threads.append(thread1)
+threads.append(thread2)
+threads.append(thread3)
 
-          for word in words:
-		if word in line and link not in results:
-                      results.append(link)
-                      if file_s == "y":
-                        file.write(link)
-                        file.write("\n")
-                      print(link)
+for t in threads:
+     t.start()
+
+# [6] Search independently 
+def search(the_urls,filen):
+
+        global verbose,words,results
+
+	for link in the_urls:
+
+		try:
+			response = requests.get(link, headers=headers, timeout=0.5, allow_redirects=False)
+		except requests.exceptions.RequestException as e:
+		     if verbose == "y":
+	    		 print(e)
+		         print("Connection error with link " + link)
+		     continue
+
+		soup = BeautifulSoup(response.text, "html.parser")
+
+		for line in soup.find_all(text = True):
+
+		  for word in words:
+			if word in line and link not in results:
+		              results.append(link)
+		              if file_s == "y":
+		                filen.write(link)
+		                filen.write("\n")
+		              print(link)
+
+# [7] Join the three files
+
+for t in threads:
+    t.join()
 
 if file_s == "y":
-    file.close()
+    file0.close()
+    file1.close()
+    file2.close()
+    subprocess.call("cat " + file_name + "* > " + file_name)
 
 print("Number of webs with match : " + str(len(results)))
 
