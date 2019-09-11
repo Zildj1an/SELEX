@@ -156,7 +156,10 @@ if file_s == "y":
     file0.close()
     file1.close()
     file2.close()
-    subprocess.call("cat " + file_name + "* > " + file_name)
+    os.system("cat " + file_name + "* > " + file_name)
+    os.system("rm " + file_name + "0")
+    os.system("rm " + file_name + "1")
+    os.system("rm " + file_name + "2")
 
 print("Number of webs with match : " + str(len(results)))
 
