@@ -6,12 +6,13 @@ Author:  Carlos Bilbao
 Version: 2.0
 ----------------------------------------------
 '''
+import sys
 from bs4 import BeautifulSoup
 from colorama import init
 init(strip=not sys.stdout.isatty())
 from termcolor import cprint
 from pyfiglet import figlet_format
-import sys,time,datetime, urllib2, requests,threading, os, subprocess
+import time,datetime, urllib2, requests,threading, os, subprocess
 
 cprint(figlet_format('iGEM Search', font='starwars'),'yellow', 'on_red', attrs=['bold'])
 URL_s     = ".igem.org/Special:AllPages"
@@ -101,17 +102,7 @@ url_chunk = []
 for i in range(0, len(urls), size):
     url_chunk.append(urls[i:i + size])
 
-thread1 = threading.Thread(target = search,the_urls=url_chunk[0], filen = file_name + "0")
-thread2 = threading.Thread(target = search,the_urls=url_chunk[1], filen = file_name + "1")
-thread3 = threading.Thread(target = search,the_urls=url_chunk[2], filen = file_name + "2")
-threads.append(thread1)
-threads.append(thread2)
-threads.append(thread3)
-
-for t in threads:
-     t.start()
-
-# [6] Search independently 
+# [6] Search independently
 def search(the_urls,filen):
 
         global verbose,words,results
@@ -134,9 +125,27 @@ def search(the_urls,filen):
 			if word in line and link not in results:
 		              results.append(link)
 		              if file_s == "y":
-		                filen.write(link)
-		                filen.write("\n")
+                                   if filen == "0":
+			                file0.write(link)
+			                file0.write("\n")
+				   elif filen == "1":
+	                                file1.write(link)
+        	                        file1.write("\n")
+				   else:
+  	                                file2.write(link)
+        	                        file2.write("\n")
+
 		              print(link)
+
+thread1 = threading.Thread(target = search, args=(url_chunk[0], "0"))
+thread2 = threading.Thread(target = search, args=(url_chunk[1], "1"))
+thread3 = threading.Thread(target = search, args=(url_chunk[2], "2"))
+threads.append(thread1)
+threads.append(thread2)
+threads.append(thread3)
+
+for t in threads:
+     t.start()
 
 # [7] Join the three files
 
