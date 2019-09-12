@@ -66,7 +66,7 @@ def search_web(url_t):
         if verbose == "y":
             print(e)
             print("Error with " + url_t)
-            break
+            return
 
     for link in soup.findAll('a'):
         new = link.get('href')
