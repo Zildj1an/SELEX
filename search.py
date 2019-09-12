@@ -64,7 +64,6 @@ def search_web(url_t):
         soup = BeautifulSoup(html,  "lxml")
     except:
         if verbose == "y":
-            print(e)
             print("Error with " + url_t)
             return
 
@@ -92,8 +91,8 @@ def search_web(url_t):
 
 letters = list(string.ascii_uppercase)
 
-# If all the urls are already stored 
-if os.path.isfile("urls") is False:
+# If all the urls are already stored
+if os.path.isfile("urls") is False or len(years) < 10:
 	for elem in years:
 	    url_k = "https://" + elem + URL_s
 	    search_web(url_t=url_k)
@@ -145,7 +144,7 @@ def search(the_urls,filen):
 	for link in the_urls:
 
 		try:
-			response = requests.get(link, headers=headers, timeout=0.7, allow_redirects=False)
+			response = requests.get(link, headers=headers, timeout=1.5, allow_redirects=False)
 		except requests.exceptions.RequestException as e:
 		     if verbose == "y":
 	    		 print(e)
@@ -166,10 +165,12 @@ def search(the_urls,filen):
 				   elif filen == "1":
 	                                file1.write(link)
         	                        file1.write("\n")
-				   else:
+				   elif filen == "2":
   	                                file2.write(link)
         	                        file2.write("\n")
-
+                                   else:
+                                        file3.write(link)
+                                        file3.write("\n")
 		              print(link)
 
 thread1 = threading.Thread(target = search, args=(url_chunk[0], "0"))
