@@ -59,8 +59,14 @@ def search_web(url_t):
 
     global urls
 
-    html = urllib2.urlopen(url_t)
-    soup = BeautifulSoup(html,  "lxml")
+    try:
+        html = urllib2.urlopen(url_t)
+        soup = BeautifulSoup(html,  "lxml")
+    except:
+        if verbose == "y":
+            print(e)
+            print("Error with " + url_t)
+            break
 
     for link in soup.findAll('a'):
         new = link.get('href')
@@ -86,12 +92,25 @@ def search_web(url_t):
 
 letters = list(string.ascii_uppercase)
 
-for elem in years:
-    url_k = "https://" + elem + URL_s
-    search_web(url_t=url_k)
+# If all the urls are already stored 
+if os.path.isfile("urls") is False:
+	for elem in years:
+	    url_k = "https://" + elem + URL_s
+	    search_web(url_t=url_k)
 
-    for letter in letters:
-         search_web(url_t = "https://" + str(elem) + URL_2s[0] + letter + URL_2s[1])
+	    for letter in letters:
+		 search_web(url_t = "https://" + str(elem) + URL_2s[0] + letter + URL_2s[1])
+
+	file_close = open("urls","w")
+	for link in urls:
+		file_close.write(link)
+		file_close.write("\n")
+	file_close.close()
+else:
+        with open("urls", "r") as filehandle:
+               for line in filehandle:
+                    current = line[:-1]
+                    urls.append(current)
 
 # [4] Now that we have all the links, we retrieve and match text
 
