@@ -60,14 +60,14 @@ namespace ps
     template<typename IntType>
     inline IntType Range<IntType>::valueToInt(float volt) const
     {
-        IntType value = IntType(float(maxInt_)/(maxValue_ - minValue_)*(maxValue_ - volt));
+        IntType value = IntType(float(maxInt_)/(maxValue_ - minValue_)*(volt - minValue_));
         return constrain(value,0,maxInt_);
     }
 
     template<typename IntType>
     inline float Range<IntType>::intToValue(IntType value) const
     {
-        return maxValue_ - (float(value)/float(maxInt_))*(maxValue_ - minValue_);
+        return (float(value)/float(maxInt_))*(maxValue_ - minValue_);
     }
 
 }

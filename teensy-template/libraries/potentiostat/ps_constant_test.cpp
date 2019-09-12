@@ -63,43 +63,43 @@ namespace ps
 
     float ConstantTest::getMaxValue() const 
     {
-        return max(value_,quietValue_);
+        return std::max(value_,quietValue_);
     }
 
 
     float ConstantTest::getMinValue() const 
     {
-        return min(value_,quietValue_);
+        return std::min(value_,quietValue_);
     }
 
 
-    void ConstantTest::getParam(JsonObject &jsonDat)
+    void ConstantTest::getParam(JsonVariant &jsonDat)
     {
         BaseTest::getParam(jsonDat);
 
         ReturnStatus status;
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant jsonDatPrm = getParamJsonVariant(jsonDat,status);
 
         if (status.success)
         {
-            jsonDatPrm.set(ValueKey, value_);
-            jsonDatPrm.set(DurationKey, convertUsToMs(duration_));
+            jsonDatPrm[ValueKey].set(value_);
+            jsonDatPrm[DurationKey].set(convertUsToMs(duration_));
         }
     }
 
-    ReturnStatus ConstantTest::setParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus ConstantTest::setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         status = BaseTest::setParam(jsonMsg,jsonDat);
 
-        // Extract parameter JsonObjects
-        JsonObject &jsonMsgPrm = getParamJsonObject(jsonMsg,status);
+        // Extract parameter JsonVariants
+        JsonVariant jsonMsgPrm = getParamJsonVariant(jsonMsg,status);
         if (!status.success)
         {
             return status;
         }
 
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant jsonDatPrm = getParamJsonVariant(jsonDat,status);
         if (!status.success)
         {
             return status;
@@ -116,19 +116,19 @@ namespace ps
     // Protected Methods
     // ----------------------------------------------------------------------------------
 
-    void ConstantTest::setDurationFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void ConstantTest::setDurationFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(ValueKey))
         {
             if (jsonMsgPrm[ValueKey].is<float>())
             {
-                setValue(jsonMsgPrm.get<float>(ValueKey));
-                jsonDatPrm.set(ValueKey,getValue());
+                setValue(jsonMsgPrm[ValueKey].as<float>());
+                jsonDatPrm[ValueKey].set(getValue());
             }
             else if (jsonMsgPrm[ValueKey].is<long>())
             {
-                setValue(float(jsonMsgPrm.get<long>(ValueKey)));
-                jsonDatPrm.set(ValueKey,getValue());
+                setValue(float(jsonMsgPrm[ValueKey].as<long>()));
+                jsonDatPrm[ValueKey].set(getValue());
             }
             else
             {
@@ -140,14 +140,14 @@ namespace ps
     }
 
 
-    void ConstantTest::setValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void ConstantTest::setValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(DurationKey))
         {
             if (jsonMsgPrm[DurationKey].is<unsigned long>())
             {
-                setDuration(convertMsToUs(jsonMsgPrm.get<unsigned long>(DurationKey)));
-                jsonDatPrm.set(DurationKey,convertUsToMs(getDuration()));
+                setDuration(convertMsToUs(jsonMsgPrm[DurationKey].as<unsigned long>()));
+                jsonDatPrm[DurationKey].set(convertUsToMs(getDuration()));
             }
             else
             {

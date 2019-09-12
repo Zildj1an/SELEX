@@ -3,17 +3,16 @@
 
 #include <Arduino.h>
 #include "ps_range.h"
-#include "ps_gains.h"
 
 namespace ps
 {
-    class VoltRange : public Range<VoltGain,uint16_t> 
+    class VoltRange : public Range<uint16_t> 
     {
         public: 
-            VoltRange() : Range<VoltGain,uint16_t>()  {};
+            VoltRange() : Range<uint16_t>()  {};
 
-            VoltRange(String name, float minValue, float maxValue, VoltGain voltGain, uint16_t maxInt)
-                : Range<VoltGain,uint16_t>(name, minValue, maxValue, voltGain, maxInt) {};
+            VoltRange(String name, float minValue, float maxValue, uint16_t maxInt)
+                : Range<uint16_t>(name, minValue, maxValue, maxInt) {};
     
     };
 

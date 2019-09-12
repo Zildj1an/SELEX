@@ -75,8 +75,8 @@ namespace ps
     void SquareWaveTest::setWindow(float value)
     {
         window_ = fabs(value);
-        window_ = max(0.0, window_);
-        window_ = min(1.0, window_);
+        window_ = std::max((float)0.0, window_);
+        window_ = std::min((float)1.0, window_);
         updateWindowLenUs();
     }
 
@@ -89,15 +89,15 @@ namespace ps
 
     float SquareWaveTest::getMaxValue() const 
     {
-        float maxValue = max(startValue_, finalValue_) + amplitude_;
-        return max(maxValue, quietValue_);
+        float maxValue = std::max(startValue_, finalValue_) + amplitude_;
+        return std::max(maxValue, quietValue_);
     }
 
 
     float SquareWaveTest::getMinValue() const 
     {
-        float minValue = min(startValue_, finalValue_) - amplitude_;
-        return min(minValue, quietValue_);
+        float minValue = std::min(startValue_, finalValue_) - amplitude_;
+        return std::min(minValue, quietValue_);
     }
 
 
@@ -175,8 +175,8 @@ namespace ps
             uint64_t tTest = t - quietTime_;
             uint64_t stepCount = tTest/samplePeriod_;
             stairValue = startValue_ + stepCount*stepSign_*stepValue_;
-            stairValue = max(stairValue, minValue_);
-            stairValue = min(stairValue, maxValue_);
+            stairValue = std::max(stairValue, minValue_);
+            stairValue = std::min(stairValue, maxValue_);
         }
         return stairValue;
     }
@@ -245,37 +245,37 @@ namespace ps
     }
 
 
-    void SquareWaveTest::getParam(JsonObject &jsonDat)
+    void SquareWaveTest::getParam(JsonVariant &jsonDat)
     {
         BaseTest::getParam(jsonDat);
 
         ReturnStatus status;
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant jsonDatPrm = getParamJsonVariant(jsonDat,status);
 
         if (status.success)
         {
-            jsonDatPrm.set(StartValueKey, startValue_);
-            jsonDatPrm.set(FinalValueKey, finalValue_);
-            jsonDatPrm.set(StepValueKey, stepValue_);
-            jsonDatPrm.set(AmplitudeKey, amplitude_);
-            jsonDatPrm.set(WindowKey, window_);
+            jsonDatPrm[StartValueKey].set(startValue_);
+            jsonDatPrm[FinalValueKey].set(finalValue_);
+            jsonDatPrm[StepValueKey].set(stepValue_);
+            jsonDatPrm[AmplitudeKey].set(amplitude_);
+            jsonDatPrm[WindowKey].set(window_);
         }
     }
 
 
-    ReturnStatus SquareWaveTest::setParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SquareWaveTest::setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         status = BaseTest::setParam(jsonMsg,jsonDat);
 
-        // Extract parameter JsonObjects
-        JsonObject &jsonMsgPrm = getParamJsonObject(jsonMsg,status);
+        // Extract parameter JsonVariants
+        JsonVariant jsonMsgPrm = getParamJsonVariant(jsonMsg,status);
         if (!status.success)
         {
             return status;
         }
 
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant jsonDatPrm = getParamJsonVariant(jsonDat,status);
         if (!status.success)
         {
             return status;
@@ -310,16 +310,16 @@ namespace ps
 
     void SquareWaveTest::updateMaxMinValues()
     {
-        maxValue_ = max(startValue_,finalValue_);
-        minValue_ = min(startValue_,finalValue_);
+        maxValue_ = std::max(startValue_,finalValue_);
+        minValue_ = std::min(startValue_,finalValue_);
     }
 
 
     void SquareWaveTest::updateWindowLenUs()
     {
         windowLenUs_ = uint64_t((halfSamplePeriod_- 1)*window_);
-        windowLenUs_ = min(halfSamplePeriod_- 1, windowLenUs_);
-        windowLenUs_ = max(uint64_t(1), windowLenUs_);
+        windowLenUs_ = std::min(halfSamplePeriod_- 1, windowLenUs_);
+        windowLenUs_ = std::max(uint64_t(1), windowLenUs_);
     }
 
 
@@ -329,19 +329,19 @@ namespace ps
     }
 
 
-    void SquareWaveTest::setStartValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void SquareWaveTest::setStartValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(StartValueKey))
         {
             if (jsonMsgPrm[StartValueKey].is<float>())
             {
-                setStartValue(jsonMsgPrm.get<float>(StartValueKey));
-                jsonDatPrm.set(StartValueKey,getStartValue());
+                setStartValue(jsonMsgPrm[StartValueKey].as<float>());
+                jsonDatPrm[StartValueKey].set(getStartValue());
             }
             else if (jsonMsgPrm[StartValueKey].is<long>())
             {
-                setStartValue(float(jsonMsgPrm.get<long>(StartValueKey)));
-                jsonDatPrm.set(StartValueKey,getStartValue());
+                setStartValue(float(jsonMsgPrm[StartValueKey].as<long>()));
+                jsonDatPrm[StartValueKey].set(getStartValue());
             }
             else
             {
@@ -353,19 +353,19 @@ namespace ps
     }
 
 
-    void SquareWaveTest::setFinalValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void SquareWaveTest::setFinalValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(FinalValueKey))
         {
             if (jsonMsgPrm[FinalValueKey].is<float>())
             {
-                setFinalValue(jsonMsgPrm.get<float>(FinalValueKey));
-                jsonDatPrm.set(FinalValueKey,getFinalValue());
+                setFinalValue(jsonMsgPrm[FinalValueKey].as<float>());
+                jsonDatPrm[FinalValueKey].set(getFinalValue());
             }
             else if (jsonMsgPrm[FinalValueKey].is<long>())
             {
-                setFinalValue(float(jsonMsgPrm.get<long>(FinalValueKey)));
-                jsonDatPrm.set(FinalValueKey,getFinalValue());
+                setFinalValue(float(jsonMsgPrm[FinalValueKey].as<long>()));
+                jsonDatPrm[FinalValueKey].set(getFinalValue());
             }
             else
             {
@@ -376,19 +376,19 @@ namespace ps
         }
     }
 
-    void SquareWaveTest::setStepValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void SquareWaveTest::setStepValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(StepValueKey))
         {
             if (jsonMsgPrm[StepValueKey].is<float>())
             {
-                setStepValue(jsonMsgPrm.get<float>(StepValueKey));
-                jsonDatPrm.set(StepValueKey,getStepValue());
+                setStepValue(jsonMsgPrm[StepValueKey].as<float>());
+                jsonDatPrm[StepValueKey].set(getStepValue());
             }
             else if (jsonMsgPrm[StepValueKey].is<long>())
             {
-                setStepValue(float(jsonMsgPrm.get<long>(StepValueKey)));
-                jsonDatPrm.set(StepValueKey,getStepValue());
+                setStepValue(float(jsonMsgPrm[StepValueKey].as<long>()));
+                jsonDatPrm[StepValueKey].set(getStepValue());
             }
             else
             {
@@ -400,19 +400,19 @@ namespace ps
     }
 
 
-    void SquareWaveTest::setAmplitudeFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void SquareWaveTest::setAmplitudeFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(AmplitudeKey))
         {
             if (jsonMsgPrm[AmplitudeKey].is<float>())
             {
-                setAmplitude(jsonMsgPrm.get<float>(AmplitudeKey));
-                jsonDatPrm.set(AmplitudeKey,getAmplitude());
+                setAmplitude(jsonMsgPrm[AmplitudeKey].as<float>());
+                jsonDatPrm[AmplitudeKey].set(getAmplitude());
             }
             else if (jsonMsgPrm[AmplitudeKey].is<long>()) 
             {
-                setAmplitude(float(jsonMsgPrm.get<long>(AmplitudeKey)));
-                jsonDatPrm.set(AmplitudeKey,getAmplitude());
+                setAmplitude(float(jsonMsgPrm[AmplitudeKey].as<long>()));
+                jsonDatPrm[AmplitudeKey].set(getAmplitude());
             }
             else
             {
@@ -423,19 +423,19 @@ namespace ps
         }
     }
 
-    void SquareWaveTest::setWindowFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void SquareWaveTest::setWindowFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(WindowKey))
         {
             if (jsonMsgPrm[WindowKey].is<float>())
             {
-                setWindow(jsonMsgPrm.get<float>(WindowKey));
-                jsonDatPrm.set(WindowKey,getWindow());
+                setWindow(jsonMsgPrm[WindowKey].as<float>());
+                jsonDatPrm[WindowKey].set(getWindow());
             }
             else if (jsonMsgPrm[WindowKey].is<long>()) 
             {
-                setWindow(float(jsonMsgPrm.get<long>(WindowKey)));
-                jsonDatPrm.set(WindowKey,getWindow());
+                setWindow(float(jsonMsgPrm[WindowKey].as<long>()));
+                jsonDatPrm[WindowKey].set(getWindow());
             }
             else
             {

@@ -21,6 +21,7 @@ namespace ps
             if (!serialBuffer_.full())
             {
                 serialBuffer_.push_back(byte);
+                Serial.print(byte);
                 if (byte == '\n')
                 {
                     messageCnt_++;

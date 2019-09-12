@@ -39,8 +39,8 @@ namespace ps
 
             virtual bool updateSample(Sample sampleRaw, Sample &sampleTest); 
 
-            virtual void getParam(JsonObject &jsonDat) override;
-            virtual ReturnStatus setParam(JsonObject &jsonMsg, JsonObject &jsonDat) override;
+            virtual void getParam(JsonVariant &jsonDat) override;
+            virtual ReturnStatus setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat) override;
             
         protected:
 
@@ -72,11 +72,11 @@ namespace ps
             void updateWindowLenUs();
             void updateStepSign();
 
-            void setStartValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setFinalValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setStepValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setAmplitudeFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setWindowFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
+            void setStartValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setFinalValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setStepValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setAmplitudeFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setWindowFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
     };
 
 

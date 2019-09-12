@@ -5,9 +5,9 @@ namespace ps
     MessageParser::MessageParser()
     { }
 
-    JsonObject &MessageParser::parse(String &message, StaticJsonBuffer<JsonMessageBufferSize> &jsonBuffer)
+    DeserializationError MessageParser::parse(String &message, StaticJsonDocument<JsonMessageBufferSize> &jsonBuffer)
     { 
-        return jsonBuffer.parseObject((char *)(message.c_str()));
+        return deserializeJson(jsonBuffer, (char *)(message.c_str()));
     }
 
 } // namespace ps

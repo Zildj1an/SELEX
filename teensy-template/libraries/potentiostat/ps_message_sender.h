@@ -19,7 +19,7 @@ namespace ps
             MessageSender();
             void sendSample(Sample sample);
             void sendSampleEnd();
-            void sendCommandResponse(ReturnStatus status, JsonObject &jsonDat);
+            void sendCommandResponse(ReturnStatus status, JsonVariant &jsonDat);
 
     };
 

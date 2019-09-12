@@ -1,4 +1,10 @@
 #include "WProgram.h"
+#include "potentiostat.h"
+
+using namespace ps;
+
+SystemState systemState;
+
 /*
 	int16_t adc_read(uint8_t mux) {
 	  uint8_t low;
@@ -12,6 +18,15 @@
 	  return (ADCH << 8) | low;                       // must read MSB only once!
 	}
 */
+
+void timerCallback() {
+    systemState.updateTestOnTimer();
+}
+/*
+void serialEvent() {
+    systemState.updateMessageData();
+}*/
+
 extern "C" int main(void)
 {
 #ifdef USING_MAKEFILE
@@ -19,19 +34,28 @@ extern "C" int main(void)
 	// To use Teensy 3.0 without Arduino, simply put your code here.
 	// For example:
 
+    Serial.begin(UsbSerialBaudrate);
+    systemState.initialize();
+    systemState.setTestTimerCallback(timerCallback);
 
-	float phase = 0.0;
-	float twopi = 3.14159 * 2;
-	elapsedMicros usec = 0;
+    while(1) {
+        systemState.processMessages();
+        systemState.serviceDataBuffer();
+        systemState.updateMessageData();
+        delay(100);
+    }
 
+/*
   	analogWriteResolution(12);
 	analogReadResolution(10);
-        analogReference(DEFAULT);
+    analogReference(DEFAULT);
 
 	Serial.begin(9600);
 
 	pinMode(13, OUTPUT);
 	pinMode(A10, INPUT);
+    pinMode(A14, OUTPUT);
+  	analogWrite(A14, 2000);
 
 
 	while(1) {
@@ -40,15 +64,10 @@ extern "C" int main(void)
 	  Serial.println(rval);
 	  delay(1000);
 	  digitalWrite(13,LOW);
-          delay(1000);
-  	  float val = sin(phase) * 2000.0 + 2050.0;
-  	  analogWrite(A14, (int)val);
-  	  phase = phase + twopi/4;
-  	  if (phase >= twopi) phase = 0;
-  	  while (usec < 500) ; // wait
-  	  usec = usec - 501;
+      delay(1000);
+  	  analogWrite(A14, 1000);
 	}
-
+*/
 #else
 	// Arduino's main() function just calls setup() and loop()....
 	setup();

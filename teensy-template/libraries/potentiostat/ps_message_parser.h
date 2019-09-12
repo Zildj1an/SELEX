@@ -15,7 +15,7 @@ namespace ps
         public:
 
             MessageParser();
-            JsonObject& parse(String &message, StaticJsonBuffer<JsonMessageBufferSize> &jsonBuffer);
+            DeserializationError parse(String &message, StaticJsonDocument<JsonMessageBufferSize> &jsonBuffer);
 
     };
 

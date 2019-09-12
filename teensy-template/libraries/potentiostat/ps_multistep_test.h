@@ -38,8 +38,8 @@ namespace ps
             virtual float getMaxValue() const override; 
             virtual float getMinValue() const override; 
 
-            virtual void getParam(JsonObject &jsonDat) override;
-            virtual ReturnStatus setParam(JsonObject &jsonMsg, JsonObject &jsonDat) override;
+            virtual void getParam(JsonVariant &jsonDat) override;
+            virtual ReturnStatus setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat) override;
 
         protected:
 
@@ -47,7 +47,7 @@ namespace ps
             Array<uint64_t, MAX_SIZE> durationArray_;
             size_t numStep_; 
 
-            void setValueAndDurationFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
+            void setValueAndDurationFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
 
     };
 
@@ -259,12 +259,12 @@ namespace ps
 
 
     template<size_t MAX_SIZE>
-    void MultiStepTest<MAX_SIZE>::getParam(JsonObject &jsonDat)
+    void MultiStepTest<MAX_SIZE>::getParam(JsonVariant &jsonDat)
     {
         BaseTest::getParam(jsonDat);
 
         ReturnStatus status;
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant &jsonDatPrm = getParamJsonVariant(jsonDat,status);
 
         if (status.success)
         {
@@ -280,19 +280,19 @@ namespace ps
 
 
     template<size_t MAX_SIZE>
-    ReturnStatus MultiStepTest<MAX_SIZE>::setParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus MultiStepTest<MAX_SIZE>::setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         status = BaseTest::setParam(jsonMsg,jsonDat);
 
-        // Extract parameter JsonObjects
-        JsonObject &jsonMsgPrm = getParamJsonObject(jsonMsg,status);
+        // Extract parameter JsonVariants
+        JsonVariant &jsonMsgPrm = getParamJsonVariant(jsonMsg,status);
         if (!status.success)
         {
             return status;
         }
 
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant &jsonDatPrm = getParamJsonVariant(jsonDat,status);
         if (!status.success)
         {
             return status;
@@ -309,7 +309,7 @@ namespace ps
     // --------------------------------------------------------------------------------------------
 
     template<size_t MAX_SIZE>
-    void MultiStepTest<MAX_SIZE>::setValueAndDurationFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void MultiStepTest<MAX_SIZE>::setValueAndDurationFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (!jsonMsgPrm.containsKey(StepArrayKey))
         {
@@ -350,7 +350,7 @@ namespace ps
                 {
                     if (jsonStep[0].is<unsigned long>())
                     { 
-                        durationArrayTmp.push_back(convertMsToUs(jsonStep.get<unsigned long>(0)));
+                        durationArrayTmp.push_back(convertMsToUs(jsonStep[0].as<unsigned long>()));
                     }
                     else
                     {
@@ -362,7 +362,7 @@ namespace ps
 
                     if (jsonStep[1].is<float>())
                     {
-                        valueArrayTmp.push_back(jsonStep.get<float>(1));
+                        valueArrayTmp.push_back(jsonStep[1].as<float>());
                     }
                     else
                     {

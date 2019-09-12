@@ -41,8 +41,8 @@ namespace ps
             virtual float getValue(uint64_t t) const override;
             virtual float getMaxValue() const override;
             virtual float getMinValue() const override;
-            virtual void getParam(JsonObject &jsonDat) override;
-            virtual ReturnStatus setParam(JsonObject &jsonMsg, JsonObject &jsonDat) override;
+            virtual void getParam(JsonVariant &jsonDat) override;
+            virtual ReturnStatus setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat) override;
 
         protected:
 
@@ -54,11 +54,11 @@ namespace ps
             float shift_ = DefaultShift;             // Waveform shift as fraction of period [0,1]
             uint64_t shiftInUs_ = 0;                 // Waveform shift in us;
             
-            void setAmplitudeFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setOffsetFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setPeriodFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setNumCyclesFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setShiftFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
+            void setAmplitudeFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setOffsetFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setPeriodFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setNumCyclesFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setShiftFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
 
             void updateShiftInUs();
 

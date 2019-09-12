@@ -5,8 +5,8 @@
 
 namespace ps
 {
-    const int DAC_INP_PIN = A14;
-    const int ADC_OUT_PIN = A10;
+    const int DAC_OUT_PIN = A14;
+    const int ADC_INP_PIN = A10;
 }
 
 #endif

@@ -25,12 +25,12 @@ namespace ps
             Voltammetry();
 
             BaseTest *getTest(String name);
-            ReturnStatus getTest(JsonObject &jsonMsg, JsonObject &jsonDat, BaseTest* &testPtr);
-            ReturnStatus getParam(JsonObject &jsonMsg, JsonObject &jsonDat);
-            ReturnStatus setParam(JsonObject &jsonMsg, JsonObject &jsonDat);
-            ReturnStatus getTestDoneTime(JsonObject &jsonMsg, JsonObject &jsonDat);
-            ReturnStatus getTestNames(JsonObject &jsonMsg, JsonObject &jsonDat);
-            ReturnStatus getMuxTestNames(JsonObject &jsonMsg, JsonObject &jsonDat);
+            ReturnStatus getTest(JsonVariant &jsonMsg, JsonVariant &jsonDat, BaseTest* &testPtr);
+            ReturnStatus getParam(JsonVariant &jsonMsg, JsonVariant &jsonDat);
+            ReturnStatus setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat);
+            ReturnStatus getTestDoneTime(JsonVariant &jsonMsg, JsonVariant &jsonDat);
+            ReturnStatus getTestNames(JsonVariant &jsonMsg, JsonVariant &jsonDat);
+            ReturnStatus getMuxTestNames(JsonVariant &jsonMsg, JsonVariant &jsonDat);
 
             void setSamplePeriod(uint64_t samplePeriod);
 
