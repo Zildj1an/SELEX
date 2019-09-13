@@ -14,7 +14,10 @@ with open('res.csv','r') as csvfile:
 
 axes = plt.gca()
 axes.set_xlim([t[0],t[-1]])
-axes.set_ylim([min(min(x),min(y))*1.1,max(max(x),max(y))*1.1])
+pmax = max(max(x),max(y))
+pmin = min(min(x),min(y))
+width = pmax - pmin
+axes.set_ylim([pmin - 0.1*width, pmax + 0.1*width])
 plt.plot(t,x, label='VoltageDAC')
 plt.plot(t,y, label='VoltageADC')
 plt.xlabel('Time(ms)')
