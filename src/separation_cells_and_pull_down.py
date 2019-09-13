@@ -541,7 +541,7 @@ def incubate(mins, secs=0, ar=100, dr=100):
       pipette.drop_tip()
       pipette.delay(seconds=15)
       
-      if robot.is_simulating:
+      if robot.is_simulating():
           elapsed_time = elapsed_time + 30
       else:
           elapsed_time = time.perf_counter() - start_time
