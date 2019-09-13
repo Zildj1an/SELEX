@@ -92,7 +92,8 @@ def search_web(url_t):
 letters = list(string.ascii_uppercase)
 
 # If all the urls are already stored
-if os.path.isfile("urls") is False or len(years) < 10:
+if os.path.isfile("urls") is False:
+
 	for elem in years:
 	    url_k = "https://" + elem + URL_s
 	    search_web(url_t=url_k)
@@ -101,6 +102,7 @@ if os.path.isfile("urls") is False or len(years) < 10:
 		 search_web(url_t = "https://" + str(elem) + URL_2s[0] + letter + URL_2s[1])
 
 	file_close = open("urls","w")
+
 	for link in urls:
 		file_close.write(link)
 		file_close.write("\n")
@@ -137,11 +139,20 @@ for i in range(0, len(urls), size):
     url_chunk.append(urls[i:i + size])
 
 # [6] Search independently
-def search(the_urls,filen):
+def search(the_urls,filen,yearsn):
 
         global verbose,words,results
 
 	for link in the_urls:
+
+                year = False
+
+                for elem in yearsn:
+                      if elem in link:
+                           year = True
+
+                if year == False:
+                     return
 
 		try:
 			response = requests.get(link, headers=headers, timeout=1.5, allow_redirects=False)
@@ -171,12 +182,12 @@ def search(the_urls,filen):
                                    else:
                                         file3.write(link)
                                         file3.write("\n")
-		              print(link)
+		              print(str(len(results)) + " - " + link)
 
-thread1 = threading.Thread(target = search, args=(url_chunk[0], "0"))
-thread2 = threading.Thread(target = search, args=(url_chunk[1], "1"))
-thread3 = threading.Thread(target = search, args=(url_chunk[2], "2"))
-thread4 = threading.Thread(target = search, args=(url_chunk[3], "3"))
+thread1 = threading.Thread(target = search, args=(url_chunk[0], "0",years))
+thread2 = threading.Thread(target = search, args=(url_chunk[1], "1",years))
+thread3 = threading.Thread(target = search, args=(url_chunk[2], "2",years))
+thread4 = threading.Thread(target = search, args=(url_chunk[3], "3",years))
 threads.extend((thread1,thread2,thread3,thread4))  			# Append multiple
 
 for t in threads:
@@ -199,5 +210,3 @@ if file_s == "y":
     os.system("rm " + file_name + "3")
 
 print("Number of webs with match : " + str(len(results)))
-
-
