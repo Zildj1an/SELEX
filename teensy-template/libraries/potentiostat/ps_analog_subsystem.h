@@ -15,8 +15,8 @@ namespace ps
 
             static const uint16_t DefaultAnalogWriteResolution = 12;
             static const uint16_t DefaultAnalogReadResolution = 16;
-            static const uint16_t DefaultAnalogReadAveraging = 1;
-            static const uint8_t  DefaultAnalogReference = INTERNAL;
+            static const uint16_t DefaultAnalogReadAveraging = 16;
+            static const uint8_t  DefaultAnalogReference = DEFAULT;
 
             static const uint16_t MaxValueAin = uint16_t((uint32_t(1) << DefaultAnalogReadResolution) -1);
             static const uint16_t MaxValueDac = uint16_t((uint32_t(1) << DefaultAnalogWriteResolution)-1);
@@ -43,7 +43,7 @@ namespace ps
             ReturnStatus setCurrRangeByName(String currRangeName);
             String getCurrRangeName() const;   
 
-        protected:
+        //protected:
 
             uint16_t valueDac_;
             VoltRange voltRange_;

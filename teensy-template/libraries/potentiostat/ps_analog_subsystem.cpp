@@ -16,11 +16,11 @@ namespace ps
         analogReadAveraging(DefaultAnalogReadAveraging);
         analogReference(DefaultAnalogReference);
 
-        // Set output voltage to zero
-        setValueDac(MidValueDac); 
-    
         setCurrRange(CurrRangeArray[0]);
+        setVoltRange(VoltRangeArray[0]);
 
+        // Set output voltage to zero
+        setValueDac(MidValueDac);     
     }
 
 

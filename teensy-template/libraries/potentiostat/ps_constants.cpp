@@ -66,12 +66,13 @@ namespace ps
 
     // Ranges for output voltage
     const String VoltageVariant = String("AD8608");
-    const VoltRange VoltRange33V(String("3.3V"),0, 1, AnalogSubsystem::MaxValueDac);
+    const VoltRange VoltRange33V(String("3.3V"),0, 3.3, AnalogSubsystem::MaxValueDac);
     VoltRange voltRangeArrayTmp[NumVoltRange] = {VoltRange33V};
+    Array<VoltRange,NumVoltRange>  VoltRangeArray(voltRangeArrayTmp);
     const float SignDac = 1;
 
     const String CurrentVariant = String("milliAmp 33");
-    const CurrRange CurrRange33mA("10uA", 0, 1,  AnalogSubsystem::MaxValueAin); 
+    const CurrRange CurrRange33mA("10uA", 0, 3.3,  AnalogSubsystem::MaxValueAin); 
     CurrRange currRangeArrayTmp[NumCurrRange] = {CurrRange33mA};
 
     const String HardwareVariant = VoltageVariant + String("_") + CurrentVariant;
