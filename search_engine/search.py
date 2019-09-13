@@ -3,7 +3,7 @@
 Search words from iGem previous teams and years
 Team:    MADRID_UCM
 Author:  Carlos Bilbao (Zildj1an)
-Version: 3.0
+Version: 4.0 (GUI)
 ----------------------------------------------
 '''
 import sys
@@ -13,8 +13,49 @@ init(strip=not sys.stdout.isatty())
 from termcolor import cprint
 from pyfiglet import figlet_format
 import time,datetime, urllib2, requests,threading, os, subprocess,string
+import Tkinter
+from Tkinter import *
+import tkMessageBox
 
 cprint(figlet_format('iGEM Search', font='starwars'),'yellow', 'on_red', attrs=['bold'])
+
+ ##########
+ #  GUI   #
+ ##########
+top = Tkinter.Tk()
+top.title("iGEM Search Engine")
+frame = Frame(top, height = 50)
+frame.pack()
+L0 = Label(frame, text = " Welcome to the iGem Search Engine open-source tool. \n Separate years and words by commas. \n Author Carlos Bilbao, 2019. \n")
+L0.pack()
+top_frame = Frame(top)
+top_frame.pack(side = TOP)
+# Top Frame
+topframe = Frame(top_frame)
+topframe.pack(side = TOP)
+L1 = Label(topframe, text="Words to search")
+L1.pack(side = LEFT)
+E1 = Entry(topframe, bd=3)
+E1.pack(side = RIGHT)
+# Mid Frame
+midframe = Frame(top_frame)
+midframe.pack(side = BOTTOM)
+L2 = Label(midframe, text = "	Years")
+L2.pack(side = LEFT)
+E2 = Entry(midframe, bd =3)
+E2.pack(side = RIGHT)
+# Bottom Frame
+bottom_frame = Frame(top)
+bottom_frame.pack(side = BOTTOM)
+def searchCallBack():
+    # TODO send info downstairs
+    tkMessageBox.showinfo("Searching...","Search in Progress")
+
+B = Tkinter.Button(bottom_frame,text= "Search", command = searchCallBack, bd= 3)
+B.pack()
+top.mainloop()
+sys.exit()
+
 URL_s       = ".igem.org/Special:AllPages"
 URL_2s      = []
 URL_2s.append(".igem.org/wiki/index.php?title=Special%3APrefixIndex&prefix=Team%3A")
