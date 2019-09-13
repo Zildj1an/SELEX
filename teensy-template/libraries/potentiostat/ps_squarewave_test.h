@@ -46,11 +46,11 @@ namespace ps
 
             float startValue_ = -0.5;
             float finalValue_ = 0.5;
-            float stepValue_ = 0.005;
-            float amplitude_ = 0.025;
+            float stepValue_ = 0.05;
+            float amplitude_ = 0.25;
             float window_ = 0.2;
 
-            float maxValue_ = 0.0;
+            float maxValue_ = 1.0;
             float minValue_ = 0.0;
             float stepSign_ = 1.0;
 

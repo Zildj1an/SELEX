@@ -150,6 +150,17 @@ namespace ps
         {
             uint64_t stepModPos = (t - quietTime_)%samplePeriod_;
             float stairValue = getStairValue(t);
+	    /*Serial.print(stairValue);
+	    Serial.print(' ');
+            Serial.print(amplitude_);
+	    Serial.print(' ');
+            Serial.print((long)samplePeriod_);
+	    Serial.print(' ');
+            Serial.print((long)(t - quietTime_));
+	    Serial.print(' ');
+            Serial.print((long)stepModPos);
+	    Serial.print(' ');
+            Serial.println((long)halfSamplePeriod_);*/
             if (stepModPos < halfSamplePeriod_)
             {
                 value = stairValue + amplitude_;
@@ -158,6 +169,7 @@ namespace ps
             {
                 value = stairValue - amplitude_;
             }
+	    //Serial.println(value);
         }
         return value;
     }
