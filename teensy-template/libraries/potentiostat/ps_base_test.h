@@ -43,8 +43,8 @@ namespace ps
             virtual SampleMethod getSampleMethod() const;
             virtual bool updateSample(Sample sampleRaw, Sample &sampleTest); 
 
-            virtual void getParam(JsonObject &jsonDat);
-            virtual ReturnStatus setParam(JsonObject &jsonMsg, JsonObject &jsonDat);
+            virtual void getParam(JsonVariant &jsonDat);
+            virtual ReturnStatus setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat);
 
             virtual bool isMuxCompatible();
             virtual void setMuxCompatible(bool value);
@@ -59,9 +59,9 @@ namespace ps
             SampleMethod sampleMethod_ = SampleGeneric;
             bool muxCompatible_ = false;
 
-            JsonObject &getParamJsonObject(JsonObject &json, ReturnStatus &status);
-            void setQuietValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setQuietTimeFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
+            JsonVariant getParamJsonVariant(JsonVariant &json, ReturnStatus &status);
+            void setQuietValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setQuietTimeFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
 
 
     };

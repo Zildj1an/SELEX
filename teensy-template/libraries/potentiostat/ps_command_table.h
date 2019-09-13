@@ -27,9 +27,9 @@ namespace ps
             size_t maxSize();
 
             void setClient(T *client);
-            void registerMethod(String key, String value, ReturnStatus (T::*method)(JsonObject&,JsonObject&));
+            void registerMethod(String key, String value, ReturnStatus (T::*method)(JsonVariant&,JsonVariant&));
 
-            ReturnStatus apply(String key, JsonObject &jsonMsg, JsonObject &jsonDat);
+            ReturnStatus apply(String key, JsonVariant &jsonMsg, JsonVariant &jsonDat);
 
         protected:
 
@@ -80,7 +80,7 @@ namespace ps
 
 
     template<typename T, size_t MAX_SIZE>
-    void CommandTable<T,MAX_SIZE>::registerMethod(String key, String value, ReturnStatus (T::*method)(JsonObject&,JsonObject&))
+    void CommandTable<T,MAX_SIZE>::registerMethod(String key, String value, ReturnStatus (T::*method)(JsonVariant&,JsonVariant&))
     {
         KeyValueCommand<T> kvCommand(key,value,method);
         table_.push_back(kvCommand);
@@ -89,7 +89,7 @@ namespace ps
 
 
     template<typename T, size_t MAX_SIZE>
-    ReturnStatus CommandTable<T,MAX_SIZE>::apply(String key, JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus CommandTable<T,MAX_SIZE>::apply(String key, JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         if (client_!= nullptr)
@@ -103,7 +103,7 @@ namespace ps
                     if (cmd.equals(table_[i].value()))
                     {
                         found = true;
-                        jsonDat.set(CommandKey,jsonMsg[key]);
+                        jsonDat[CommandKey].set(jsonMsg[key]);
                         status = table_[i].applyMethod(client_,jsonMsg,jsonDat);
                         break;
                     }

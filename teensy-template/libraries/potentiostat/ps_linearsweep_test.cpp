@@ -83,44 +83,44 @@ namespace ps
 
     float LinearSweepTest::getMaxValue() const 
     {
-        return max(startValue_, max(finalValue_, quietValue_));
+        return std::max(startValue_, std::max(finalValue_, quietValue_));
     }
 
 
     float LinearSweepTest::getMinValue() const 
     {
-        return min(startValue_, min(finalValue_, quietValue_));
+        return std::min(startValue_, std::min(finalValue_, quietValue_));
     }
 
 
-    void LinearSweepTest::getParam(JsonObject &jsonDat)
+    void LinearSweepTest::getParam(JsonVariant &jsonDat)
     {
         BaseTest::getParam(jsonDat);
 
         ReturnStatus status;
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant jsonDatPrm = getParamJsonVariant(jsonDat,status);
 
         if (status.success)
         {
-            jsonDatPrm.set(StartValueKey, startValue_);
-            jsonDatPrm.set(FinalValueKey, finalValue_);
-            jsonDatPrm.set(DurationKey, convertUsToMs(duration_));
+            jsonDatPrm[StartValueKey].set(startValue_);
+            jsonDatPrm[FinalValueKey].set(finalValue_);
+            jsonDatPrm[DurationKey].set(convertUsToMs(duration_));
         }
     }
 
-    ReturnStatus LinearSweepTest::setParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus LinearSweepTest::setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         status = BaseTest::setParam(jsonMsg,jsonDat);
 
-        // Extract parameter JsonObjects
-        JsonObject &jsonMsgPrm = getParamJsonObject(jsonMsg,status);
+        // Extract parameter JsonVariants
+        JsonVariant jsonMsgPrm = getParamJsonVariant(jsonMsg,status);
         if (!status.success)
         {
             return status;
         }
 
-        JsonObject &jsonDatPrm = getParamJsonObject(jsonDat,status);
+        JsonVariant jsonDatPrm = getParamJsonVariant(jsonDat,status);
         if (!status.success)
         {
             return status;
@@ -137,19 +137,19 @@ namespace ps
     // Protected methods
     // ----------------------------------------------------------------------------------
 
-    void LinearSweepTest::setStartValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void LinearSweepTest::setStartValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(StartValueKey))
         {
             if (jsonMsgPrm[StartValueKey].is<float>())
             {
-                setStartValue(jsonMsgPrm.get<float>(StartValueKey));
-                jsonDatPrm.set(StartValueKey,getStartValue());
+                setStartValue(jsonMsgPrm[StartValueKey].as<float>());
+                jsonDatPrm[StartValueKey].set(getStartValue());
             }
             else if (jsonMsgPrm[StartValueKey].is<long>())
             {
-                setStartValue(float(jsonMsgPrm.get<long>(StartValueKey)));
-                jsonDatPrm.set(StartValueKey,getStartValue());
+                setStartValue(float(jsonMsgPrm[StartValueKey].as<long>()));
+                jsonDatPrm[StartValueKey].set(getStartValue());
             }
             else
             {
@@ -161,19 +161,19 @@ namespace ps
     }
 
 
-    void LinearSweepTest::setFinalValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void LinearSweepTest::setFinalValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(FinalValueKey))
         {
             if (jsonMsgPrm[FinalValueKey].is<float>())
             {
-                setFinalValue(jsonMsgPrm.get<float>(FinalValueKey));
-                jsonDatPrm.set(FinalValueKey,getFinalValue());
+                setFinalValue(jsonMsgPrm[FinalValueKey].as<float>());
+                jsonDatPrm[FinalValueKey].set(getFinalValue());
             }
             else if (jsonMsgPrm[FinalValueKey].is<long>())
             {
-                setFinalValue(float(jsonMsgPrm.get<long>(FinalValueKey)));
-                jsonDatPrm.set(FinalValueKey,getFinalValue());
+                setFinalValue(float(jsonMsgPrm[FinalValueKey].as<long>()));
+                jsonDatPrm[FinalValueKey].set(getFinalValue());
             }
             else
             {
@@ -185,14 +185,14 @@ namespace ps
     }
 
 
-    void LinearSweepTest::setDurationFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void LinearSweepTest::setDurationFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(DurationKey))
         {
             if (jsonMsgPrm[DurationKey].is<unsigned long>())
             {
-                setDuration(convertMsToUs(jsonMsgPrm.get<unsigned long>(DurationKey)));
-                jsonDatPrm.set(DurationKey,convertUsToMs(getDuration()));
+                setDuration(convertMsToUs(jsonMsgPrm[DurationKey].as<unsigned long>()));
+                jsonDatPrm[DurationKey].set(convertUsToMs(getDuration()));
             }
             else
             {

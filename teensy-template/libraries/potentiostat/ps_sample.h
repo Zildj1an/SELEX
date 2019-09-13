@@ -11,7 +11,6 @@ namespace ps
             uint64_t t;
             float volt;
             float curr;
-            uint8_t chan;
     };
 
 }

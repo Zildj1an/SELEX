@@ -27,8 +27,8 @@ namespace ps
             virtual float getValue(uint64_t t) const override; 
             virtual float getMaxValue() const override; 
             virtual float getMinValue() const override; 
-            virtual void getParam(JsonObject &jsonDat) override;
-            virtual ReturnStatus setParam(JsonObject &jsonMsg, JsonObject &jsonDat) override;
+            virtual void getParam(JsonVariant &jsonDat) override;
+            virtual ReturnStatus setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat) override;
 
         protected:
 
@@ -36,9 +36,9 @@ namespace ps
             float finalValue_ =  0.5;
             uint64_t duration_ = 2000000;
 
-            void setStartValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setFinalValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
-            void setDurationFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status);
+            void setStartValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setFinalValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
+            void setDurationFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status);
 
     };
 

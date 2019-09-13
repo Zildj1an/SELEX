@@ -7,41 +7,37 @@ namespace ps
     MessageSender::MessageSender()
     {}
 
-    void MessageSender::sendCommandResponse(ReturnStatus status, JsonObject &jsonDat)
+    void MessageSender::sendCommandResponse(ReturnStatus status, JsonVariant &jsonDat)
     {
-        StaticJsonBuffer<JsonMessageBufferSize> jsonBuffer;
-        JsonObject &jsonMsg = jsonBuffer.createObject();
-        jsonMsg.set(SuccessKey, status.success);
+        StaticJsonDocument<JsonMessageBufferSize> jsonMsg;
+        jsonMsg[SuccessKey].set(status.success);
         if (status.message.length() > 0)
         {
-            jsonMsg.set(MessageKey, status.message);
+            jsonMsg[MessageKey].set(status.message);
         }
-        jsonMsg.set(ResponseKey, jsonDat);
-        jsonMsg.printTo(Serial);
-        Serial.println();
+        jsonMsg[ResponseKey].set(jsonDat);
+        char output[JsonMessageBufferSize];
+        serializeJson(jsonMsg, output);
+        Serial.println(output);
     }
 
     void MessageSender::sendSample(Sample sample)
     {
-        StaticJsonBuffer<JsonMessageBufferSize> jsonBuffer;
-        JsonObject &jsonSample = jsonBuffer.createObject();
-        jsonSample.set(TimeKey, convertUsToMs(sample.t)); 
-        jsonSample.set(VoltKey, sample.volt);
-        jsonSample.set(CurrKey, sample.curr);
-        if (sample.chan > 0)
-        {
-            jsonSample.set(ChanKey, sample.chan);
-        }
-        jsonSample.printTo(Serial);
-        Serial.println();
+        StaticJsonDocument<JsonMessageBufferSize> jsonSample;
+        jsonSample[TimeKey].set(convertUsToMs(sample.t)); 
+        jsonSample[VoltKey].set(sample.volt);
+        jsonSample[CurrKey].set(sample.curr);
+        char output[JsonMessageBufferSize];
+        serializeJson(jsonSample, output);
+        Serial.println(output);
     }
 
     void MessageSender::sendSampleEnd()
     {
-        StaticJsonBuffer<JsonMessageBufferSize> jsonBuffer;
-        JsonObject &jsonSample = jsonBuffer.createObject();
-        jsonSample.printTo(Serial);
-        Serial.println();
+        StaticJsonDocument<JsonMessageBufferSize> jsonSample;
+        char output[JsonMessageBufferSize];
+        serializeJson(jsonSample, output);
+        Serial.println(output);
     }
 
 } // namespace ps

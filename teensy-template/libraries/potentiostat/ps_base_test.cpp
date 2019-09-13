@@ -47,13 +47,13 @@ namespace ps
 
     float BaseTest::getMaxValue() const 
     { 
-        return max(quietValue_,0.0); 
+        return std::max(quietValue_,0.0f); 
     }
 
 
     float BaseTest::getMinValue() const 
     { 
-        return min(quietValue_,0.0); 
+        return std::min(quietValue_,0.0f); 
     }
 
     void BaseTest::setQuietTime(uint64_t quietTime)
@@ -129,26 +129,26 @@ namespace ps
     }
 
 
-    void BaseTest::getParam(JsonObject &jsonDat)
+    void BaseTest::getParam(JsonVariant &jsonDat)
     {
-        JsonObject &jsonDatPrm = jsonDat.createNestedObject(ParamKey);
-        jsonDatPrm.set(QuietValueKey, quietValue_);
-        jsonDatPrm.set(QuietTimeKey, convertUsToMs(quietTime_));
+        JsonVariant jsonDatPrm = jsonDat.createNestedObject(ParamKey);
+        jsonDatPrm[QuietValueKey].set(quietValue_);
+        jsonDatPrm[QuietTimeKey].set(convertUsToMs(quietTime_));
     }
 
-    ReturnStatus BaseTest::setParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus BaseTest::setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
 
-        // Extract JsonObject containing parameters
-        JsonObject &jsonMsgPrm = getParamJsonObject(jsonMsg,status);
+        // Extract JsonVariant containing parameters
+        JsonVariant jsonMsgPrm = getParamJsonVariant(jsonMsg,status);
         if (!status.success)
         {
             return status;
         }
 
         // Set Parameters_ 
-        JsonObject &jsonDatPrm = jsonDat.createNestedObject(ParamKey);
+        JsonVariant jsonDatPrm = jsonDat.createNestedObject(ParamKey);
 
         setQuietValueFromJson(jsonMsgPrm, jsonDatPrm, status);
         setQuietTimeFromJson(jsonMsgPrm, jsonDatPrm, status);
@@ -169,9 +169,9 @@ namespace ps
     // Protected Methods
     // ----------------------------------------------------------------------------------
 
-    JsonObject &BaseTest::getParamJsonObject(JsonObject &json, ReturnStatus &status)
+    JsonVariant BaseTest::getParamJsonVariant(JsonVariant &json, ReturnStatus &status)
     {
-        // Extract JsonObject containing parameters
+        // Extract JsonVariant containing parameters
         if (!json.containsKey(ParamKey))
         {
             status.success = false;
@@ -189,19 +189,19 @@ namespace ps
         return json[ParamKey];
     }
 
-    void BaseTest::setQuietValueFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void BaseTest::setQuietValueFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(QuietValueKey))
         {
             if (jsonMsgPrm[QuietValueKey].is<float>())
             {
-                setQuietValue(jsonMsgPrm.get<float>(QuietValueKey));
-                jsonDatPrm.set(QuietValueKey,getQuietValue());
+                setQuietValue(jsonMsgPrm[QuietValueKey].as<float>());
+                jsonDatPrm[QuietValueKey].set(getQuietValue());
             }
             else if (jsonMsgPrm[QuietValueKey].is<long>())
             {
-                setQuietValue(float(jsonMsgPrm.get<long>(QuietValueKey)));
-                jsonDatPrm.set(QuietValueKey,getQuietValue());
+                setQuietValue(float(jsonMsgPrm[QuietValueKey].as<long>()));
+                jsonDatPrm[QuietValueKey].set(getQuietValue());
             }
             else
             {
@@ -213,14 +213,14 @@ namespace ps
     }
 
 
-    void BaseTest::setQuietTimeFromJson(JsonObject &jsonMsgPrm, JsonObject &jsonDatPrm, ReturnStatus &status)
+    void BaseTest::setQuietTimeFromJson(JsonVariant &jsonMsgPrm, JsonVariant &jsonDatPrm, ReturnStatus &status)
     {
         if (jsonMsgPrm.containsKey(QuietTimeKey))
         {
             if (jsonMsgPrm[QuietTimeKey].is<unsigned long>())
             {
-                setQuietTime(convertMsToUs(jsonMsgPrm.get<unsigned long>(QuietTimeKey)));
-                jsonDatPrm.set(QuietTimeKey,convertUsToMs(getQuietTime()));
+                setQuietTime(convertMsToUs(jsonMsgPrm[QuietTimeKey].as<unsigned long>()));
+                jsonDatPrm[QuietTimeKey].set(convertUsToMs(getQuietTime()));
             }
             else
             {

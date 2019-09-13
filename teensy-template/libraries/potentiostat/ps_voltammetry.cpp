@@ -32,13 +32,13 @@ namespace ps
     }
 
     
-    ReturnStatus Voltammetry::getTest(JsonObject &jsonMsg, JsonObject &jsonDat, BaseTest* &testPtr)
+    ReturnStatus Voltammetry::getTest(JsonVariant &jsonMsg, JsonVariant &jsonDat, BaseTest* &testPtr)
     {
         ReturnStatus status;
         if (jsonMsg.containsKey(TestKey))
         {
             String testName = String((const char *)(jsonMsg[TestKey]));
-            jsonDat.set(TestKey,jsonMsg[TestKey]);
+            jsonDat[TestKey].set(jsonMsg[TestKey]);
             testPtr = getTest(testName);
             if (testPtr == nullptr)
             {
@@ -55,7 +55,7 @@ namespace ps
     }
 
 
-    ReturnStatus Voltammetry::getParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus Voltammetry::getParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
 
@@ -77,7 +77,7 @@ namespace ps
     }
     
     
-    ReturnStatus Voltammetry::setParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus Voltammetry::setParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
 
@@ -104,7 +104,7 @@ namespace ps
     } 
     
     
-    ReturnStatus Voltammetry::getTestDoneTime(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus Voltammetry::getTestDoneTime(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
 
@@ -128,16 +128,16 @@ namespace ps
         uint64_t doneTimeUs = testPtr -> getDoneTime();
         uint32_t doneTimeMs = convertUsToMs(doneTimeUs);
 
-        jsonDat.set(TestKey, testName);
-        jsonDat.set(TestDoneTimeKey, doneTimeMs);
+        jsonDat[TestKey].set(testName);
+        jsonDat[TestDoneTimeKey].set(doneTimeMs);
 
         return status;
     }
 
-    ReturnStatus Voltammetry::getTestNames(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus Voltammetry::getTestNames(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
-        JsonArray &jsonNameArray = jsonDat.createNestedArray(TestNameArrayKey);
+        JsonArray jsonNameArray = jsonDat.createNestedArray(TestNameArrayKey);
         for (size_t i=0; i<availableTests_.size(); i++)
         {
             jsonNameArray.add(availableTests_[i] -> getName());
@@ -146,10 +146,10 @@ namespace ps
     }
 
 
-    ReturnStatus Voltammetry::getMuxTestNames(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus Voltammetry::getMuxTestNames(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
-        JsonArray &jsonNameArray = jsonDat.createNestedArray(TestNameArrayKey);
+        JsonArray jsonNameArray = jsonDat.createNestedArray(TestNameArrayKey);
         for (size_t i=0; i<availableTests_.size(); i++)
         {
             if (availableTests_[i] -> isMuxCompatible())

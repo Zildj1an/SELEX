@@ -1,5 +1,4 @@
 #include "ps_system_state.h"
-#include "ps_device_id_eeprom.h"
 #include "util/atomic.h"
 
 
@@ -24,6 +23,14 @@ namespace ps
 
     void SystemState::initialize()
     {
+
+        delay(1000);
+        StaticJsonDocument<100> doc;
+        doc["initialize"] = "true";
+        char output[100];
+        serializeJson(doc, output);
+        Serial.println(output);
+
         commandTable_.setClient(this);
         commandTable_.registerMethod(CommandKey,   RunTestCmd,            &SystemState::onCommandRunTest);
         commandTable_.registerMethod(CommandKey,   StopTestCmd,           &SystemState::onCommandStopTest);
@@ -32,13 +39,15 @@ namespace ps
         commandTable_.registerMethod(CommandKey,   SetSamplePeriodCmd,    &SystemState::onCommandSetSamplePeriod);
         commandTable_.registerMethod(CommandKey,   GetSamplePeriodCmd,    &SystemState::onCommandGetSamplePeriod);
         commandTable_.registerMethod(CommandKey,   GetTestDoneTimeCmd,    &SystemState::onCommandGetTestDoneTime);
+        commandTable_.registerMethod(CommandKey,   GetTestNamesCmd,       &SystemState::onCommandGetTestNames);
 
+        analogSubsystem_.initialize();
+        analogSubsystem_.setVolt(0);
         messageReceiver_.reset();
-
     }
 
 
-    ReturnStatus SystemState::onCommandRunTest(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandRunTest(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status = voltammetry_.getTest(jsonMsg,jsonDat,test_);
         if (!status.success)
@@ -58,7 +67,7 @@ namespace ps
     }
 
 
-    ReturnStatus SystemState::onCommandStopTest(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandStopTest(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         stopTest();
@@ -66,21 +75,21 @@ namespace ps
     }
 
 
-    ReturnStatus SystemState::onCommandSetTestParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandSetTestParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status = voltammetry_.setParam(jsonMsg,jsonDat);
         return status;
     }
 
 
-    ReturnStatus SystemState::onCommandGetTestParam(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandGetTestParam(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status = voltammetry_.getParam(jsonMsg,jsonDat);
         return status;
     }
 
 
-    ReturnStatus SystemState::onCommandSetSamplePeriod(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandSetSamplePeriod(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         if (!jsonMsg.containsKey(SamplePeriodKey))
@@ -97,7 +106,7 @@ namespace ps
             }
             else
             {
-                uint32_t samplePeriodMs = jsonMsg.get<uint32_t>(SamplePeriodKey);
+                uint32_t samplePeriodMs = jsonMsg[SamplePeriodKey].as<uint32_t>();
                 uint32_t samplePeriodUs = uint32_t(convertMsToUs(samplePeriodMs));
                 if (samplePeriodUs > MaximumSamplePeriod)
                 {
@@ -112,7 +121,7 @@ namespace ps
                 else
                 {
                     setSamplePeriod(samplePeriodUs);
-                    jsonDat.set(SamplePeriodKey,convertUsToMs(getSamplePeriod()));
+                    jsonDat[SamplePeriodKey].set(convertUsToMs(getSamplePeriod()));
                 }
             }
         }
@@ -120,21 +129,27 @@ namespace ps
     }
 
 
-    ReturnStatus SystemState::onCommandGetSamplePeriod(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandGetSamplePeriod(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
-        jsonDat.set(SamplePeriodKey,convertUsToMs(getSamplePeriod()));
+        jsonDat[SamplePeriodKey].set(convertUsToMs(getSamplePeriod()));
         return status;
     }
 
     
-    ReturnStatus SystemState::onCommandGetTestDoneTime(JsonObject &jsonMsg, JsonObject &jsonDat)
+    ReturnStatus SystemState::onCommandGetTestDoneTime(JsonVariant &jsonMsg, JsonVariant &jsonDat)
     {
         ReturnStatus status;
         status = voltammetry_.getTestDoneTime(jsonMsg, jsonDat);
         return status;
     }
 
+    ReturnStatus SystemState::onCommandGetTestNames(JsonVariant &jsonMsg, JsonVariant &jsonDat)
+    {
+        ReturnStatus status;
+        status = voltammetry_.getTestNames(jsonMsg, jsonDat);
+        return status;
+    }
 
     void SystemState::updateMessageData()
     {
@@ -147,15 +162,17 @@ namespace ps
 
         if (messageReceiver_.available())
         {
+            
             ReturnStatus status;
-            StaticJsonBuffer<JsonMessageBufferSize> messageJsonBuffer;
-            StaticJsonBuffer<JsonMessageBufferSize> commandRespJsonBuffer;
+            StaticJsonDocument<JsonMessageBufferSize> messageJsonDocument;
+            StaticJsonDocument<JsonMessageBufferSize> commandRespJsonDocument;
 
             String message = messageReceiver_.next();
-            JsonObject &jsonMsg = messageParser_.parse(message,messageJsonBuffer);
+            DeserializationError err = messageParser_.parse(message,messageJsonDocument);
+            JsonVariant jsonMsg = messageJsonDocument.as<JsonVariant>(); 
 
-            JsonObject &jsonDat = commandRespJsonBuffer.createObject();
-            if (jsonMsg.success())
+            JsonVariant jsonDat = commandRespJsonDocument.createNestedObject();
+            if (!err)
             {
                 status = commandTable_.apply(CommandKey,jsonMsg,jsonDat);
             }
@@ -168,6 +185,7 @@ namespace ps
         }
     }
 
+    
 
     void SystemState::serviceDataBuffer()
     {
@@ -227,17 +245,6 @@ namespace ps
             analogSubsystem_.setVolt(volt);
             float curr = analogSubsystem_.getCurr();
 
-            int electNum = 0; // Default value (0 is non mux channel)
-            int electInd = 0; // Default value 
-
-            if (multiplexer_.isRunning())
-            {
-                electNum = multiplexer_.currentWrkElect();
-                electInd = multiplexer_.electNumToIndex(electNum);
-            }
-
-            currLowPass_[electInd].update(curr,lowPassDtSec_);
-
             if (timerCnt_ > 0)
             {
                 if (test_ -> getSampleMethod() == SampleGeneric)
@@ -247,12 +254,8 @@ namespace ps
                     // ------------------------------------------------------------------
                     if (timerCnt_%sampleModulus_ == 0)
                     {
-                        Sample sample = {t, volt, currLowPass_[electInd].value(),uint8_t(electNum)};
+                        Sample sample = {t, volt, curr};
                         dataBuffer_.push_back(sample);
-                        if (multiplexer_.isRunning())
-                        {
-                            multiplexer_.connectNextEnabledWrkElect();   
-                        }
                     }
                 }
                 else
@@ -260,15 +263,11 @@ namespace ps
                     // ------------------------------------------------------------------
                     // Send sample for tests which use custom sampling methods
                     // ------------------------------------------------------------------
-                    Sample sampleRaw  = {t, volt, currLowPass_[0].value(),uint8_t(electNum)}; // Raw sample data
-                    Sample sampleTest = {0, 0.0, 0.0, uint8_t(electNum)}; // Custom sample data (set in updateSample)
+                    Sample sampleRaw  = {t, volt, curr}; // Raw sample data
+                    Sample sampleTest = {0, 0.0, 0.0}; // Custom sample data (set in updateSample)
                     if (test_ -> updateSample(sampleRaw, sampleTest))
                     {
                         dataBuffer_.push_back(sampleTest);
-                        if (multiplexer_.isRunning())
-                        {
-                            multiplexer_.connectNextEnabledWrkElect();   
-                        }
                     }
                 }
             }
