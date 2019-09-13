@@ -72,7 +72,7 @@ def search_web(url_t):
 
         if new != None:
 
-	  # Sanitize new urls
+          # Sanitize new urls
 
           if elem not in new:
              new = elem + ".igem.org" + new
@@ -81,7 +81,7 @@ def search_web(url_t):
 
              if new[0] != "/":
                   new = "https://" + new
-	     else:
+             else:
                   new = "https:/" + new
 
           if "igem.org//" in new:
@@ -94,19 +94,19 @@ letters = list(string.ascii_uppercase)
 # If all the urls are already stored
 if os.path.isfile("urls") is False:
 
-	for elem in years:
-	    url_k = "https://" + elem + URL_s
-	    search_web(url_t=url_k)
+    for elem in years:
+        url_k = "https://" + elem + URL_s
+        search_web(url_t=url_k)
 
-	    for letter in letters:
-		 search_web(url_t = "https://" + str(elem) + URL_2s[0] + letter + URL_2s[1])
+        for letter in letters:
+            search_web(url_t = "https://" + str(elem) + URL_2s[0] + letter + URL_2s[1])
 
-	file_close = open("urls","w")
+        file_close = open("urls","w")
 
-	for link in urls:
-		file_close.write(link)
-		file_close.write("\n")
-	file_close.close()
+        for link in urls:
+            file_close.write(link)
+            file_close.write("\n")
+        file_close.close()
 else:
         with open("urls", "r") as filehandle:
                for line in filehandle:
@@ -143,7 +143,7 @@ def search(the_urls,filen,yearsn):
 
         global verbose,words,results
 
-	for link in the_urls:
+        for link in the_urls:
 
                 year = False
 
@@ -154,35 +154,35 @@ def search(the_urls,filen,yearsn):
                 if year == False:
                      return
 
-		try:
-			response = requests.get(link, headers=headers, timeout=1.5, allow_redirects=False)
-		except requests.exceptions.RequestException as e:
-		     if verbose == "y":
-	    		 print(e)
-		         print("Connection error with link " + link)
-		     continue
+                try:
+                    response = requests.get(link, headers=headers, timeout=1.5, allow_redirects=False)
+                except requests.exceptions.RequestException as e:
+                     if verbose == "y":
+                         print(e)
+                         print("Connection error with link " + link)
+                     continue
 
-		soup = BeautifulSoup(response.text, "html.parser")
+                soup = BeautifulSoup(response.text, "html.parser")
 
-		for line in soup.find_all(text = True):
+                for line in soup.find_all(text = True):
 
-		  for word in words:
-			if word in line and link not in results:
-		              results.append(link)
-		              if file_s == "y":
-                                   if filen == "0":
-			                file0.write(link)
-			                file0.write("\n")
-				   elif filen == "1":
-	                                file1.write(link)
-        	                        file1.write("\n")
-				   elif filen == "2":
-  	                                file2.write(link)
-        	                        file2.write("\n")
-                                   else:
-                                        file3.write(link)
-                                        file3.write("\n")
-		              print(str(len(results)) + " - " + link)
+                    for word in words:
+                        if word in line and link not in results:
+                            results.append(link)
+                            if file_s == "y":
+                                if filen == "0":
+                                    file0.write(link)
+                                    file0.write("\n")
+                                elif filen == "1":
+                                    file1.write(link)
+                                    file1.write("\n")
+                                elif filen == "2":
+                                    file2.write(link)
+                                    file2.write("\n")
+                                else:
+                                    file3.write(link)
+                                    file3.write("\n")
+                                print(str(len(results)) + " - " + link)
 
 thread1 = threading.Thread(target = search, args=(url_chunk[0], "0",years))
 thread2 = threading.Thread(target = search, args=(url_chunk[1], "1",years))
