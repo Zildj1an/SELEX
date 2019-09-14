@@ -19,6 +19,7 @@ import tkMessageBox
 
 cprint(figlet_format('iGEM Search', font='starwars'),'yellow', 'on_red', attrs=['bold'])
 
+'''
  ##########
  #  GUI   #
  ##########
@@ -47,6 +48,7 @@ E2.pack(side = RIGHT)
 # Bottom Frame
 bottom_frame = Frame(top)
 bottom_frame.pack(side = BOTTOM)
+
 def searchCallBack():
     # TODO send info downstairs
     tkMessageBox.showinfo("Searching...","Search in Progress")
@@ -55,6 +57,7 @@ B = Tkinter.Button(bottom_frame,text= "Search", command = searchCallBack, bd= 3)
 B.pack()
 top.mainloop()
 sys.exit()
+'''
 
 URL_s       = ".igem.org/Special:AllPages"
 URL_2s      = []
@@ -133,7 +136,7 @@ def search_web(url_t):
 letters = list(string.ascii_uppercase)
 
 # If all the urls are already stored
-if os.path.isfile("urls") is False:
+if os.path.isfile("urls_to_" + year) is False:
 
     for elem in years:
         url_k = "https://" + elem + URL_s
@@ -142,14 +145,14 @@ if os.path.isfile("urls") is False:
         for letter in letters:
             search_web(url_t = "https://" + str(elem) + URL_2s[0] + letter + URL_2s[1])
 
-        file_close = open("urls","w")
+        file_close = open("urls_to_"+year,"w")
 
         for link in urls:
             file_close.write(link)
             file_close.write("\n")
         file_close.close()
 else:
-        with open("urls", "r") as filehandle:
+        with open("urls_to_"+year, "r") as filehandle:
                for line in filehandle:
                     current = line[:-1]
                     urls.append(current)
@@ -193,7 +196,7 @@ def search(the_urls,filen,yearsn):
                            year = True
 
                 if year == False:
-                     return
+                     continue
 
                 try:
                     response = requests.get(link, headers=headers, timeout=1.5, allow_redirects=False)
