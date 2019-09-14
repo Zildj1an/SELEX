@@ -262,7 +262,7 @@ bbottomframe.pack(side = BOTTOM)
 
 def searchCallBack(words,years,file_name):
 
-    #main_exe(words,years,file_name)
+    main_exe(words,years,file_name)
     msg = "Search finished. You may now close this windows.\nYou can contribute to the source code at github.com/Zildj1an"
     tkMessageBox.showinfo("Search finished",msg)
 
