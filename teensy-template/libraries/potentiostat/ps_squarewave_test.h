@@ -44,10 +44,10 @@ namespace ps
             
         protected:
 
-            float startValue_ = -0.5;
-            float finalValue_ = 0.5;
+            float startValue_ = 0;
+            float finalValue_ = 1;
             float stepValue_ = 0.05;
-            float amplitude_ = 0.25;
+            float amplitude_ = 0.025;
             float window_ = 0.2;
 
             float maxValue_ = 1.0;
