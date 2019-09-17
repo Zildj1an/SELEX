@@ -7,7 +7,8 @@ from opentrons import labware, instruments, modules, robot
 from opentrons.util.vector import Vector
 from opentrons.drivers.rpi_drivers.gpio import set_button_light
 from time import sleep, monotonic, perf_counter
-import logging
+from functools import reduce
+import logging, os
 
 metadata = {
    'protocolName' : 'Latex affinity',
@@ -18,15 +19,15 @@ metadata = {
 
 # [1] Labware
 
-Falcon           = labware.load('Falcon_Samples',    slot = '1')
+Falcon           = labware.load('Falcon_Samples',    slot = 1)
 plate_samples    = labware.load('96-flat',       slot = 3)
-Eppendorf        = labware.load('Eppendorf_Samples', slot = 4)
-tiprack        = labware.load('opentrons-tiprack-300ul', slot=5)
+Eppendorf        = labware.load('Eppendorf_Samples', slot = 5)
+tiprack        = labware.load('opentrons-tiprack-300ul', slot=6)
 
 # Use the regular trash as trash_liquid, but displace the pipette to avoid collisions
 trash = robot.fixed_trash().top()
-displacement = Vector(0,30,100)
-trash_liquid = (trash[0], displacement)
+#displacement = Vector(0,30,100)
+trash_liquid = trash;#(trash[0], displacement)
 
 # [2] Pipettes
 pipette = instruments.P300_Single(mount = 'left', tip_racks=[tiprack])
@@ -42,10 +43,11 @@ def robot_wait_tiprack():
 
     if not robot.is_simulating():
        robot.comment("Waiting...")
+       os.system('/data/startpwm 1 1 1 16')
        while not robot._driver.read_button():
-          set_button_light(blue=True, red=True, green=False)
           sleep(0.5)
 
+       os.system('/data/stoppwm')
        robot._driver.turn_on_blue_button_light()
 
 
@@ -64,31 +66,32 @@ def addrow(well, num):
    return chr(ord(well[0])+num) + well[1:]
 
 
-def storage_samples(where, vol, new_tip='once', module = Eppendorfs, safe_flow_rate=15, mix=False, measure_time=True, downto=5):
+def storage_samples(where, dest, vol, new_tip='once', module = Eppendorf, safe_flow_rate=15, mix=False, measure_time=True, downto=5):
 
    # Where is an array: ['A1'] will always aspirate from that well. ['A1','A2','A3'] will transfer
    # from well A1 in module to first col in samples, A2 to second col, etc
 
    # safe_flow_rate sets the dispense rate
+   pipette.set_flow_rate(aspirate = 300, dispense = safe_flow_rate)
 
    if new_tip == 'once':
       custom_pick_up_tip()
 
-   if len(where) < 3:
+   if len(where) < 9:
       # Support for different origins
-      where *= 3
+      where *= 9
 
    first_dispense=True
    start_time=0
    
-   for sample,origin in zip(['A6', 'D6', 'D7'], where):
+   for sample,origin in zip([addrow(p,i) for p in dest for i in range(0,3)], where):
 
       # For every well in A1 - A3
 
       if mix:
-         pipette.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
-         pipette.mix(3,25,module.wells(origin))
-         pipette.set_flow_rate(aspirate = 50, dispense = safe_flow_rate)
+         pipette.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
+         pipette.mix(3,150,module.wells(origin))
+         pipette.set_flow_rate(aspirate = 300, dispense = safe_flow_rate)
       pipette.aspirate(vol,module.wells(origin).bottom())
       pipette.dispense(vol,plate_samples.wells(sample).bottom(downto))
       pipette.blow_out(plate_samples.wells(sample).bottom(downto))
@@ -96,22 +99,26 @@ def storage_samples(where, vol, new_tip='once', module = Eppendorfs, safe_flow_r
    if new_tip == 'once':
       pipette.drop_tip()
 
-   pipette.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
+   pipette.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
-def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
+def samples_trash(source, vol, new_tip='once', safe_flow_rate=15, downto=0, mix=False):
 
    # safe_flow_rate sets the aspirate rate
 
-   pipette.set_flow_rate(aspirate = safe_flow_rate, dispense = 50)
+   pipette.set_flow_rate(aspirate = safe_flow_rate, dispense = 300)
 
    if new_tip == 'once':
       custom_pick_up_tip()
 
-   for sample in ['A6', 'D6', 'D7']:
+   for sample in [addrow(p,i) for p in source for i in range(0,3)]:
 
       if new_tip == 'always':
          custom_pick_up_tip()
 
+      if mix:
+         pipette.set_flow_rate(aspirate = 50, dispense = 50)
+         pipette.mix(3,150,plate_samples.wells(sample).bottom(downto))
+         pipette.set_flow_rate(aspirate = safe_flow_rate, dispense = 300)
       pipette.aspirate(vol,plate_samples.wells(sample).bottom(downto))
       pipette.dispense(vol,trash_liquid)
       pipette.blow_out(trash_liquid)
@@ -122,7 +129,7 @@ def samples_trash(vol, new_tip='once', safe_flow_rate=15, downto=0):
    if new_tip == 'once':
       pipette.drop_tip()
 
-   pipette.set_flow_rate(aspirate=flow_rate['a_r'], dispense=flow_rate['d_r'])
+   pipette.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
 
 def robot_wait():
@@ -135,13 +142,13 @@ def robot_wait():
 
        robot._driver.turn_on_blue_button_light()
    
-def tween_wash(times=1):
+def tween_wash(src, times=1, mix=False):
 
    # (3) Lavado x3 con PBS 1x tween 0.1
    for x in range(1,times+1):
       # TODO altura
-      storage_samples(['A1'],200, module=Falcon, new_tip='once', downto = 11.7)
-      samples_trash(200, new_tip='once', downto = 0)
+      storage_samples(['A1'],['A6','D6','D7'], 200, module=Falcon, new_tip='once', downto = 11.7)
+      samples_trash(src, 200, new_tip='once', downto = 0, mix=mix)
 
 
 
@@ -153,32 +160,32 @@ robot._driver.turn_on_rail_lights()
 pipette.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
 # (1) Retirar buffer coating
-samples_trash(220, new_tip='once', downto = 0)
+#samples_trash(['A6','D6','D7'],220, new_tip='once', downto = 0)
 
 # (2) Lavado PBS-T x1
-tween_wash()
+tween_wash(['A6','D6','D7'])
 
 # (3) BSA 200
-storage_samples(['A1', 'A1', 'A2'],200, new_tip='once', mix=True, downto = 10)
+storage_samples(['A1', 'A1', 'A1', 'A1', 'A1', 'A2', 'A2', 'A2', 'A2'],['A6','D6','A7'],200, new_tip='once', mix=True, downto = 10)
 
 # (4) Incubar 1h
 robot_wait()
 
 # (5) Retirar BSA
-samples_trash(220, new_tip='once', downto = 0)
+samples_trash(['A6','D6','A7'],220, new_tip='once', downto = 0)
 
 # (6) Lavado x2
-tween_wash(times = 2)
+tween_wash(['A6','D6','A7'],times = 2)
 
 # (5) Add 100ul latex beads
 
-for epp,dest in [('C1','A6'), ('C1','A7'), ('C1','D7'), ('C1','A8'), ('C1','D8')]:
+for epp,dest in [('C1','A6'), ('C1','A7'), ('C1','D7'), ('C1','D8')]:
    # source, dest
 
    pipette.pick_up_tip()
 
    for pos in range(1,4):
-      pipette.mix(3,50,Eppendorf.wells(epp))
+      pipette.mix(3,150,Eppendorf.wells(epp))
       pipette.set_flow_rate(dispense=20)
       pipette.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)).bottom(10), new_tip='never', blow_out=True)
       pipette.set_flow_rate(dispense=200)
@@ -189,13 +196,13 @@ for epp,dest in [('C1','A6'), ('C1','A7'), ('C1','D7'), ('C1','A8'), ('C1','D8')
 robot_wait()
 
 # (7) Retirar 100ul
-samples_trash(100, new_tip='once', downto=0);
+samples_trash(['A6','A7','D7','D8'], 100, new_tip='once', downto=0);
 
 # (8) Lavado x2 con tween TODO RESUSPENDER A VEL MEDIA
-tween_wash(times=2)
+tween_wash(['A6','A7','D7','D8'],times=2, mix=True)
 
 # (9) Añadir 100ul H2O
-storage_samples(['B1'],100, new_tip='once');
+storage_samples(['B1'],['A6','D6','A7','D7','A8','D8'],100, new_tip='once');
 
 robot.turn_off_rail_lights()
 robot._driver.home()
