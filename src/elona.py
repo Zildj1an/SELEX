@@ -61,15 +61,14 @@ plate_samples    = labware.load('96-flat-1',       slot = 3)
 plate_buffers    = labware.load('96-flat',     slot = 6)
 td_lab           = labware.load(ninja_name, slot=1)
 Eppendorf        = labware.load('Eppendorf_Samples', slot = 4)
-tiprack_l        = labware.load('opentrons-tiprack-300ul', slot=5)
-tiprack_r        = labware.load('opentrons-tiprack-300ul', slot=9)
+tiprack_l        = labware.load('opentrons-tiprack-300ul', slot=9)
+tiprack_r        = labware.load('opentrons-tiprack-300ul', slot=5)
 # Note: tiprack_r is actually an 'opentrons-tiprack-300ul', but its name must be
 # different than tiprack_l's to prevent calibration issues
 
 # Use the regular trash as trash_liquid, but displace the pipette to avoid collisions
 trash = robot.fixed_trash().top()
-displacement = Vector(0,30,100)
-trash_liquid = (trash[0], displacement)
+trash_liquid = trash
 
 # [2] Pipettes
 pipette_l = instruments.P300_Single(mount = 'left', tip_racks=[tiprack_l])
@@ -86,8 +85,8 @@ def robot_wait_tiprack():
 
     if not robot.is_simulating():
        robot.comment("Waiting...")
+       set_button_light(blue=True, red=True, green=True)
        while not robot._driver.read_button():
-          set_button_light(blue=True, red=True, green=False)
           sleep(0.5)
 
        robot._driver.turn_on_blue_button_light()
@@ -254,7 +253,7 @@ def tween_wash(times=3):
       robot_wait()
       
       if x < 3:
-         pass#samples_trash(200, new_tip='always', downto = 0)
+         samples_trash(200, new_tip='always', downto = 0)
 
    end_time = perf_counter()
    log.warning(f'Tween wash duration: {end_time-start_time}')
@@ -280,11 +279,8 @@ pipette_l.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
 # (-2)
 # TODO ESTE PASO TIENE QUE ASPIRAR CASI AL FONDO. CALIBRAR A 10.7 mm bajo el tope del pozo
-#samples_trash(200, new_tip='always', downto = 0)
-#tween_wash()
-
-storage_samples(['A1'],200, new_tip='once', downto = 11.7)
-robot_wait()
+samples_trash(200, new_tip='always', downto = 0)
+tween_wash()
 
 # (1) 200ul of PBS 1x BSA 5% to plate
 # TODO BAJAR MAS
@@ -304,9 +300,6 @@ for epp,dest in [('A1','A1'), ('A2','A2'), ('A3','A3'), ('A4','A7'), ('A4','A8')
    pipette_l.pick_up_tip()
 
    for pos in range(1,6):
-      if '7' not in epp:
-         # Don't mix aptamer buffer
-         pipette_l.mix(3,50,Eppendorf.wells(epp))
       pipette_l.set_flow_rate(dispense=20)
       pipette_l.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)).bottom(10), new_tip='never', blow_out=True)
       pipette_l.set_flow_rate(dispense=200)
