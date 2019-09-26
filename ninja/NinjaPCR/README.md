@@ -4,7 +4,7 @@ This is the original NinjaPCR software, modified to allow OTA updates and contro
 
 The lid will automatically open when the system boots, close when a program starts, and open again when it is completed or stopped.
 
-You can use the OTA updater via "http://<address>/update"
+You can use the OTA updater via "http://\<address\>/update"
 
 NOTE: we were unable to use mDNS to connect to the server, so to control the module you'll have to either use it in AP mode, get your DHCP server to assign it a fixed IP, or manually find the IP address each time using, for example, nmap.
 
