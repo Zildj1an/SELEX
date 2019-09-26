@@ -92,5 +92,6 @@
 #define MAX_LID_PWM 1023
 #define MIN_LID_PWM 0
 
+#define USE_AUTOMATED_LID 1
 
 #endif /* ___BOARD_CONF_NINJAPCR___ */

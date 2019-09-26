@@ -96,20 +96,18 @@ bool isApMode = false;
 
 void setup() {
 
-    
-    //Serial.begin(BAUD_RATE);
 
-    //U0C0 ^= BIT(24) | BIT(23) | BIT(22);
-
+#ifdef USE_AUTOMATED_LID
     //********** CHANGE SERIAL PIN FUNCTION  TO GPIO **********
-    //GPIO 1 (TX) swap the pin to a GPIO.
-    pinMode(1, FUNCTION_3); 
     //GPIO 3 (RX) swap the pin to a GPIO.
     pinMode(3, FUNCTION_3); 
     //**************************************************
 
     LidServo.attach(1);
     LidServo.write(180);
+#else
+    Serial.begin(BAUD_RATE);
+#endif
     
     pinMode(PIN_WIFI_MODE, INPUT);
     delay(100);
