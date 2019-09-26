@@ -26,7 +26,7 @@
 #define DEBUG 1
 
 #define DEBUG_ADC /* Debug ADC */
-// #define DEBUG_NETWORK /* Debug Network Status */
+#define DEBUG_NETWORK /* Debug Network Status */
 // TODO DEBUG_TEMPERATURE
 // TODO_DEBUG_HARDWARE_OUTPUT
 

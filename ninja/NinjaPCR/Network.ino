@@ -6,8 +6,6 @@
 #include "pcr_includes.h"
 #include <EEPROM.h>
 #include <WiFiClient.h>
-#include <WiFiClient.h>
-#include <ESP8266mDNS.h>
 #include <ESP8266WiFiMulti.h>
 #include <esp8266_peri.h>
 
@@ -51,6 +49,10 @@ void wifi_send(char *response, char *funcName) {
 /* Handle request to "/" */
 void requestHandlerTop() {
     server.send(200, "text/plain", "NinjaPCR is DEAD! Long live SamuraiPCR! Version 1.0");
+    for (uint8_t i = 0; i < server.args(); i++) {
+        String sValue = server.arg(i);
+        LidServo.write(sValue.toInt());
+    }
 }
 /* Handle request to "/command" */
 void requestHandlerCommand() {
@@ -524,10 +526,18 @@ boolean startWiFiHTTPServerMode() {
 
 }
 int beginMDNS (const char *hostName) {
-    MDNS.begin(hostName);
+    if(MDNS.begin(hostName)) {
+      PCR_NETWORK_DEBUG_LINE("MDNS begin.");
+    }
     MDNS.addService("http", "tcp", 80);
     PCR_NETWORK_DEBUG_LINE("MDNS started.");
     PCR_NETWORK_DEBUG_LINE(hostName);
+}
+
+void requestHandlerReset() {
+  server.send(200, "text/html", "Resetting");
+  delay(1000);
+  ESP.restart();
 }
 
 void startNormalOperationServer() {
@@ -536,6 +546,7 @@ void startNormalOperationServer() {
     // Never remove it (for OTA configuration)
     server.on("/config", requestHandlerConfig);
     server.on("/update", requestHandlerFirmwareUpdate);
+    server.on("/reset",  requestHandlerReset);
 
     server.on("/", requestHandlerTop);
 

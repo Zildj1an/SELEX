@@ -66,7 +66,6 @@ void PID::Compute()
       else if (output < outMin)
         output = outMin;
       *myOutput = output;
-	  
       /*Remember some variables for next time*/
       lastInput = input;
       lastTime = now;
@@ -196,4 +195,3 @@ double PID::GetKi(){ return  dispKi;}
 double PID::GetKd(){ return  dispKd;}
 int PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL;}
 int PID::GetDirection(){ return controllerDirection;}
-

@@ -120,7 +120,7 @@ void Communicator::SendStatus() {
   statusPtr = AddParam(statusPtr, 'x', tc.getAnalogValueLid()); // Hardware output
   statusPtr = AddParam(statusPtr, 'y', tc.getAnalogValuePeltier()); // Hardware output
   statusPtr = AddParam(statusPtr, 'z', tc.GetTemp(), 1, false); // Sample temp
-  statusPtr = AddParam(statusPtr, 'w', tc.GetLidState()); // Lid state
+  statusPtr = AddParam(statusPtr, 'L', tc.GetLidState()); // Lid state
   statusPtr++; //to include null terminator
 
   int statusBufLen = statusPtr - statusBuf;

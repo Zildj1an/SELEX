@@ -92,14 +92,14 @@
 #define PLATE_PID_DEC_HIGH_D (240)
 
 #define PLATE_PID_DEC_NORM_P 2000
-#define PLATE_PID_DEC_NORM_I 800
-#define PLATE_PID_DEC_NORM_D 200
+#define PLATE_PID_DEC_NORM_I 200
+#define PLATE_PID_DEC_NORM_D 1000
 
 #define PLATE_PID_DEC_LOW_P 4000
 #define PLATE_PID_DEC_LOW_I 100
 #define PLATE_PID_DEC_LOW_D 200
 
-#define PLATE_BANGBANG_THRESHOLD 1.5
+#define PLATE_BANGBANG_THRESHOLD 5
 
 #endif /* PID_CONF_NINJAPCR_WIFI */
 
@@ -262,6 +262,7 @@ TCCR1A |= (1<<WGM11) | (1<<WGM10);
 #endif /* ifndef USE_WIFI */
   iszProgName[0] = '\0';
   iPlateThermistor.start();
+  iPlatePid.SetOutputLimits(MIN_PELTIER_PWM, MAX_PELTIER_PWM);
 }
 
 Thermocycler::~Thermocycler() {
@@ -384,12 +385,12 @@ PcrStatus Thermocycler::Start() {
 boolean Thermocycler::SetLidState(LidState st) {
 	if (iLidState == OPEN) {
 		if (st == CLOSED) {
-			Serial.print(CLOSE_LID);			
+			delay(1);//Serial.println(CLOSE_LID);			
 		}	
 	}
 	else {
 		if (st == OPEN) {
-			Serial.print(OPEN_LID);
+			delay(1);//Serial.println(OPEN_LID);
 		}
 	}
 	iLidState = st;
@@ -424,16 +425,28 @@ boolean Thermocycler::Loop() {
 
   case ELidWait:
     if (GetLidTemp() >= iTargetLidTemp - LID_START_TOLERANCE) {
-      //lid has warmed, begin program
-      iThermalDirection = OFF;
-      iPeltierPwm = 0;
-      PreprocessProgram();
-      iProgramState = ERunning;
+      //lid has warmed, begin counter
 
-      ipProgram->BeginIteration();
-      AdvanceToNextStep();
+      if (iLidWarmStart == 0) {
+        iLidWarmStart = millis();
+      }
 
-      iProgramStartTimeMs = millis();
+      //If 60 seconds have passed after lid has warmed, begin program
+      unsigned long elapsedTime = millis() - iLidWarmStart;
+
+      if (elapsedTime > 600*1000) {
+        iLidWarmStart = 0;
+      
+        iThermalDirection = OFF;
+        iPeltierPwm = 0;
+        PreprocessProgram();
+        iProgramState = ERunning;
+
+        ipProgram->BeginIteration();
+        AdvanceToNextStep();
+
+        iProgramStartTimeMs = millis();
+      }
     }
     break;
 
@@ -491,8 +504,8 @@ boolean Thermocycler::Loop() {
       PCR_DEBUG_LINE(ipCurrentStep->GetTemp());
       if (iRamping && ipCurrentStep != NULL && abs(ipCurrentStep->GetTemp() - GetTemp()) <= CYCLE_START_TOLERANCE) {
         iRamping = false;
-        SetLidState(OPEN);
       }
+      SetLidState(OPEN);
       break;
     }
   }
@@ -695,7 +708,7 @@ void Thermocycler::ControlPeltier() {
 
     if (iDecreasing && iTargetPlateTemp > PLATE_PID_DEC_LOW_THRESHOLD) {
       if (iTargetPlateTemp < plateTemp) {
-        iPlatePid.ResetI();
+        //iPlatePid.ResetI();
       }
       else {
         iDecreasing = false;
@@ -849,7 +862,7 @@ void Thermocycler::CheckHardware(float *lidTemp, float *wellTemp) {
         }
     }
 
-    if (errorsCount > 3) {
+    if (errorsCount > 5) {
         PCR_DEBUG_LINE("Continuous errors found!");
         PCR_DEBUG_LINE(errNo);
         iHardwareStatus = errNo;
@@ -940,10 +953,10 @@ void Thermocycler::SetPeltier(ThermalDirection dir, int pwm /* Signed value of p
   // TODO Use table of internal heat & peltier efficiency
   if (dir == COOL) {
     if (GetPlateTemp() < 30) {
-      pwm = pwm/8;
+      pwm = pwm;
     }
     else if (GetPlateTemp() < 35) {
-      pwm = pwm/4;
+      pwm = pwm/2;
     }
     else if (GetPlateTemp() < 40) {
       pwm = pwm/2;
@@ -952,6 +965,9 @@ void Thermocycler::SetPeltier(ThermalDirection dir, int pwm /* Signed value of p
       pwm = pwm * 2 / 3;
     }
   }
+
+  
+  
   pwm = max(-MAX_PELTIER_PWM, min(MAX_PELTIER_PWM, (int)(pwm * iPowerOutputRatio)));
     Thermocycler::ThermalDirection dirActual;
     int pwmActual;
@@ -1074,9 +1090,9 @@ void Thermocycler::ProcessCommand(SCommand& command) {
     ProgramStore::StoreContrast(command.contrast);
   }
   else if (command.command == SCommand::LidOpen) {
-    iLidState=OPEN;
+    SetLidState(OPEN);
   }
   else if (command.command == SCommand::LidClosed) {
-    iLidState=CLOSED;
+    SetLidState(CLOSED);
   }
 }

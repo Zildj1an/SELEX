@@ -59,13 +59,7 @@ public:
 
   enum ControlMode {
     EBangBang,
-    EPIDLid,
     EPIDPlate
-  };
-
-  enum LidState {
-	OPEN = 0,
-	CLOSED = 1
   };
 
   Thermocycler();
@@ -91,7 +85,6 @@ public:
   boolean Ramping() { return iRamping; }
   boolean Paused() { return iPaused; }
   int GetPeltierPwm() { return iPeltierPwm; }
-  double GetLidTemp() { return iLidThermistor.GetTemp(); }
   double GetPlateTemp() { return iPlateThermistor.GetTemp(); }
   double GetTemp () { return iEstimatedSampleTemp; }
   double GetPlateResistance() { return iPlateThermistor.GetResistance(); }
@@ -101,19 +94,15 @@ public:
   boolean InControlledRamp() { return iRamping && ipCurrentStep->GetRampDurationS() > 0 && ipPreviousStep != NULL; }
 
   int getAnalogValuePeltier() { return analogValuePeltier; }
-  int getAnalogValueLid() { return analogValueLid; }
-
-  LidState GetLidState() { return iLidState; }
 
   // control
-  void SetProgram(Cycle* pProgram, Cycle* pDisplayCycle, const char* szProgName, int lidTemp); //takes ownership of cycles
+  void SetProgram(Cycle* pProgram, Cycle* pDisplayCycle, const char* szProgName); //takes ownership of cycles
   void Stop();
   boolean Pause();
   boolean Resume();
   boolean NextStep();
   boolean NextCycle();
   PcrStatus Start();
-  boolean SetLidState(LidState st);
   void ProcessCommand(SCommand& command);
 
   // internal
@@ -123,21 +112,17 @@ public:
 private:
   struct CyclerStatus {
       long timestamp;
-      float lidTemp;
       float wellTemp;
-      int lidOutput;
       int wellOutput;
       HardwareStatus hardwareStatus;
   };
 private:
-  void ReadLidTemp();
   void ReadPlateTemp();
   void CalcPlateTarget();
   void ControlPeltier();
-  void ControlLid();
   void PreprocessProgram();
   void UpdateEta();
-  void CheckHardware(float *lidTemp, float *wellTemp);
+  void CheckHardware(float *wellTemp);
 
   //util functions
   void AdvanceToNextStep();
@@ -145,13 +130,11 @@ private:
   void PrepareStep();
   void SetPlateControlStrategy();
   void SetPeltier(ThermalDirection dir, int pwm);
-  void SetLidOutput(int drive);
 public:
   Communicator* ipCommunicator;
 private:
   // components
   Display* ipDisplay;
-  CLidThermistor iLidThermistor;
   CPlateThermistor iPlateThermistor;
   ProgramComponentPool<Cycle, 6> iCyclePool;
   ProgramComponentPool<Step, 20> iStepPool;
@@ -159,7 +142,6 @@ private:
   // state
   ProgramState iProgramState;
   double iTargetPlateTemp;
-  double iTargetLidTemp;
   double iEstimatedSampleTemp;
   boolean iTempUpdated;
   Cycle* ipProgram;
@@ -180,7 +162,6 @@ private:
 
   ControlMode iPlateControlMode;
   HardwareStatus iHardwareStatus;
-  LidState iLidState;
 
   // Log buffer
   CyclerStatus statusBuff[CyclerStatusBuffSize];
@@ -189,7 +170,6 @@ private:
 
   // peltier control
   PID iPlatePid;
-  CPIDController iLidPid;
   ThermalDirection iThermalDirection; //holds actual real-time state
   double iPeltierPwm;
 
@@ -204,12 +184,14 @@ private:
   double iElapsedFastRampDegrees;
   unsigned long iTotalElapsedFastRampDurationMs;
 
+  //Time of lid warming
+  unsigned long iLidWarmStart = 0;
+
   double iRampStartTemp;
   unsigned long iRampElapsedTimeMs;
   unsigned long iEstimatedTimeRemainingS;
   boolean iHasCooled;
   int analogValuePeltier;
-  int analogValueLid;
 };
 
 #endif

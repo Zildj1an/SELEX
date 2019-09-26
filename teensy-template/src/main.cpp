@@ -36,13 +36,19 @@ extern "C" int main(void)
 
     Serial.begin(UsbSerialBaudrate);
     systemState.initialize();
-    systemState.setTestTimerCallback(timerCallback);
+    systemState.setTestTimerCallback(timerCallback);	
+    //pinMode(A14, OUTPUT);
+    //analogWriteResolution(12);
+    //pinMode(A10, INPUT);
+    //analogReadResolution(12);
+    //analogWrite(A14, 2048);
 
     while(1) {
         systemState.processMessages();
         systemState.serviceDataBuffer();
         systemState.updateMessageData();
-        delay(100);
+	//Serial.println(analogRead(A10));
+        delay(10);
     }
 
 /*

@@ -1,9 +1,8 @@
 #include <LEAmDNS.h>
-#include <ESP8266mDNS.h>
 #include <LEAmDNS_lwIPdefs.h>
+#include <ESP8266mDNS.h>
 #include <LEAmDNS_Priv.h>
 #include <ESP8266mDNS_Legacy.h>
-#include <esp8266_peri.h>
 
 /*
  *  openpcr.pde - OpenPCR control software.tt
@@ -36,6 +35,8 @@
 #include <ESP8266HTTPClient.h>
 #include "serialcontrol_chrome.h"
 #include "wifi_communicator.h"
+
+Servo LidServo;
 
 
 #ifdef DEBUG
@@ -96,9 +97,19 @@ bool isApMode = false;
 void setup() {
 
     
-    Serial.begin(BAUD_RATE);
+    //Serial.begin(BAUD_RATE);
 
-    //U0C0 ^= BIT(24) | BIT(23) | BIT(22);    
+    //U0C0 ^= BIT(24) | BIT(23) | BIT(22);
+
+    //********** CHANGE SERIAL PIN FUNCTION  TO GPIO **********
+    //GPIO 1 (TX) swap the pin to a GPIO.
+    pinMode(1, FUNCTION_3); 
+    //GPIO 3 (RX) swap the pin to a GPIO.
+    pinMode(3, FUNCTION_3); 
+    //**************************************************
+
+    LidServo.attach(1);
+    LidServo.write(180);
     
     pinMode(PIN_WIFI_MODE, INPUT);
     delay(100);
@@ -214,7 +225,7 @@ void loop() {
 bool startLamp = false;
 void checkSerialConnection() {
     PCR_DEBUG("pcr1.2"); //TODO
-    Serial.print("\n");
+    //Serial.print("\n");
 #ifdef USE_STATUS_PINS
     digitalWrite(PIN_STATUS_A, (startLamp)?HIGH:LOW);
 #endif /* USE_STATUS_PINS */

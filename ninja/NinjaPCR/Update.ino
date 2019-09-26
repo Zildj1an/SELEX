@@ -63,7 +63,7 @@ void clearOTAFlag() {
 
 void loadOTAConfig() {
     char typeValueCh = EEPROM.read(EEPROM_OTA_TYPE_ADDR);
-    Serial.print(typeValueCh);
+    //Serial.print(typeValueCh);
     int otaType = typeValueCh - '0';
 
     if (otaType == OTA_TYPE_LOCAL_UPLOAD) {
@@ -99,7 +99,7 @@ void loadOTAConfig() {
         isUpdateMode = false;
     }
 
-    Serial.print("OTA Type=");
+    //Serial.print("OTA Type=");
     PCR_DEBUG_LINE(otaType);
 }
 
@@ -152,15 +152,15 @@ void startUpdaterServer() {
     server.on("/config", requestHandlerOTAError);
     server.on("/restart", requestHandlerRestart);
     server.begin();
-    Serial.printf("HTTPUpdateServer ready!");
+    //Serial.printf("HTTPUpdateServer ready!");
 }
 
 /* Handle request to "/config"  (OTA conf) */
 // Restart device in binary upload mode
 void requestHandlerConfig() {
     String type = server.arg("ot");
-    Serial.print("type=");
-    Serial.print(type);
+    //Serial.print("type=");
+    //Serial.print(type);
     saveStringToEEPROM(type, EEPROM_OTA_TYPE_ADDR, 1);
     saveStringToEEPROM(OPENPCR_FIRMWARE_VERSION_STRING,
     EEPROM_OTA_CURRENT_VERSION_ADDR,
@@ -175,8 +175,8 @@ void requestHandlerConfig() {
 // Download the latest binary by HTTPS
 void requestHandlerFirmwareUpdate() {
     String type = server.arg("ot");
-    Serial.print("type=");
-    Serial.print(type);
+    //Serial.print("type=");
+    //Serial.print(type);
     saveStringToEEPROM("2", EEPROM_OTA_TYPE_ADDR, 1);
     saveStringToEEPROM(OPENPCR_FIRMWARE_VERSION_STRING,
     EEPROM_OTA_CURRENT_VERSION_ADDR,
@@ -196,28 +196,27 @@ void execUpdate() {
     PCR_DEBUG_LINE("Updating...");
     // Fetch MD5 of latest firmware by SSL
     String md5 = getMD5("/secure/NinjaPCR.md5");
-    Serial.println("Expected MD5=" + md5);
+    //Serial.println("Expected MD5=" + md5);
 
     t_httpUpdate_return ret = HTTP_UPDATE_FAILED;
     ret = ninjaUpdate.update("http://midl.ddns.net/update/NinjaPCR.bin", md5);
 
     switch (ret) {
     case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ninjaUpdate.getLastError(), ninjaUpdate.getLastErrorString().c_str());
-        Serial.printf("HTTP_UPDATE_FAILD Error");
+        //Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ninjaUpdate.getLastError(), ninjaUpdate.getLastErrorString().c_str());
+        //Serial.printf("HTTP_UPDATE_FAILD Error");
         break;
 
     case HTTP_UPDATE_NO_UPDATES:
-        Serial.printf("HTTP_UPDATE_NO_UPDATES");
+        //Serial.printf("HTTP_UPDATE_NO_UPDATES");
         break;
 
     case HTTP_UPDATE_OK:
-        Serial.printf("HTTP_UPDATE_OK");
+        //Serial.printf("HTTP_UPDATE_OK");
         break;
     default:
-        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ninjaUpdate.getLastError(), ninjaUpdate.getLastErrorString().c_str());
+        //Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ninjaUpdate.getLastError(), ninjaUpdate.getLastErrorString().c_str());
         break;
     }
     ESP.restart();
 }
-

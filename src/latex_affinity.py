@@ -77,9 +77,9 @@ def storage_samples(where, dest, vol, new_tip='once', module = Eppendorf, safe_f
    if new_tip == 'once':
       custom_pick_up_tip()
 
-   if len(where) < 9:
+   if len(where) < 3*len(dest):
       # Support for different origins
-      where *= 9
+      where *= 3*len(dest)
 
    first_dispense=True
    start_time=0
@@ -147,7 +147,7 @@ def tween_wash(src, times=1, mix=False):
    # (3) Lavado x3 con PBS 1x tween 0.1
    for x in range(1,times+1):
       # TODO altura
-      storage_samples(['A1'],['A6','D6','D7'], 200, module=Falcon, new_tip='once', downto = 11.7)
+      storage_samples(['A1'],src, 200, module=Falcon, new_tip='once', downto = 11.7)
       samples_trash(src, 200, new_tip='once', downto = 0, mix=mix)
 
 
@@ -160,7 +160,7 @@ robot._driver.turn_on_rail_lights()
 pipette.set_flow_rate(aspirate=flow_rate['a_l'], dispense=flow_rate['d_l'])
 
 # (1) Retirar buffer coating
-#samples_trash(['A6','D6','D7'],220, new_tip='once', downto = 0)
+samples_trash(['A6','D6','D7'],220, new_tip='once', downto = 0)
 
 # (2) Lavado PBS-T x1
 tween_wash(['A6','D6','D7'])
@@ -179,10 +179,10 @@ tween_wash(['A6','D6','A7'],times = 2)
 
 # (5) Add 100ul latex beads
 
+pipette.pick_up_tip()
+
 for epp,dest in [('C1','A6'), ('C1','A7'), ('C1','D7'), ('C1','D8')]:
    # source, dest
-
-   pipette.pick_up_tip()
 
    for pos in range(1,4):
       pipette.mix(3,150,Eppendorf.wells(epp))
@@ -190,7 +190,9 @@ for epp,dest in [('C1','A6'), ('C1','A7'), ('C1','D7'), ('C1','D8')]:
       pipette.transfer(100,Eppendorf.wells(epp),plate_samples.wells(addrow(dest,pos-1)).bottom(10), new_tip='never', blow_out=True)
       pipette.set_flow_rate(dispense=200)
 
-   pipette.drop_tip()
+pipette.drop_tip()
+
+pipette.start_at_tip(tiprack.well('F3'))
 
 # (6) Pausar para incubar 1h - PAUSE (Hand made)
 robot_wait()

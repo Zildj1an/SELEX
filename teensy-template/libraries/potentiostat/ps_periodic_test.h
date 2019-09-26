@@ -11,8 +11,8 @@ namespace ps
     {
         public:
 
-            static constexpr float DefaultAmplitude = 0.2; 
-            static constexpr float DefaultOffset = 1.2;
+            static constexpr float DefaultAmplitude = 0.5; 
+            static constexpr float DefaultOffset = 1;
             static constexpr float DefaultShift = 0.0;
             static constexpr uint64_t DefaultPeriod = UINT64_C(1000000);
             static constexpr uint32_t DefaultNumCycles = UINT32_C(10);

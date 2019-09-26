@@ -264,11 +264,12 @@ namespace ps
                     // Send sample for tests which use custom sampling methods
                     // ------------------------------------------------------------------
                     Sample sampleRaw  = {t, volt, curr}; // Raw sample data
-                    Sample sampleTest = {0, 0.0, 0.0}; // Custom sample data (set in updateSample)
                     dataBuffer_.push_back(sampleRaw);
+                    Sample sampleTest = {0, 0.0, 0.0}; // Custom sample data (set in updateSample)
+                    //dataBuffer_.push_back(sampleRaw);
                     if (test_ -> updateSample(sampleRaw, sampleTest))
                     {
-                        dataBuffer_.push_back(sampleTest);
+                        //dataBuffer_.push_back(sampleTest);
                     }
                 }
             }

@@ -222,6 +222,7 @@ namespace ps
 
             if (stepModPos < halfSamplePeriod_)
             {
+		//return true;
                 // forward step
                 if ((halfSamplePeriod_ - stepModPos - 1) < windowLenUs_)
                 {
@@ -231,6 +232,7 @@ namespace ps
             }
             else
             {
+		//return false
                 // reverse step
                 if ((samplePeriod_ - stepModPos - 1) < windowLenUs_)
                 {

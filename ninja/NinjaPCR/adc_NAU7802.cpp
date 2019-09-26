@@ -7,7 +7,7 @@
 
 #ifdef USE_ADC_NAU7802
 /* Skip init sequence and return dummy values. This mode is for testing board without */
-// #define ADC_DUMMY_MODE 
+//#define ADC_DUMMY_MODE 
 #define NO_ERR 0x00
 HardwareStatus switchADCConfig (uint8_t channel, uint8_t SPS0, uint8_t SPS1, uint8_t SPS2);
 /* Implementation of NAU7802 A/D Converter */
@@ -94,16 +94,16 @@ bool waitForFlag (uint8_t regAddress, int flagIndex, bool flagValue, long timeou
     }
     if (flagResult == flagValue) {
       /*
-        Serial.print("e=");
-        Serial.print(count);
-        Serial.print(".");
+        //Serial.print("e=");
+        //Serial.print(count);
+        //Serial.print(".");
         PCR_ADC_DEBUG_LINE(elapsed);
         */
         return true;
     }
   } while (elapsed < timeoutMsec);
   // Timeout
-  Serial.print("TIMEOUT! resetting.");
+  //Serial.print("TIMEOUT! resetting.");
   initADC();
   PCR_ADC_DEBUG_LINE(elapsed);
   delay(200);
@@ -115,6 +115,10 @@ uint8_t initADC () {
   if (isAdcInitialized) {
     return 0;
   }
+
+  #ifdef ADC_DUMMY_MODE
+    return 0;
+  #endif
   delay(200);
   isAdcInitialized = true;
 
@@ -176,7 +180,7 @@ uint8_t initADC () {
   // Start conversion
   setRegisterBit(NAU7802_REG_ADDR_CTRL2, NAU7802_BIT_CS);
   
-  Serial.print("CTRL2=");
+  //Serial.print("CTRL2=");
   PCR_ADC_DEBUG_LINE(wellADCReadRegValue(NAU7802_REG_ADDR_CTRL2));
   if (wellADCReadRegValue(NAU7802_REG_ADDR_REVISION)==0x0F) {
     PCR_ADC_DEBUG_LINE("Rev code OK");
@@ -257,7 +261,7 @@ float getADCValue () {
 */
 HardwareStatus getWellADCValue (float *val) {
 #ifdef ADC_DUMMY_MODE
-  return 0;
+  return (HardwareStatus)0;
 #endif /* ADC_DUMMY_MODE */
   // Wait for "Cycle ready" flag
   if (waitForFlag(NAU7802_REG_ADDR_PU_CTRL, NAU7802_BIT_CR, true, 500)==false) { PCR_ADC_DEBUG_LINE("ERROR WHILE READING WELL"); return HARD_ERROR_ADC; }
@@ -273,7 +277,7 @@ HardwareStatus getWellADCValue (float *val) {
 // Read ADC value of channel 1
 HardwareStatus getLidADCValue (float *val) {
 #ifdef ADC_DUMMY_MODE
-  return 0;
+  return (HardwareStatus)0;
 #endif /* ADC_DUMMY_MODE */
   // Wait for "Cycle ready" flag
   if (waitForFlag(NAU7802_REG_ADDR_PU_CTRL, NAU7802_BIT_CR, true, 500)==false) {PCR_ADC_DEBUG_LINE("ERROR WHILE READING LID"); return HARD_ERROR_ADC; }

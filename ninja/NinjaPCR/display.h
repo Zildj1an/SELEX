@@ -54,5 +54,3 @@ private:
 };
 
 #endif /* ifndef _DISPLAY_H_ */
-
-
