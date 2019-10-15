@@ -39,11 +39,7 @@ paper = labware.load(paper_sheet, slot=1)
 pipette = instruments.P300_Single(mount='left')
 
 
-cmd  = "ffplay -nodisp -autoexit /data/cera.mp3 &> /dev/null"
-cmd2 = "pkill ffplay"
-
-if not robot.is_simulating():
-	p = Popen(cmd,shell=True)
+robot._driver.turn_on_rail_lights()
 
 pipette.pick_up_tip(location=stamps.wells('A1'))
 
@@ -63,12 +59,13 @@ for j in range(1,3):
     pipette.move_to(wax.wells('A1').top(20))
 
     for i in range(1,4):
-        pipette.move_to(paper.wells(f'A{i}').top())
+        pipette.move_to(paper.wells(f'A{j}').top())
         pipette.aspirate(30)
-        pipette.move_to(paper.wells(f'A{i}').top(-2))
+        pipette.move_to(paper.wells(f'A{j}').top(-2))
         pipette.dispense(30)
 
 pipette.return_tip()
 
-if not robot.is_simulating():
-	os.system(cmd2)
+
+robot._driver.turn_off_rail_lights()
+
