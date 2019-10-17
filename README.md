@@ -5,7 +5,7 @@
 
 These are biotechnological protocols for obtaining trained libraries of DNA aptamer molecules automated with the Opentrons OT-2 robot. This protocol is part of our contribution to the 2019 iGEM international biotechnology competition. We also did an **Artificial Intelligence algorithm** to predict the optimal DNA molecule shapes (more info below). In addition, you can use our <a href="https://github.com/Zildj1an/iGem_search_engine">search engine</a> for words in previous or this wear team's websites. For the thermocycler we built the Ninja-PCR. More information about the entire project can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>. The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-alike, as shown above, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR). You can update a new binary since ESP8266 SystemOnChip includes the TCP/IP stack. We also recommend the usage of an external Raspberry Pi to uninterruptedly provide the robot with Wi-Fi.
 
-<img src="https://github.com/Zildj1an/SELEX/OT_Robot/img/blob/master/img/robot.jpg" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="445"/>
+<img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/robot.jpg" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/img/ninja.png" alt="" width="445"/>
 
 ## Artificial Intelligence Algorithm
 
