@@ -263,11 +263,10 @@ bbottomframe.pack(side = BOTTOM)
 def searchCallBack(words,years,file_name):
 
     main_exe(words,years,file_name)
-    msg = "Search finished. You may now close this windows.\nYou can contribute to the source code at github.com/Zildj1an"
+    msg = "Search finished. You may now close these windows.\nYou can contribute to the source code at github.com/Zildj1an"
     tkMessageBox.showinfo("Search finished",msg)
 
 B = Tkinter.Button(bbottomframe,text= "Search", command = lambda: searchCallBack(words=E1.get().split(','),years=E2.get().split(','),file_name=E3.get()), bd= 3)
 B.pack(side = BOTTOM)
 top.mainloop()
 sys.exit()
-
