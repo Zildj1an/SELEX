@@ -1,15 +1,28 @@
-# OT-2 Robot DNA-SELEX Protocol
+# SELEX Process with AI
+
+## Introduction
+
+This was a long project that involved:
+
+* The robotic automatization of biotechnological protocols [1]
+* The usage of Artifical Intelligence [2]
+* A website design 
+* A search engine [3]
+* And many, many custom hardware [4] 
+You can find information on installation and usage at the end [5]
+
+## [1] Biotechnological Designs
 
 ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000) [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://2019.igem.org/Team:MADRID_UCM/Landing)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
-These are biotechnological protocols for obtaining trained libraries of DNA aptamer molecules automated with the Opentrons OT-2 robot. This protocol is part of our contribution to the 2019 iGEM international biotechnology competition. We also did an **Artificial Intelligence algorithm** to predict the optimal DNA molecule shapes (more info below). In addition, you can use our <a href="https://github.com/Zildj1an/iGem_search_engine">search engine</a> for words in previous or this wear team's websites. For the thermocycler we built the Ninja-PCR. More information about the entire project can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>. The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-alike, as shown above, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR). You can update a new binary since ESP8266 SystemOnChip includes the TCP/IP stack. We also recommend the usage of an external Raspberry Pi to uninterruptedly provide the robot with Wi-Fi.
+Folder OT_Robot contains biotechnological protocols for obtaining trained libraries of DNA aptamer molecules automated with the Opentrons OT-2 robot. This protocol is part of our contribution to the 2019 iGEM international biotechnology competition. For the thermocycler we built the Ninja-PCR. More information about the entire project can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>. The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-alike, as shown above, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR). You can update a new binary since ESP8266 SystemOnChip includes the TCP/IP stack. We also recommend the usage of an external Raspberry Pi to uninterruptedly provide the robot with Wi-Fi. You can find more information about usage at [5].
 
 <img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/robot.jpg" alt="" width="350"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/ninja.png" alt="" width="445"/>
 
-## Artificial Intelligence Algorithm
+## [2] Artificial Intelligence Algorithm: GAN network
 
-It is a Generative adversarial network, divided in two neuronal networks: the Generative and the Discriminative. CNN nets are used. 
+We also did an **Artificial Intelligence algorithm** to predict the optimal DNA molecule shapes. It is a Generative adversarial network, divided in two neuronal networks: the Generative and the Discriminative. CNN nets are used. 
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/molecule2.gif" alt="" width="400"/></p>
 
@@ -20,6 +33,10 @@ Aptamers are a cutting-edge technology that is revolutionizing biotechnology, fr
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/aptameros.png" alt="" width="400"/></p>
 
 _The SELEX process_
+
+## [3] iGem Search Engine
+
+In addition, you can use our <a href="https://github.com/Zildj1an/iGem_search_engine">search engine</a> for words in previous or this wear team's websites
 
 ## Installation and Usage
 
