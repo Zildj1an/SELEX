@@ -1,4 +1,4 @@
-# SELEX Process with AI
+# SELEX Process with Artificial Intelligence
 
 ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000) [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://2019.igem.org/Team:MADRID_UCM/Landing)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
