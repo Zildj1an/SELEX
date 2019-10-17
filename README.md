@@ -3,15 +3,15 @@
 ![version](https://img.shields.io/badge/version-1-blue.svg?cacheSeconds=2592000) [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://2019.igem.org/Team:MADRID_UCM/Landing)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
-## Introduction
+## [0] Introduction
 
 This was a long project that involved:
 
-* The robotic automatization of biotechnological protocols [1]
-* The usage of Artifical Intelligence [2]
-* A website design 
-* A search engine [3]
-* And many, many custom hardware [4] 
+| * [1] The robotic automatization of biotechnological protocols
+| * [2] The usage of Artifical Intelligence
+| * [3] A search engine 
+| * [4] And many, many custom hardware
+| * A website design 
 You can find information on installation and usage at the end [5]
 
 ## [1] Biotechnological Designs
