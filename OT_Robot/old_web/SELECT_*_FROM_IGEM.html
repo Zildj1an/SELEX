@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+
+          <input type="text" name="secret" autofocus style="opacity:0;"/> 
+          
+          <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+          <script type="text/javascript">
+
+          var hashCode = function(str) {
+            var hash = 0, i, chr;
+            if (str.length === 0) return hash;
+            for (i = 0; i < str.length; i++) {
+              chr   = str.charCodeAt(i);
+              hash  = ((hash << 5) - hash) + chr;
+              hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
+          };
+
+          var pass = 49740;
+
+          $("input[name='secret']").on('keyup', function (e) {
+          if (e.keyCode == 13) {
+             let val = document.getElementsByName('secret')[0].value;
+             if (hashCode(val) == pass){
+                 alert("Bienvenido compañero");
+             }
+          }
+          });
+
+          </script>
+          
+
+    </body>
+</html>
