@@ -11,7 +11,8 @@ This was a long project that involved:
  * [2] The usage of Artifical Intelligence
  * [3] A search engine 
  * [4] And many, many custom hardware
- * A website design 
+ * A website design
+
 You can find information on installation and usage at the end [5]
 
 ## [1] Biotechnological Designs 🔬
