@@ -39,6 +39,8 @@ _Generated aptamer_
 
 In addition, you can use our <a href="https://github.com/Zildj1an/iGem_search_engine">search engine</a> for words in previous or this wear team's websites. This is a python search engine with GUI for searching words in each competition year and team's website.
 
+<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/iGem_Search_Engine/search.png" alt="" width="400"/></p>
+
 ## [4] Other suggested custom hardware
 
 We also handcrafted some modules from ourselves to make things easier and make them fit in the robot. We used a 3D-printer for some of our designs to store Eppendorf and Falcon tipracks. We also deisgned a PCB for a potenciostat microcontroller Teensy 3.0 and an auxiliar thermic module to cool to 4 degrees Celsius, and so on.
