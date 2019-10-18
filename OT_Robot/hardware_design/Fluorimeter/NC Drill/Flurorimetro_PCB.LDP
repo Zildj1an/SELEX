@@ -1,0 +1,3 @@
+Layer Pairs Export File for PCB: C:\Irene\UCM\iGEM\AEGIS\Fluorímetro\PCB\Fluorimetro_Project\Flurorimetro_PCB.PcbDoc
+LayersSetName=Top_Bot_Thru_Holes|DrillFile=flurorimetro_pcb-roundholes.txt|DrillLayers=gtl,gbl
+LayersSetName=Top_Bot_Slot_Holes|DrillFile=flurorimetro_pcb-slotholes.txt|DrillLayers=gtl,gbl
