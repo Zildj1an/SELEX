@@ -63,38 +63,36 @@ Our project has a lot of software involved, including:
 
 1. A graphical Search Engine for words in websites of previous years of iGem:
    
-   You can run it from your terminal using:
-	```
-	$ python search.py
-	```
-	You might have some dependencies not installed, you just need to do:
-	```
-	$ sudo pip install <dependencies>	
-	```
+You can run it from your terminal using:
+```
+$ python search.py
+```
+You might have some dependencies not installed, you just need to do:
+```
+$ sudo pip install <dependencies>	
+```
 
 2. The Aptamer Folding:
 
-   In the folder DB_Creation, execute (if you use Mac or Linux), for terminal:
-   ```
-   $ python DB_Creation_Terminal.py
-   ```
-   You can also speed things up with threads with bash run_several.sh, but be aware that you would need to modify the absolute path to the Rosetta software.
+In the folder DB_Creation, execute (if you use Mac or Linux), for terminal:
+```
+$ python DB_Creation_Terminal.py
+```
+You can also speed things up with threads with bash run_several.sh, but be aware that you would need to modify the absolute path to the Rosetta software.
 
-   In the folder GAN_Network, from terminal:
-	```
-	$ python Main.py
-	```
-   Other files that could be used if the judge wants:
-   - 3D_structure_creation_in_pdb.py Creates only one PDB for the DDBB (testing puposes)
-   - GAN_Network.py (Same thing as GAN_Network folder but in one file)
+In the folder GAN_Network, from terminal:
+```
+$ python Main.py
+```
+Other files that could be used if the judge wants:
+- 3D_structure_creation_in_pdb.py Creates only one PDB for the DDBB (testing puposes)
+- GAN_Network.py (Same thing as GAN_Network folder but in one file)
 
 3. OT_Robot protocols
 
-	It contains tons of biotechnological protocols automated for the Opentrons OT2 robot in Python. The most important one is the SELEX process. To run these protocols you just need to drug and drop the protocols into the OT2 app.
+It contains tons of biotechnological protocols automated for the Opentrons OT2 robot in Python. The most important one is the SELEX process. To run these protocols you just need to drug and drop the protocols into the OT2 app.
 
-    You can also find in here the hardware design.
-[Uploading JUDGES.zip…]()
-
+You can also find in here the hardware design.
 
 You can clone this repo or download the zip. Make sure all the dependencies are covered. First line is for installation of pip at most Linux distributions.
 
