@@ -42,7 +42,7 @@ _Generated aptamer_
 
 ## [3] iGem Search Engine 🔍 
 
-In addition, you can use our <a href="https://github.com/Zildj1an/iGem_search_engine">search engine</a> for words in previous or this wear team's websites. This is a python search engine with GUI for searching words in each competition year and team's website.
+In addition, you can use our Search Engine for words in previous or this wear team's websites. This is a python search engine with GUI for searching words in each competition year and team's website.
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/iGem_Search_Engine/search.png" alt="" width="400"/></p>
 
