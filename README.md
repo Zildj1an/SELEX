@@ -61,7 +61,8 @@ Any team could reproduce this potentiostat sending the gerber and the NC Drill f
 Regarding to the case, we designed it with a 3D modelling software, and we cut the flat faces in methacrylate with a laser cutter machine and otherwise we printed it with a 3D printer.
 
 The PCB was made with the Altium Designer software. Altium can export PCB and schematic files as ACCEL-ASCII files. With these files you can import them to Eagle.
-<img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/potencio.png" alt="" width="350" height = "320"/> 
+
+<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/potencio.png" alt="" width="350" height = "320"/></p>
 
 ## Fluorimeter
 To assemble the fluorimeter, you should send to manufacture the PCB, for instance we sent it to JLPCB (https://jlcpcb.com/) and buy the components listed on the Bill of Materials file. After that, you should solder those materials on the PCB. You can also request them to solder the components, if they have them.
@@ -90,7 +91,8 @@ In relation to the case, we redesigned the NinjaPCR case with a 3D modelling sof
 We redesigned it because we used another fan.
 
 
-<img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/termaux.png" alt="" width="350" height = "320"/>
+<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/termaux.png" alt="" width="350" height = "320"/></p>
+
 
 ## Shaker Module
 To assemble the Shaker Module, you should send to manufacture the PCB, in our instance we sent it to JLPCB (https://jlcpcb.com/) and buy the components listed on the Bill of Materials file. After that, you should solder those materials on the PCB. You can also request them to solder the components, if they have them.
