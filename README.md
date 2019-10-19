@@ -85,8 +85,8 @@ In the folder GAN_Network, from terminal:
 $ python Main.py
 ```
 Other files that could be used:
-- 3D_structure_creation_in_pdb.py Creates only one PDB for the DDBB (testing puposes)
-- GAN_Network.py (Same thing as GAN_Network folder but in one file)
+> 3D_structure_creation_in_pdb.py Creates only one PDB for the DDBB (testing puposes)
+> GAN_Network.py (Same thing as GAN_Network folder but in one file)
 
 3. OT_Robot protocols
 
