@@ -79,6 +79,8 @@ The PCB was made with the Eagle software. To generate the necessary files, you c
 
 In relation to the case, we designed it with a 3D modelling software, and we cut the faces with a laser cutter and the part where the resistances are located, was printed with an aluminium printer. Also, the part where the stamps are placed can be printed with a 3D printer.
 
+<img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/custom_print.png" alt="" width="350"/></p>
+
 ## PCR, Thermal Modules
 To assemble the NinjaPCR, you can make it yourself following the instructions written on their webpage or buy it (https://ninjapcr.tori.st/en/index.html).
 
@@ -102,7 +104,7 @@ We also designed some PCBs from ourselves to make things easier and make them fi
 The 3D-designs will be made available for public use at https://cad.onshape.com/documents?nodeId=a2079861d9f4b3ba70dc3807&resourceType=folder
 
 <img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/potencio.png" alt="" width="350" height = "320"/> <img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/termaux.png" alt="" width="350" height = "320"/>
-<p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/custom_print.png" alt="" width="350"/></p>
+<p align="center">
 
 ## [5] Installation and Usage ❓
 
