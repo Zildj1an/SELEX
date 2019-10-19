@@ -193,6 +193,7 @@ The key's randomart image is:
 * [Pablo Villalobos](https://github.com/pablo-vs)
 * [Carlos Bilbao](https://github.com/Zildj1an)
 * [Ana Matesanz](https://github.com/anamatesanz)
+* [Irene Guardiola](https://github.com/Irene-G)
 
 ## License
 This project's source code is licensed under the GNU-GPL License - see the <a href="https://github.com/Zildj1an/SELEX/blob/master/LICENSE">LICENSE.md</a> file for details. The other parts of the project have the Creative Commons license, as stated in the competition guidelines.
