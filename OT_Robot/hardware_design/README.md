@@ -15,20 +15,19 @@ Regarding to the case, we designed it with a 3D modelling software, and we cut t
 The PCB was made with the Altium Designer software. Altium can export PCB and schematic files as ACCEL-ASCII files. With these files you can import them to Eagle.
 
 
-##Fluorimeter
+## Fluorimeter
+To assemble the fluorimeter, you should send to manufacture the PCB, for instance we sent it to JLPCB (https://jlcpcb.com/) and buy the components listed on the Bill of Materials file. After that, you should solder those materials on the PCB. You can also request them to solder the components, if they have them.
 
-
-The PCB of the flourimeter is assembled in the same way as the potentiostat.
-
-The PCB was made with the Altium Designer software. As said before, Altium can export PCB and schematic files as ACCEL-ASCII files. With these files you can import them to Eagle. 
+Any team could reproduce this fluorimeter sending the gerber and the NC Drill files to the manufacturer. The PCB was made with the Altium Designer software. Altium can export PCB and schematic files as ACCEL-ASCII files. With these files you can import them to Eagle.
 
 In relation to the case, we designed it with a 3D modelling software, and we cut the faces in methacrylate with a laser cutter machine.
 
+## Wax Module
 
-##Wax Module
+To assemble the Wax Module, you should send to manufacture the PCB, in our instance we sent it to JLPCB (https://jlcpcb.com/) and buy the components listed on the Bill of Materials file. After that, you should solder those materials on the PCB. You can also request them to solder the components, if they have them.
 
+Any team could reproduce this module sending the gerber and the NC Drill files to the manufacturer.
 
-The PCB of the Wax Module is assembled in the same way as the potentiostat. In this case, most of the components were soldered by the manufacturer.
 
 The PCB was made with the Eagle software. To generate the necessary files, you can follow the JLPCB guide (https://support.jlcpcb.com/article/43-how-to-export-eagle-pcb-to-gerber-files).
 
@@ -56,3 +55,4 @@ The PCB of the Shaker Module is assembled in the same way as the potentiostat. L
 The PCB was made with the Eagle software. To generate the necessary files, you can follow the JLPCB guide (https://support.jlcpcb.com/article/43-how-to-export-eagle-pcb-to-gerber-files).
 
 In relation to the case, we designed it with a 3D modelling software, and we printed the module with a 3D printer.
+
