@@ -1,0 +1,16 @@
+"Part";"Value";"Device";"Package";"Description";"MF";"MPN";"OC_FARNELL";"OC_NEWARK";"PROD_ID";"SPICEMODEL";"SPICEPREFIX";"VALUE";
+"C1";"10uF";"CC1206";"C1206";"CAPACITOR, European symbol";"";"";"";"";"";"NONE";"C";"";
+"FT232";"";"MA06-1";"MA06-1";"PIN HEADER";"";"";"unknown";"unknown";"";"";"";"";
+"IC1";"LM1117MP-3.3";"LM1117MP-3.3";"SOT223";"800mA Low-Dropout Linear Regulator";"Texas Instruments";"LM1117MP-3.3";"9778195";"28X3416";"";"";"";"";
+"Q2";"310mA/60V/1.6Ω";"MOSFET-NCH-2N7002PW";"SOT323";"N-channel MOSFETs";"";"";"";"";"TRANS-11151";"";"";"310mA/60V/1.6Ω";
+"R1";"10k";"10KOHM-0603-1/10W-1%";"0603";"10kΩ resistor";"";"";"";"";"RES-00824";"";"";"10k";
+"R2";"10k";"10KOHM-0603-1/10W-1%";"0603";"10kΩ resistor";"";"";"";"";"RES-00824";"";"";"10k";
+"R3";"10k";"10KOHM-0603-1/10W-1%";"0603";"10kΩ resistor";"";"";"";"";"RES-00824";"";"";"10k";
+"R4";"10k";"10KOHM-0603-1/10W-1%";"0603";"10kΩ resistor";"";"";"";"";"RES-00824";"";"";"10k";
+"R5";"10k";"RR1206";"R1206";"RESISTOR, European symbol";"";"";"";"";"";"NONE";"R";"";
+"S1";"";"10-XX";"B3F-10XX";"OMRON SWITCH";"";"B3F-1000";"176432";"36M3542";"";"";"";"";
+"S2";"";"10-XX";"B3F-10XX";"OMRON SWITCH";"";"B3F-1000";"176432";"36M3542";"";"";"";"";
+"SENSOR";"332-02";"332-02";"332-02";"2 Pin - 2mm Dual Row";"";"";"";"";"";"";"";"";
+"SJR1";"";"ESP8266-12EESP12E";"ESP8266-ESP12E";"ESP8266-12E Library for Eagle CAD";"";"";"";"";"";"";"";"";
+"X1";"";"AK500/2";"AK500/2";"CONNECTOR";"";"";"unknown";"unknown";"";"";"";"";
+"X2";"";"AK500/2";"AK500/2";"CONNECTOR";"";"";"unknown";"unknown";"";"";"";"";
