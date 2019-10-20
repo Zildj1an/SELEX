@@ -1,0 +1,100 @@
+Export log for : Flurorimetro_PCB.Rep
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+      Warning: Unknown Kind 11
+AddingPadStyle (Default)
+AddingPadStyle P:EX60Y60D301
+AddingPadStyle P:EX118Y118D1181
+AddingPadStyle EF37X33TOP1
+AddingPadStyle P:EX59Y59D391
+AddingPadStyle EF35X28TOP1
+AddingPadStyle EF14X83TOP1
+AddingPadStyle P:SX55Y55D351
+AddingPadStyle P:EX55Y55D351
+AddingPadStyle EF130X87TOP1
+AddingPadStyle EF39X87TOP1
+AddingPadStyle EF16X47TOP1
+AddingPadStyle EF43X67TOP1
+AddingPadStyle EF79X47TOP1
+AddingPadStyle EF20X20TOP1
+AddingPadStyle EF18X20TOP1
+AddingPadStyle EF16X20TOP1
+AddingPadStyle EF18X50TOP1
+AddingPadStyle P:EX31Y31D311
+AddingPadStyle P:EX45Y71D221
+AddingPadStyle P:EX57Y79D331
+AddingPadStyle EF71X39TOP1
+AddingPadStyle EF69X59TOP1
+AddingPadStyle EF31X55TOP1
+AddingPadStyle P:EX56Y56D361
+AddingPadStyle EF57X51TOP1
+Adding ViaStyle (Default)
+Adding ViaStyle V:EX24Y24D121
+Adding TextStyle (Default)
+Adding TextStyle T:H60W10
+Adding TextStyle T:H35W7
+Adding TextStyle T:H20W8
+Adding TextStyle T:H47W8
+Adding TextStyle T:H40W7
+Adding TextStyle T:H16W2
+Adding PatternDef CAP0603_1
+Adding PatternDef PTS645SH432LFS_1
+Adding PatternDef RES0603_1
+Adding PatternDef FT232RL_1
+Adding PatternDef TSL257-LF_1
+Adding PatternDef ZLDO1117G33TA_1
+Adding PatternDef SN74HC4066PWR_1
+Adding PatternDef ESP8266-12E/ESP-12E_1
+Adding PatternDef 2SC5646A-TL-H_1
+Adding PatternDef DIOD-SOT523-3_V_1
+Adding PatternDef 629105150521_1
+Adding PatternDef 1206L075THYR_1
+Adding PatternDef LTW-150TK_1
+Adding PatternDef DIOC200X125X110_LTST-C171KRKT_1
+Adding PatternDef LED_1
+Adding PatternDef APT2012VBC/D_1
+Adding PatternDef LTST-C171GKT_1
+Adding PatternDef DIOC200X125X110_LTST-C171KSKT(PRIMARY) - DUPLICATE - DUPLICATE_1
+Adding PatternDef CAP0805_1
+Adding CompDef CAP0603_1
+Adding CompDef PTS645SH432LFS_1
+Adding CompDef RES0603_1
+Adding CompDef FT232RL_1
+Adding CompDef TSL257-LF_1
+Adding CompDef ZLDO1117G33TA_1
+Adding CompDef SN74HC4066PWR_1
+Adding CompDef ESP8266-12E/ESP-12E_1
+Adding CompDef 2SC5646A-TL-H_1
+Adding CompDef DIOD-SOT523-3_V_1
+Adding CompDef 629105150521_1
+Adding CompDef 1206L075THYR_1
+Adding CompDef LTW-150TK_1
+Adding CompDef DIOC200X125X110_LTST-C171KRKT_1
+Adding CompDef LED_1
+Adding CompDef APT2012VBC/D_1
+Adding CompDef LTST-C171GKT_1
+Adding CompDef DIOC200X125X110_LTST-C171KSKT(PRIMARY) - DUPLICATE - DUPLICATE_1
+Adding CompDef CAP0805_1
+      Warning: Arcs In Polygon have been converted to Line Segments
+      Warning: Polygon has been imported as unpoured.  It will need to be repoured in PCAD
+      Warning: Unexpected Poly Region Object Found On Layer TopOverlay.
+      Warning: Unexpected Poly Region Object Found On Layer TopOverlay.
+      Warning: Unexpected Poly Region Object Found On Layer TopOverlay.
+      Warning: Unexpected Poly Region Object Found On Layer TopOverlay.
+      Warning: Unexpected Poly Region Object Found On Layer TopOverlay.
+      Warning: Unexpected Poly Region Object Found On Layer TopOverlay.
+ 
+EndLog
