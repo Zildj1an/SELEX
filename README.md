@@ -35,8 +35,6 @@ We also did an **Artificial Intelligence algorithm** to predict the optimal DNA 
 
 <p align="center"><img src="https://github.com/igemsoftware2019/MADRID_UCM/blob/master/OT_Robot/img/gif03.gif" alt="" width="400"/></p>
 
-_Generated aptamer_
-
 ## [3] iGem Search Engine 🔍 
 
 In addition, you can use our Search Engine for words in previous or this year's team's websites. This is a python search engine with GUI for searching words in each competition year and team's website.
