@@ -35,7 +35,7 @@ In relation to the case, we designed it with a 3D modelling software, and we cut
 The first design was made with PLA, however it got too hot and we melted it, thus the next design was made in aluminium, additionally it is a better conductor of heat. 
 
 
-##PCR, Thermal Modules
+## PCR, Thermal Modules
 
 
 To assemble the NinjaPCR, you can make it yourself following the instructions written on their webpage or buy it (https://ninjapcr.tori.st/en/index.html). 
@@ -48,7 +48,7 @@ In relation to the case, we redesigned the NinjaPCR case with a 3D modelling sof
 At the beginnig we bougth the ARCTIC Freezer 11 LP fan, but it did not dissipate enough heat and the peltier cell started getting hot, therefore we changed it to SilverStone SST-AR06. With this one was enough, but at some point it broke down and we finally changed it to ARCTIC F12 - 120 mm.
 
 
-##Shaker Module
+## Shaker Module
 
 The PCB of the Shaker Module is assembled in the same way as the potentiostat. Like the Wax Module, most of the components were soldered by the manufacturer.
 
