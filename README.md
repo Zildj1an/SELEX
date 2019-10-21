@@ -100,7 +100,7 @@ In relation to the case, we designed it with a 3D modelling software, and we pri
 
 We also designed some PCBs from ourselves to make things easier and make them fit in the robot. We used a 3D-printer for some of our designs to store Eppendorf and Falcon tipracks. We also deisgned a PCB for a potenciostat microcontroller Teensy 3.0 and an auxiliar thermic module to cool to 4 degrees Celsius, and so on.
 
-The 3D-designs will be made available for public use at https://cad.onshape.com/documents?nodeId=a2079861d9f4b3ba70dc3807&resourceType=folder
+The 3D-designs will are available at the folder OT_Robot/hardware_design
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/custom_print.png" alt="" width="350"/></p>
 
