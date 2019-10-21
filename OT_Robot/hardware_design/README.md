@@ -1,8 +1,8 @@
 
-#Hardware Design
+# Hardware Design
 
 
-##Potentiostat
+## Potentiostat
 
 
 To assemble the potentiostat, first you should send to manufacture the PCB, in our case we sent it to JLPCB (https://jlcpcb.com/), and buy the components listed on the Bill of Materials file. After that, you should solder those materials on the PCB. You can also request them to solder the components, if they have them.
