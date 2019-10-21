@@ -19,7 +19,7 @@ You can find information on installation and usage at the end [5]
 
 ## [1] Biotechnological Designs 🔬
 
-Folder OT_Robot contains biotechnological protocols for obtaining trained libraries of DNA aptamer molecules automated with the Opentrons OT-2 robot. This protocol is part of our contribution to the 2019 iGEM international biotechnology competition. For the thermocycler we built the Ninja-PCR. More information about the entire project can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
+Folder OT_Robot contains biotechnological protocols for obtaining trained libraries of DNA aptamer molecules automated with the Opentrons OT-2 robot. This protocol is part of our contribution to the 2019 iGEM international biotechnology competition. For the thermocycler we built the Ninja-PCR (original from [hisashin](https://github.com/hisashin/NinjaPCR/)). More information about the entire project can be found in our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
 The small-sized thermal cycler is controlled via motherboard Ninja-PCR Arduino-alike, as shown above, manually welded, whose code is in NinjaPCR [folder](https://github.com/Zildj1an/SELEX/tree/master/NinjaPCR). You can update a new binary since ESP8266 SystemOnChip includes the TCP/IP stack. We also recommend the usage of an external Raspberry Pi to uninterruptedly provide the robot with Wi-Fi. You can find more information about usage at [5].
 
