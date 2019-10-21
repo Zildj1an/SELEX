@@ -43,9 +43,7 @@ In addition, you can use our Search Engine for words in previous or this year's 
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/iGem_Search_Engine/search.png" alt="" width="400"/></p>
 
-## [4] Other suggested custom hardware 🔋 
-
-# Hardware Design
+# [4] Hardware Design 🔋 
 
 ## Potentiostat
 
