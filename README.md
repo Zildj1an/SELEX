@@ -12,7 +12,8 @@ This was a long project that involved:
       All the custom hardware design can be found at OT_Robot/harware_design.
  * [2] The usage of Artifical Intelligence.
  * [3] A search engine.
- * [4] And many, many custom hardware.
+ * [4] A tool to migrate WordPress websites to the iGem servers.
+ * [5] And many, many custom hardware.
 
 You can find information on installation and usage at the end [5] and our <a href = "https://2019.igem.org/Team:MADRID_UCM/Landing">website</a>.
 
@@ -40,7 +41,19 @@ In addition, you can use our Search Engine for words in previous or this year's 
 
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/iGem_Search_Engine/search.png" alt="" width="400"/></p>
 
-# [4] Hardware Design 🔋 
+# [4] A tool to migrate WordPress websites to the iGem servers.
+
+We also developed a tool to make life easier to web page developers at the iGem competition. You can use WordPress templates to develop your site and then migrate it easily with this multi-threaded script located at Tool_Migrate folder.
+
+To run the script you can do:
+
+```
+$ bash treatment.sh [url_1] -nm - - [url_2]
+```
+
+Some additional options are available, feel free to navigate throw our code!
+
+# [5] Hardware Design 🔋 
 
 ## Potentiostat
 
@@ -100,7 +113,7 @@ The 3D-designs will are available at the folder OT_Robot/hardware_design
 <p align="center"><img src="https://github.com/Zildj1an/SELEX/blob/master/OT_Robot/img/custom_print.png" alt="" width="350"/></p>
 
 
-## [5] Installation and Usage ❓
+## [6] Installation and Usage ❓
 
 Our project has a lot of software involved, including:
 
